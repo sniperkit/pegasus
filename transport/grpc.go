@@ -1,10 +1,10 @@
 package transport
 
 import (
-	"fmt"
 	"bitbucket.org/code_horse/pegasus/helpers"
 	"bitbucket.org/code_horse/pegasus/transport/grpc_transport"
 	pb "bitbucket.org/code_horse/pegasus/transport/grpc_transport/proto"
+	"fmt"
 	"google.golang.org/grpc"
 )
 

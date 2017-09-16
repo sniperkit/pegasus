@@ -8,9 +8,8 @@ import (
 // receive and send messages to third providers. Some of those transportation methods
 // could be the http, grpc or even kafka and rabbitMQ.
 type ITransporter interface {
-	Send(properties *network.Properties, options *network.Options, payload []byte) (*network.Payload, error)
 
-	BuildStream(properties *network.Properties) (network.IStream, error)
+	Send(properties *network.Properties, options *network.Options, payload []byte) (*network.Payload, error)
 
 	Listen(properties *network.Properties, handler network.Handler, middleware network.Middleware)
 }

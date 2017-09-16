@@ -17,6 +17,7 @@ func (t *Transport) Send(properties *network.Properties, options *network.Option
 	consumer := NewComponent(mqProperties, t.Connection)
 	ch, err := consumer.Connection.Channel()
 	defer ch.Close()
+
 	RabbitError(err, "Cannot connect")
 
 	consumer.Channel = ch
@@ -24,10 +25,6 @@ func (t *Transport) Send(properties *network.Properties, options *network.Option
 	consumer.Publish(mqOptions, body)
 
 	return nil, nil
-}
-
-func (t *Transport) BuildStream(properties *network.Properties) (network.IStream, error) {
-	panic("implement me")
 }
 
 func (t *Transport) Listen(properties *network.Properties, handler network.Handler, middleware network.Middleware) {

@@ -1,14 +1,13 @@
 package dummies_http
 
 import (
-	"fmt"
+	"bitbucket.org/code_horse/pegasus/dummies"
+	"bitbucket.org/code_horse/pegasus/helpers"
+	"bitbucket.org/code_horse/pegasus/network"
 	"bitbucket.org/code_horse/pegasus/transport"
 	"bitbucket.org/code_horse/pegasus/transport/http_transport"
-	"bitbucket.org/code_horse/pegasus/network"
+	"fmt"
 	"github.com/gorilla/mux"
-	"net/http"
-	"bitbucket.org/code_horse/pegasus/helpers"
-	"bitbucket.org/code_horse/pegasus/dummies"
 )
 
 var HttpTransporter transport.ITransporter
@@ -39,45 +38,15 @@ func handlerSample(channel *network.Channel) {
 }
 
 func Init() {
-	// Create an HTTP router
 	Router = mux.NewRouter()
 
-	// Create a new HTTP transporter for our new router
 	HttpTransporter = transport.NewHttpTransporter(Router)
 
 	properties := http_transport.NewProperties().
 		SetPath("/pegasus/sample/11").
 		SetGetMethod()
 
-	// Listen to the http router using HTTP transporter Listen Method
 	HttpTransporter.Listen(properties.GetProperties(), handlerSample, middleware)
 
-}
-
-func StartServer() {
-	err := http.ListenAndServe("0.0.0.0:8900", Router)
-
-	if err != nil {
-		panic(err)
-	}
-}
-
-func ClientCall() {
-
-	options := http_transport.NewOptions().SetHeader("foo", "bar")
-
-	properties := http_transport.NewProperties().
-		SetPath("http://localhost:8900/pegasus/sample/11?pa=11").
-		SetGetMethod()
-
-	payload, err := HttpTransporter.Send(properties.GetProperties(), options.GetOptions(), nil)
-
-	if err != nil {
-		panic(err)
-	}
-
-	bodyContent := payload.Body
-	responseOptions := http_transport.NewOptions().BuildFromBytes(payload.Options)
-
-	fmt.Println("http payload", string(bodyContent), responseOptions)
+	transport.StartHTTP("0.0.0.0:8900", Router)
 }

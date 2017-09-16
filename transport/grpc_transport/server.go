@@ -1,8 +1,8 @@
 package grpc_transport
 
 import (
-	pb "bitbucket.org/code_horse/pegasus/transport/grpc_transport/proto"
 	"bitbucket.org/code_horse/pegasus/network"
+	pb "bitbucket.org/code_horse/pegasus/transport/grpc_transport/proto"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -23,8 +23,10 @@ func (s *Server) Start(link string) {
 	server := grpc.NewServer()
 
 	pb.RegisterServeServer(server, &Server{Router: s.Router})
+
 	// Register reflection service on gRPC server.
 	reflection.Register(server)
+
 	if err := server.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}

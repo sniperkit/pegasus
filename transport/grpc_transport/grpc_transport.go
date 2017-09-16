@@ -1,9 +1,9 @@
 package grpc_transport
 
 import (
-	"errors"
-	pb "bitbucket.org/code_horse/pegasus/transport/grpc_transport/proto"
 	"bitbucket.org/code_horse/pegasus/network"
+	pb "bitbucket.org/code_horse/pegasus/transport/grpc_transport/proto"
+	"errors"
 	"golang.org/x/net/context"
 )
 
@@ -38,30 +38,6 @@ func (*Transporter) Send(properties *network.Properties, options *network.Option
 	pl := &network.Payload{Body: syncResponse.Content, Options: syncResponse.Options}
 
 	return pl, nil
-}
-
-func (*Transporter) BuildStream(properties *network.Properties) (network.IStream, error) {
-
-	grpcProperties := NewProperties().BuildProperties(properties)
-
-	stream := &Stream{Path: grpcProperties.GetPath()}
-
-	connection := grpcProperties.GetConnection()
-
-	if connection == nil {
-		return nil, errors.New("Connection not found. Set the network." +
-			"Options.Private.GrpcConnection field.")
-	}
-
-	grpcStream, err := connection.Handler(context.Background())
-
-	if err != nil {
-		return nil, err
-	}
-
-	stream.Channel = grpcStream
-
-	return stream, nil
 }
 
 func (t *Transporter) Listen(properties *network.Properties, handler network.Handler, middleware network.Middleware) {

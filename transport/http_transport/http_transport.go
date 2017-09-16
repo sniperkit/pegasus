@@ -1,9 +1,9 @@
 package http_transport
 
 import (
+	"bitbucket.org/code_horse/pegasus/network"
 	"bytes"
 	"errors"
-	"bitbucket.org/code_horse/pegasus/network"
 	"github.com/gorilla/mux"
 	"io/ioutil"
 	"net/http"
@@ -18,10 +18,6 @@ type Transporter struct {
 
 	// The mux router
 	Router *mux.Router
-}
-
-func (*Transporter) BuildStream(properties *network.Properties) (network.IStream, error) {
-	panic("HTTP does not support streams")
 }
 
 func (t *Transporter) Send(properties *network.Properties, options *network.Options, payload []byte) (*network.Payload, error) {
