@@ -1,8 +1,8 @@
-package grpc_transport
+package trangrpc
 
 import (
 	"bitbucket.org/code_horse/pegasus/network"
-	pb "bitbucket.org/code_horse/pegasus/transport/grpc_transport/proto"
+	"google.golang.org/grpc"
 )
 
 type Properties struct {
@@ -46,14 +46,14 @@ func (p *Properties) GetPath() string {
 	return p.Path
 }
 
-func (p *Properties) SetConnection(connection pb.ServeClient) *Properties {
+func (p *Properties) SetConnection(connection *grpc.ClientConn) *Properties {
 	p.initMapperObjects("GRPC-CONNECTION")
 	p.Objects["GRPC-CONNECTION"]["VALUE"] = connection
 	return p
 }
 
-func (p *Properties) GetConnection() pb.ServeClient{
-	if c, ok := p.Objects["GRPC-CONNECTION"]["VALUE"].(pb.ServeClient); ok {
+func (p *Properties) GetConnection() *grpc.ClientConn {
+	if c, ok := p.Objects["GRPC-CONNECTION"]["VALUE"].(*grpc.ClientConn); ok {
 		return c
 	}
 	return nil

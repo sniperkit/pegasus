@@ -17,8 +17,7 @@ var _ = Describe("Options", func() {
 			It("Should returns a new object with valid properties", func() {
 				options := network.NewOptions()
 				options.Path = "foo"
-				options.CreateNewField("foo")
-				options.Fields["foo"]["bar"] = "baz"
+				options.SetField("foo", "bar", "baz")
 
 				Expect(options).To(PointTo(MatchAllFields(
 					Fields{
@@ -38,13 +37,6 @@ var _ = Describe("Options", func() {
 				Expect(func() { options.Fields["foo"]["bar"] = "4" }).To(Panic())
 			})
 
-			It("Should not panic if field mapper is stetted via CreateNewField", func() {
-				options := network.NewOptions()
-				options.Path = "foo"
-				options.CreateNewField("foo")
-				Expect(func() { options.Fields["foo"]["bar"] = "4" }).ToNot(Panic())
-			})
-
 		})
 
 		Context("Check Marshal and Unmarshal methods", func() {
@@ -52,8 +44,7 @@ var _ = Describe("Options", func() {
 			It("Should Marshal/unmarshal the struct properly", func() {
 				options := network.NewOptions()
 				options.Path = "a/cool/path"
-				options.CreateNewField("foo")
-				options.Fields["foo"]["baz"] = "bar"
+				options.SetField("foo", "bar", "baz")
 
 				marshaledData := options.Marshal()
 
@@ -65,6 +56,33 @@ var _ = Describe("Options", func() {
 						"Fields": Equal(options.Fields),
 					},
 				)))
+			})
+
+		})
+
+		Context("Check Marshal and Unmarshal methods with nil params", func() {
+
+			It("Should unmarshal the struct properly", func() {
+				network.NewOptions().Unmarshal(nil)
+				Expect(func() { network.NewOptions().Unmarshal(nil) }).ToNot(Panic())
+			})
+
+			It("Should marshal the struct properly", func() {
+				Expect(func() { network.NewOptions().Marshal() }).ToNot(Panic())
+			})
+
+		})
+
+		Context("Set/Get Field", func() {
+
+			It("Should returns always the field value", func() {
+				Expect(network.NewOptions().GetField("foo", "faa")).To(Equal(""))
+			})
+
+			It("Should set always the field value", func() {
+				options := network.NewOptions()
+				options.SetField("foo", "faa", "Ga")
+				Expect(options.GetField("foo", "faa")).To(Equal("Ga"))
 			})
 
 		})

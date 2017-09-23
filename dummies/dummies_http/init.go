@@ -5,7 +5,7 @@ import (
 	"bitbucket.org/code_horse/pegasus/helpers"
 	"bitbucket.org/code_horse/pegasus/network"
 	"bitbucket.org/code_horse/pegasus/transport"
-	"bitbucket.org/code_horse/pegasus/transport/http_transport"
+	"bitbucket.org/code_horse/pegasus/transport/tranhttp"
 	"fmt"
 	"github.com/gorilla/mux"
 )
@@ -22,7 +22,7 @@ func handlerSample(channel *network.Channel) {
 
 	params := channel.Receive()
 
-	httpOptions := http_transport.NewOptions().BuildFromBytes(params.Options)
+	httpOptions := tranhttp.NewOptions().BuildFromBytes(params.Options)
 
 	data := network.Payload{
 		Body:    []byte("hello world. Got: " + string(params.Body) + " Header foo->" + httpOptions.GetHeaders()["Foo"] + " END."),
@@ -30,7 +30,7 @@ func handlerSample(channel *network.Channel) {
 	}
 
 	output := "pegasus, HTTP Handler receive from /pegasus/sample/11 the data " + string(params.Body) +
-		" docker container: " + helpers.GetContainerId()
+		" docker container: " + helpers.GetContainerID()
 	fmt.Println(output)
 	dummies.SendLogs(output)
 
@@ -42,7 +42,7 @@ func Init() {
 
 	HttpTransporter = transport.NewHttpTransporter(Router)
 
-	properties := http_transport.NewProperties().
+	properties := tranhttp.NewProperties().
 		SetPath("/pegasus/sample/11").
 		SetGetMethod()
 

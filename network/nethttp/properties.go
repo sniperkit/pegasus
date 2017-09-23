@@ -1,4 +1,4 @@
-package http_transport
+package tranhttp
 
 import "bitbucket.org/code_horse/pegasus/network"
 

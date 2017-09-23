@@ -1,4 +1,4 @@
-package grpc_transport
+package trangrpc
 
 import "bitbucket.org/code_horse/pegasus/network"
 

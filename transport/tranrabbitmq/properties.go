@@ -1,4 +1,4 @@
-package rabbitmq_transport
+package tranrabbitmq
 
 import (
 	"bitbucket.org/code_horse/pegasus/network"

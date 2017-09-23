@@ -2,7 +2,7 @@ package dummies
 
 import (
 	"bitbucket.org/code_horse/pegasus/transport"
-	"bitbucket.org/code_horse/pegasus/transport/http_transport"
+	"bitbucket.org/code_horse/pegasus/transport/tranhttp"
 	"net/url"
 )
 
@@ -14,11 +14,11 @@ func SendLogs(content string) {
 	params.Add("content", content)
 
 	_, err := httpTransporter.Send(
-		http_transport.NewProperties().
+		tranhttp.NewProperties().
 			SetPath("http://http_log_service:8800/log?content="+params.Encode()).
 			SetGetMethod().
 			GetProperties(),
-		http_transport.NewOptions().
+		tranhttp.NewOptions().
 			GetOptions(),
 		nil,
 	)

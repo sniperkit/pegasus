@@ -5,7 +5,7 @@ import (
 	"bitbucket.org/code_horse/pegasus/helpers"
 	"bitbucket.org/code_horse/pegasus/network"
 	"bitbucket.org/code_horse/pegasus/transport"
-	"bitbucket.org/code_horse/pegasus/transport/grpc_transport"
+	"bitbucket.org/code_horse/pegasus/transport/trangrpc"
 	"fmt"
 )
 
@@ -30,7 +30,7 @@ func handlerSample1(channel *network.Channel) {
 	}
 
 	output := "pegasus, GRPC Handler receive from /pegasus/sample/1 the data " + string(params.Body) +
-		" docker container: " + helpers.GetContainerId()
+		" docker container: " + helpers.GetContainerID()
 	fmt.Println(output)
 	dummies.SendLogs(output)
 
@@ -40,9 +40,10 @@ func handlerSample1(channel *network.Channel) {
 func Init() {
 	grpcTransport, grpcRouter = transport.NewGrpcTransporter()
 
-	properties := grpc_transport.NewProperties().SetPath("/pegasus/sample/1").GetProperties()
+	properties := trangrpc.NewProperties().SetPath("/pegasus/sample/1").GetProperties()
 
 	grpcTransport.Listen(properties, handlerSample1, middleware)
 
 	transport.StartGrpcServer(grpcRouter, "0.0.0.0:50051")
+
 }

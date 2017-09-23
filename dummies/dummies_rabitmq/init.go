@@ -17,10 +17,10 @@ func middleware(handler network.Handler, chanel *network.Channel) {
 
 func testHandler(channel *network.Channel) {
 	payload := channel.Receive()
-	options := rabbitmq_transport.BuildOptionsByBytes(payload.Options)
+	options := tranrabbitmq.BuildOptionsByBytes(payload.Options)
 
 	output := "pegasus, RabitMQ Handler receive from /pegasus/sample/1 the data " + string(payload.Body) +
-		" docker container: " + helpers.GetContainerId()
+		" docker container: " + helpers.GetContainerID()
 	fmt.Println(output, options)
 	dummies.SendLogs(output)
 }
@@ -28,9 +28,9 @@ func testHandler(channel *network.Channel) {
 func Init() {
 	RabbitMQ = transport.ConnectToRabbitMQServer("amqp://guest:guest@haproxy:5672/")
 
-	var properties *rabbitmq_transport.Properties
+	var properties *tranrabbitmq.Properties
 
-	properties = rabbitmq_transport.NewListenProperties().SetPath("/pegasus/sample/1").
+	properties = tranrabbitmq.NewListenProperties().SetPath("/pegasus/sample/1").
 		SetKey("/pegasus/sample/1")
 	RabbitMQ.Listen(properties.GetProperties(), testHandler, middleware)
 }

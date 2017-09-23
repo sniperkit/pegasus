@@ -1,9 +1,9 @@
-package http_transport
+package tranhttp
 
 import (
-	"bitbucket.org/code_horse/pegasus/network"
 	"bytes"
 	"errors"
+	"bitbucket.org/code_horse/pegasus/network"
 	"github.com/gorilla/mux"
 	"io/ioutil"
 	"net/http"

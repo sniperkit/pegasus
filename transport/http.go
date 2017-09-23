@@ -1,9 +1,9 @@
 package transport
 
 import (
-	"bitbucket.org/code_horse/pegasus/transport/http_transport"
 	"github.com/gorilla/mux"
 	"net/http"
+	"bitbucket.org/code_horse/pegasus/transport/tranhttp"
 )
 
 func NewHttpTransporter(router *mux.Router) ITransporter {
@@ -12,7 +12,7 @@ func NewHttpTransporter(router *mux.Router) ITransporter {
 		router = mux.NewRouter()
 	}
 
-	return &http_transport.Transporter{
+	return &tranhttp.Transporter{
 		Router: router,
 	}
 }

@@ -31,6 +31,9 @@ func (c *Options) Marshal() []byte {
 
 // Unmarshal convert an Option object from bytes to an actually object.
 func (c *Options) Unmarshal(data []byte) *Options {
+	if data == nil {
+		return NewOptions()
+	}
 	err := json.Unmarshal(data, c)
 	if err != nil {
 		panic(err)
@@ -38,9 +41,26 @@ func (c *Options) Unmarshal(data []byte) *Options {
 	return c
 }
 
-// CreateNewField creates a new property for current Field if not already exists
-func (c *Options) CreateNewField(key string) {
-	if c.Fields[key] == nil {
-		c.Fields[key] = make(map[string]string)
+// SetField create a Fields map[string]map[string]string. We need this method in order to initialize the map each
+// time when a new group (the first map is known as group) is created. The parameters are the group which is a key
+// for the first mapper, the key which for the previous group and the value.
+func (c *Options) SetField(group string, key string, value string) {
+	if c.Fields == nil {
+		c.Fields = make(map[string]map[string]string)
 	}
+	if c.Fields[group] == nil {
+		c.Fields[group] = make(map[string]string)
+	}
+	c.Fields[group][key] = value
+}
+
+// GetField return the value of a Field. The return value is a string.
+func (c *Options) GetField(group string, key string) string {
+	if c.Fields == nil {
+		return ""
+	}
+	if c.Fields[group] == nil {
+		return ""
+	}
+	return c.Fields[group][key]
 }

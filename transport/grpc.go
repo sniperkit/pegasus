@@ -2,27 +2,27 @@ package transport
 
 import (
 	"bitbucket.org/code_horse/pegasus/helpers"
-	"bitbucket.org/code_horse/pegasus/transport/grpc_transport"
-	pb "bitbucket.org/code_horse/pegasus/transport/grpc_transport/proto"
+	"bitbucket.org/code_horse/pegasus/transport/trangrpc"
+	pb "bitbucket.org/code_horse/pegasus/transport/trangrpc/proto"
 	"fmt"
 	"google.golang.org/grpc"
 )
 
-type GrpcRouter *grpc_transport.Router
+type GrpcRouter *trangrpc.Router
 
 type GrpcServeClient pb.ServeClient
 
-func NewGrpcTransporter() (ITransporter, *grpc_transport.Router) {
-	router := &grpc_transport.Router{
-		PathsWrapper: make(map[string]*grpc_transport.PathWrapper),
+func NewGrpcTransporter() (ITransporter, *trangrpc.Router) {
+	router := &trangrpc.Router{
+		PathsWrapper: make(map[string]*trangrpc.PathWrapper),
 	}
-	return &grpc_transport.Transporter{
+	return &trangrpc.Transporter{
 		Router: router,
 	}, router
 }
 
-func StartGrpcServer(router *grpc_transport.Router, address string) {
-	server := &grpc_transport.Server{Router: router}
+func StartGrpcServer(router *trangrpc.Router, address string) {
+	server := &trangrpc.Server{Router: router}
 	server.Start(address)
 }
 

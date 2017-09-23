@@ -1,4 +1,4 @@
-package rabbitmq_transport
+package tranrabbitmq
 
 import (
 	"log"

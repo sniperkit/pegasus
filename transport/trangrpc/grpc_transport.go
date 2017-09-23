@@ -1,8 +1,8 @@
-package grpc_transport
+package trangrpc
 
 import (
 	"bitbucket.org/code_horse/pegasus/network"
-	pb "bitbucket.org/code_horse/pegasus/transport/grpc_transport/proto"
+	pb "bitbucket.org/code_horse/pegasus/transport/trangrpc/proto"
 	"errors"
 	"golang.org/x/net/context"
 )
@@ -15,7 +15,7 @@ func (*Transporter) Send(properties *network.Properties, options *network.Option
 
 	grpcProperties := NewProperties().BuildProperties(properties)
 
-	connection := grpcProperties.GetConnection()
+	connection := pb.NewServeClient(grpcProperties.GetConnection())
 
 	grpcOptions := BuildOptions(options)
 
@@ -25,7 +25,7 @@ func (*Transporter) Send(properties *network.Properties, options *network.Option
 
 	syncResponse, err := connection.HandlerSync(context.Background(),
 		&pb.HandlerRequest{
-			Content: []byte("hello world sync"),
+			Content: payload,
 			Options: grpcOptions.Marshal(),
 			Path:    grpcProperties.GetPath(),
 		},

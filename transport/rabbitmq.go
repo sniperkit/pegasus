@@ -1,10 +1,10 @@
 package transport
 
 import (
-	"bitbucket.org/code_horse/pegasus/transport/rabbitmq_transport"
 	"github.com/streadway/amqp"
 	"bitbucket.org/code_horse/pegasus/helpers"
 	"fmt"
+	"bitbucket.org/code_horse/pegasus/transport/tranrabbitmq"
 )
 
 func ConnectToRabbitMQServer(path string) ITransporter{
@@ -21,6 +21,6 @@ func ConnectToRabbitMQServer(path string) ITransporter{
 		return false
 	})
 
-	rabbitmq_transport.RabbitError(err, "Cannot connect to RabbitMQ server")
-	return &rabbitmq_transport.Transport{Connection: conn}
+	tranrabbitmq.RabbitError(err, "Cannot connect to RabbitMQ server")
+	return &tranrabbitmq.Transport{Connection: conn}
 }
