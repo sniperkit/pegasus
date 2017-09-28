@@ -3,11 +3,10 @@ package netgrpc_test
 import (
 	"bitbucket.org/code_horse/pegasus/network/netgrpc"
 
-	"bitbucket.org/code_horse/pegasus/tests/mocks/mockgrpc"
+	"bitbucket.org/code_horse/pegasus/network"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"reflect"
-	"bitbucket.org/code_horse/pegasus/network"
 )
 
 var _ = Describe("Server", func() {
@@ -25,40 +24,12 @@ var _ = Describe("Server", func() {
 
 		})
 
-		Context("Serve struct function", func() {
+		Context("SetPath function", func() {
+			path := netgrpc.SetPath("path")
 
-			netgrpc.NewServer = mockgrpc.NewServer
-
-			server := netgrpc.NewServer(nil)
-
-			It("Should listen to Serve function", func() {
-				Expect(func() { server.Serve("x.x.x.x:PP") }).ToNot(Panic())
+			It("Should return the path as array", func() {
+				Expect(path).To(Equal([]string{"path"}))
 			})
-
-		})
-
-		Context("Listen struct function", func() {
-
-			netgrpc.NewServer = mockgrpc.NewServer
-
-			server := netgrpc.NewServer(nil)
-
-			It("Should have the listen function", func() {
-				Expect(func() { server.Listen("/grpc", handler, middleware) }).ToNot(Panic())
-			})
-
-		})
-
-		Context("ListenTo struct function", func() {
-
-			netgrpc.NewServer = mockgrpc.NewServer
-
-			server := netgrpc.NewServer(nil)
-
-			It("Should listen to Serve function", func() {
-				Expect(func() { server.ListenTo(&netgrpc.Properties{}, handler, middleware) }).ToNot(Panic())
-			})
-
 		})
 
 	})
@@ -69,6 +40,6 @@ func handler(channel *network.Channel) {
 
 }
 
-func middleware(handler network.Handler, chanel *network.Channel){
+func middleware(handler network.Handler, chanel *network.Channel) {
 
 }

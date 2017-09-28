@@ -11,24 +11,6 @@ import (
 	"net"
 )
 
-// IServer is an interface that describe the Server struct.
-type IServer interface {
-
-	// Serve function start the server for the configured router and giver path
-	Serve(path string)
-
-	// Listen function creates a handler for a specific endpoint. It gets the path string unique key, the handler
-	// which is a function and the middleware which also is a function.
-	Listen(path string, handler network.Handler, middleware network.Middleware)
-
-	// ListenTo function creates a handler for a specific endpoint. It gets the netgrpc Properties as parameters the
-	// handler which is a function and the middleware which also is a function.
-	ListenTo(properties *Properties, handler network.Handler, middleware network.Middleware)
-
-	// Stop function stops the server forever
-	Stop()
-}
-
 // Server is the manger of GRPC server. It's responsible to configure the server in order to run properly.
 type Server struct {
 
@@ -44,13 +26,18 @@ type Server struct {
 
 // NewServer is the construct of Server struct. Generates and return a new Serve object. The parameter Router defines
 // the route manager which is responsible to call the handlers.
-var NewServer = func(router *Router) IServer {
+var NewServer = func(router *Router) network.IServer {
 
 	if router == nil {
 		router = NewRouter()
 	}
 
 	return &Server{Router: router}
+}
+
+// SetPath get a path as parameter and return an array. It use for Server.Listen.
+func SetPath(path string) []string {
+	return []string{path}
 }
 
 // Serve function start a new GRPC server. It gets a string which is the address ("localhost:50099") and the GRPC router
@@ -62,19 +49,8 @@ func (s *Server) Serve(address string) {
 
 // Listen function creates a handler for a specific endpoint. It gets the path string unique key, the handler
 // which is a function and the middleware which also is a function.
-func (s *Server) Listen(path string, handler network.Handler, middleware network.Middleware) {
-	s.Router.Add(path, handler, middleware)
-}
-
-// ListenTo function creates a handler for a specific endpoint. It gets the netgrpc Properties as parameters the handler
-// which is a function and the middleware which also is a function.
-func (s *Server) ListenTo(properties *Properties, handler network.Handler, middleware network.Middleware) {
-	s.Router.Add(properties.GetPath(), handler, middleware)
-}
-
-// Stop function stops the server forever
-func (s *Server) Stop() {
-	s.server.Stop()
+func (s *Server) Listen(path []string, handler network.Handler, middleware network.Middleware) {
+	s.Router.Add(path[0], handler, middleware)
 }
 
 // HandlerSync is the method which send and receive the messages between the GRPC server. This is the brain of GRPC

@@ -17,15 +17,48 @@ type Client struct {
 }
 
 // NewClient connects to a GRPC server, set up the struct and return the new Client object
-func NewClient(address string) *Client {
+var NewClient = func(address string) network.IClient {
 	client := &Client{}
-	client.Connection = client.Connect(address)
+	client.Connection = client.connect(address)
 	return client
 }
 
-// Connect used to connect with another GRPC service. The first parameter is address and returns the connection
+// Send function sends a payload to a GRPC server. It gets the string path which is the unique id and the payload
+// object.
+func (c *Client) Send(path []string, payload network.Payload) (*network.Payload, error) {
+
+	connection := pb.NewServeClient(c.Connection)
+
+	if connection == nil {
+		// todo: [fix] [A002] Finish the Blunder package and throw an error
+		return nil, errors.New("CONNECTION NOT FOUND")
+	}
+
+	syncResponse, err := connection.HandlerSync(context.Background(),
+		&pb.HandlerRequest{
+			Content: payload.Body,
+			Options: payload.Options,
+			Path:    path[0],
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	pl := &network.Payload{Body: syncResponse.Content, Options: syncResponse.Options}
+
+	return pl, nil
+}
+
+// Close terminate the connection immediately.
+func (c *Client) Close() {
+	c.Connection.Close()
+}
+
+// connect used to connect with another GRPC service. The first parameter is address and returns the connection
 // and ServeClient from proto buff
-func (c *Client) Connect(address string) *grpc.ClientConn {
+func (c *Client) connect(address string) *grpc.ClientConn {
 
 	var conn *grpc.ClientConn
 	var err error
@@ -43,32 +76,4 @@ func (c *Client) Connect(address string) *grpc.ClientConn {
 		panic(err)
 	}
 	return conn
-}
-
-// Send function sends a payload to a GRPC server. It gets the string path which is the unique id and the payload
-// object.
-func (c *Client) Send(path string, payload network.Payload) (*network.Payload, error) {
-
-	connection := pb.NewServeClient(c.Connection)
-
-	if connection == nil {
-		// todo: [fix] [A002] Finish the Blunder package and throw an error
-		return nil, errors.New("CONNECTION NOT FOUND")
-	}
-
-	syncResponse, err := connection.HandlerSync(context.Background(),
-		&pb.HandlerRequest{
-			Content: payload.Body,
-			Options: payload.Options,
-			Path:    path,
-		},
-	)
-
-	if err != nil {
-		return nil, err
-	}
-
-	pl := &network.Payload{Body: syncResponse.Content, Options: syncResponse.Options}
-
-	return pl, nil
 }

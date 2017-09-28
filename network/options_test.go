@@ -16,12 +16,10 @@ var _ = Describe("Options", func() {
 
 			It("Should returns a new object with valid properties", func() {
 				options := network.NewOptions()
-				options.Path = "foo"
 				options.SetField("foo", "bar", "baz")
 
 				Expect(options).To(PointTo(MatchAllFields(
 					Fields{
-						"Path":   Equal("foo"),
 						"Fields": Equal(map[string]map[string]string{"foo": {"bar": "baz"}}),
 					},
 				)))
@@ -33,7 +31,6 @@ var _ = Describe("Options", func() {
 
 			It("Should panic if field mapper is not stetted", func() {
 				options := network.NewOptions()
-				options.Path = "foo"
 				Expect(func() { options.Fields["foo"]["bar"] = "4" }).To(Panic())
 			})
 
@@ -43,7 +40,6 @@ var _ = Describe("Options", func() {
 
 			It("Should Marshal/unmarshal the struct properly", func() {
 				options := network.NewOptions()
-				options.Path = "a/cool/path"
 				options.SetField("foo", "bar", "baz")
 
 				marshaledData := options.Marshal()
@@ -52,7 +48,6 @@ var _ = Describe("Options", func() {
 
 				Expect(unashamedData).To(PointTo(MatchAllFields(
 					Fields{
-						"Path":   Equal(options.Path),
 						"Fields": Equal(options.Fields),
 					},
 				)))
@@ -86,6 +81,55 @@ var _ = Describe("Options", func() {
 			})
 
 		})
+
+		Context("Set/Get Params", func() {
+
+			options := network.NewOptions()
+
+			options.SetParams(map[string]string{"foo": "fa"})
+
+			It("Should be equal to mapper", func() {
+				Expect(options.Fields["PARAMS"]).To(Equal(map[string]string{"foo": "fa"}))
+			})
+
+			It("Should return map[string]string", func() {
+				Expect(options.GetParams()).To(Equal(map[string]string{"foo": "fa"}))
+			})
+
+			It("Should set a new param", func() {
+				options.SetParam("baz", "ba")
+				Expect(options.GetParams()).To(Equal(map[string]string{"foo": "fa", "baz":"ba"}))
+			})
+
+			It("Should get a param", func() {
+				Expect(options.GetParam("foo")).To(Equal("fa"))
+			})
+		})
+
+		Context("Set/Get Headers", func() {
+
+			options := network.NewOptions()
+
+			options.SetHeaders(map[string]string{"foo": "fa"})
+
+			It("Should be equal to mapper", func() {
+				Expect(options.Fields["HEADERS"]).To(Equal(map[string]string{"foo": "fa"}))
+			})
+
+			It("Should return map[string]string", func() {
+				Expect(options.GetHeaders()).To(Equal(map[string]string{"foo": "fa"}))
+			})
+
+			It("Should set a new header", func() {
+				options.SetHeader("baz", "ba")
+				Expect(options.GetHeaders()).To(Equal(map[string]string{"foo": "fa", "baz":"ba"}))
+			})
+
+			It("Should get a header", func() {
+				Expect(options.GetHeader("foo")).To(Equal("fa"))
+			})
+		})
+
 
 	})
 

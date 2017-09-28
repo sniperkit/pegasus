@@ -5,7 +5,6 @@ import (
 	"bitbucket.org/code_horse/pegasus/network/netgrpc"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"fmt"
 )
 
 var _ = Describe("Netgrpc", func() {
@@ -17,15 +16,9 @@ var _ = Describe("Netgrpc", func() {
 
 		// Set the listeners
 
-		server.Listen("/grpc/end-to-end", handler, nil)
+		server.Listen(netgrpc.SetPath("/grpc/end-to-end"), handler, nil)
 
-		properties := netgrpc.NewProperties().SetPath("/grpc/end-to-end/properties")
-		server.ListenTo(properties, handler, nil)
-
-		server.Listen("/grpc/end-to-end/middleware", handler, middleware)
-
-		properties = netgrpc.NewProperties().SetPath("/grpc/end-to-end/properties/middleware")
-		server.ListenTo(properties, handler, middleware)
+		server.Listen(netgrpc.SetPath("/grpc/end-to-end/middleware"), handler, middleware)
 
 		// Start the server
 		server.Serve("localhost:50052")
@@ -40,8 +33,8 @@ var _ = Describe("Netgrpc", func() {
 				payload := network.BuildPayload([]byte(id+"hello message"), options.Marshal())
 
 				// Send the payload
-				netgrpc.NewClient("localhost:50052").Send("/grpc/end-to-end", payload)
-				response, err := netgrpc.NewClient("localhost:50052").Send("/grpc/end-to-end", payload)
+				netgrpc.NewClient("localhost:50052").Send([]string{"/grpc/end-to-end"}, payload)
+				response, err := netgrpc.NewClient("localhost:50052").Send([]string{"/grpc/end-to-end"}, payload)
 
 				It("Should not throw an error", func() {
 					Expect(err).To(BeNil())
@@ -52,7 +45,6 @@ var _ = Describe("Netgrpc", func() {
 					options := network.NewOptions().Unmarshal(response.Options)
 					Expect(options.Fields["options"]["value"]).To(Equal(id + "option response"))
 				})
-				fmt.Println(id)
 
 			}
 
@@ -69,28 +61,7 @@ var _ = Describe("Netgrpc", func() {
 			payload := network.BuildPayload([]byte("hello message"), options.Marshal())
 
 			// Send the payload
-			response, err := netgrpc.NewClient("localhost:50052").Send("/grpc/end-to-end", payload)
-
-			It("Should not throw an error", func() {
-				Expect(err).To(BeNil())
-			})
-
-			It("The response should have the following values", func() {
-				Expect(response.Body).To(Equal([]byte("hello message response")))
-				options := network.NewOptions().Unmarshal(response.Options)
-				Expect(options.Fields["options"]["value"]).To(Equal("option response"))
-			})
-		})
-
-		Context("Exchange GRPC payload via ListenTo-Send", func() {
-			// Create a payload
-			options := network.NewOptions()
-			options.SetField("options", "value", "option")
-			payload := network.BuildPayload([]byte("hello message"), options.Marshal())
-
-			// Send the payload
-			response, err := netgrpc.NewClient("localhost:50052").
-				Send("/grpc/end-to-end/properties", payload)
+			response, err := netgrpc.NewClient("localhost:50052").Send([]string{"/grpc/end-to-end"}, payload)
 
 			It("Should not throw an error", func() {
 				Expect(err).To(BeNil())
@@ -111,28 +82,7 @@ var _ = Describe("Netgrpc", func() {
 
 			// Send the payload
 			response, err := netgrpc.NewClient("localhost:50052").
-				Send("/grpc/end-to-end/middleware", payload)
-
-			It("Should not throw an error", func() {
-				Expect(err).To(BeNil())
-			})
-
-			It("The response should have the following values", func() {
-				Expect(response.Body).To(Equal([]byte("hello message middleware response")))
-				options := network.NewOptions().Unmarshal(response.Options)
-				Expect(options.Fields["options"]["value"]).To(Equal("option middleware response"))
-			})
-		})
-
-		Context("Exchange GRPC payload via ListenTo-Send with middleware", func() {
-			// Create a payload
-			options := network.NewOptions()
-			options.SetField("options", "value", "option")
-			payload := network.BuildPayload([]byte("hello message"), options.Marshal())
-
-			// Send the payload
-			response, err := netgrpc.NewClient("localhost:50052").
-				Send("/grpc/end-to-end/properties/middleware", payload)
+				Send([]string{"/grpc/end-to-end/middleware"}, payload)
 
 			It("Should not throw an error", func() {
 				Expect(err).To(BeNil())
@@ -153,8 +103,8 @@ var _ = Describe("Netgrpc", func() {
 			payload := network.BuildPayload([]byte("hello message"), options.Marshal())
 
 			// Send the payload
-			netgrpc.NewClient("localhost:50052").Send("/grpc/end-to-end", payload)
-			response, err := netgrpc.NewClient("localhost:50052").Send("/grpc/end-to-end", payload)
+			netgrpc.NewClient("localhost:50052").Send([]string{"/grpc/end-to-end"}, payload)
+			response, err := netgrpc.NewClient("localhost:50052").Send([]string{"/grpc/end-to-end"}, payload)
 
 			It("Should not throw an error", func() {
 				Expect(err).To(BeNil())
@@ -173,7 +123,7 @@ var _ = Describe("Netgrpc", func() {
 			payload := network.BuildPayload([]byte("hello message"), nil)
 
 			// Send the payload
-			response, err := netgrpc.NewClient("localhost:50052").Send("/grpc/end-to-end", payload)
+			response, err := netgrpc.NewClient("localhost:50052").Send([]string{"/grpc/end-to-end"}, payload)
 
 			It("Should not throw an error", func() {
 				Expect(err).To(BeNil())
@@ -183,7 +133,6 @@ var _ = Describe("Netgrpc", func() {
 				Expect(response.Body).To(Equal([]byte("hello message response")))
 			})
 		})
-
 
 	})
 
