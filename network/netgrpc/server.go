@@ -2,7 +2,7 @@ package netgrpc
 
 import (
 	"bitbucket.org/code_horse/pegasus/network"
-	pb "bitbucket.org/code_horse/pegasus/transport/trangrpc/proto"
+	pb "bitbucket.org/code_horse/pegasus/network/netgrpc/proto"
 	"errors"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
@@ -26,7 +26,7 @@ type Server struct {
 
 // NewServer is the construct of Server struct. Generates and return a new Serve object. The parameter Router defines
 // the route manager which is responsible to call the handlers.
-var NewServer = func(router *Router) network.IServer {
+var NewServer = func(router *Router) network.Server {
 
 	if router == nil {
 		router = NewRouter()

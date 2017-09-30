@@ -17,7 +17,7 @@ var _ = Describe("Server", func() {
 
 			server := netgrpc.NewServer(nil)
 
-			It("Should return a new server instance which implement the IServer interface", func() {
+			It("Should return a new server instance which implement the Server interface", func() {
 				Expect(server).ToNot(BeNil())
 				Expect(reflect.ValueOf(server).String()).To(Equal("<*netgrpc.Server Value>"))
 			})

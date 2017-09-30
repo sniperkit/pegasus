@@ -1,8 +1,8 @@
 package network
 
-// IClient interface describes the protocols client model. Client keep the connections open for each protocol in order
+// Client interface describes the protocols client model. Client keep the connections open for each protocol in order
 // close the connection should use the Close function. Send function used to send data to other servers.
-type IClient interface {
+type Client interface {
 
 	// Send function sends a payload to other servers. It gets the string path which is the unique id and the payload
 	// object. The path may use other function ir order to generate the format for each provider.

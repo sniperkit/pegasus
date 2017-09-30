@@ -1,8 +1,8 @@
 package network
 
-// IServer is an interface that describes the Server struct. It's responsible to start the server and set up the
+// Server is an interface that describes the Server struct. It's responsible to start the server and set up the
 // listeners
-type IServer interface {
+type Server interface {
 
 	// Serve function start the server for the configured router and giver address. The address must have the following
 	// format <address>:<port>

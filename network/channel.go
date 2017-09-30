@@ -1,7 +1,14 @@
 package network
 
-// Channel is the only and main way to transport data between transporters. The payload property contains the body and
-// options as categories for transportation data.
+// Channel is the only and main way to transport data between from Handlers to receivers. The payload struct field
+// contains the Body and Options as sub-struct fields.
+//
+// An example for usage could be:
+//	func handler(channel *network.Channel) {
+//		payload := channel.Receive() // Receive the payload here
+//		options := network.BuildOptions(payload.Options) // Convert the received options to options struct
+// 		payload.Body = payload.Body + []byte(" sub-fix") // Change the body
+//
 type Channel struct {
 	payload chan Payload
 }

@@ -3,7 +3,7 @@ package netgrpc
 import (
 	"bitbucket.org/code_horse/pegasus/helpers"
 	"bitbucket.org/code_horse/pegasus/network"
-	pb "bitbucket.org/code_horse/pegasus/transport/trangrpc/proto"
+	pb "bitbucket.org/code_horse/pegasus/network/netgrpc/proto"
 	"context"
 	"errors"
 	"google.golang.org/grpc"
@@ -17,7 +17,7 @@ type Client struct {
 }
 
 // NewClient connects to a GRPC server, set up the struct and return the new Client object
-var NewClient = func(address string) network.IClient {
+var NewClient = func(address string) network.Client {
 	client := &Client{}
 	client.Connection = client.connect(address)
 	return client

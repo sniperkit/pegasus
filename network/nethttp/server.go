@@ -19,7 +19,7 @@ type Server struct {
 
 // NewServer is constructor of Server struct. It initialize and return a Server object. It get a *mux.Router as
 // parameter, if the router parameter is nil it will generate a new router and assign it to the object.
-var NewServer = func(router *mux.Router) network.IServer {
+var NewServer = func(router *mux.Router) network.Server {
 
 	if router == nil {
 		router = mux.NewRouter()
