@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#375EAB">
+
+  <title>network - The Go Programming Language</title>
+
+<link type="text/css" rel="stylesheet" href="../../../../../lib/godoc/style.css">
+
+<link rel="stylesheet" href="../../../../../lib/godoc/jquery.treeview.css">
+<script type="text/javascript">window.initFuncs = [];</script>
+</head>
+<body>
+
+<div id='lowframe' style="position: fixed; bottom: 0; left: 0; height: 0; width: 100%; border-top: thin solid grey; background-color: white; overflow: auto;">
+...
+</div><!-- #lowframe -->
+
+<div id="topbar" class="wide"><div class="container">
+<div class="top-heading" id="heading-wide"><a href="http://localhost:6060/">The Go Programming Language</a></div>
+<div class="top-heading" id="heading-narrow"><a href="http://localhost:6060/">Go</a></div>
+<a href="index.html#" id="menu-button"><span id="menu-button-arrow">&#9661;</span></a>
+<form method="GET" action="http://localhost:6060/search">
+<div id="menu">
+<a href="http://localhost:6060/doc/">Documents</a>
+<a href="http://localhost:6060/pkg/">Packages</a>
+<a href="http://localhost:6060/project/">The Project</a>
+<a href="http://localhost:6060/help/">Help</a>
+<a href="http://localhost:6060/blog/">Blog</a>
+
+<input type="text" id="search" name="q" class="inactive" value="Search" placeholder="Search">
+</div>
+</form>
+
+</div></div>
+
+
+
+<div id="page" class="wide">
+<div class="container">
+
+
+  <h1>
+    Package network
+    <span class="text-muted"></span>
+  </h1>
+
+
+
+
+
+
+
+<div id="nav"></div>
+
+
+<!--
+	Copyright 2009 The Go Authors. All rights reserved.
+	Use of this source code is governed by a BSD-style
+	license that can be found in the LICENSE file.
+-->
+<!--
+	Note: Static (i.e., not template-generated) href and id
+	attributes start with "pkg-" to make it impossible for
+	them to conflict with generated attributes (some of which
+	correspond to Go identifiers).
+-->
+
+	<script type='text/javascript'>
+	document.ANALYSIS_DATA = null;
+	document.CALLGRAPH = null;
+	</script>
+
+	
+		
+		<div id="short-nav">
+			<dl>
+			<dd><code>import "bitbucket.org/code_horse/pegasus/network"</code></dd>
+			</dl>
+			<dl>
+			<dd><a href="index.html#pkg-overview" class="overviewLink">Overview</a></dd>
+			<dd><a href="index.html#pkg-index" class="indexLink">Index</a></dd>
+			
+			
+				<dd><a href="index.html#pkg-subdirectories">Subdirectories</a></dd>
+			
+			</dl>
+		</div>
+		<!-- The package's Name is printed as title by the top-level template -->
+		<div id="pkg-overview" class="toggleVisible">
+			<div class="collapsed">
+				<h2 class="toggleButton" title="Click to show Overview section">Overview ▹</h2>
+			</div>
+			<div class="expanded">
+				<h2 class="toggleButton" title="Click to hide Overview section">Overview ▾</h2>
+				
+			</div>
+		</div>
+		
+
+		<div id="pkg-index" class="toggleVisible">
+		<div class="collapsed">
+			<h2 class="toggleButton" title="Click to show Index section">Index ▹</h2>
+		</div>
+		<div class="expanded">
+			<h2 class="toggleButton" title="Click to hide Index section">Index ▾</h2>
+
+		<!-- Table of contents for API; must be named manual-nav to turn off auto nav. -->
+			<div id="manual-nav">
+			<dl>
+			
+				<dd><a href="index.html#pkg-constants">Constants</a></dd>
+			
+			
+			
+			
+				
+				<dd><a href="index.html#Channel">type Channel</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#NewChannel">func NewChannel(channelSize int) *Channel</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Channel.Receive">func (c *Channel) Receive() Payload</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Channel.Send">func (c *Channel) Send(payload Payload)</a></dd>
+				
+			
+				
+				<dd><a href="index.html#Client">type Client</a></dd>
+				
+				
+			
+				
+				<dd><a href="index.html#Handler">type Handler</a></dd>
+				
+				
+			
+				
+				<dd><a href="index.html#Middleware">type Middleware</a></dd>
+				
+				
+			
+				
+				<dd><a href="index.html#Options">type Options</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#BuildOptions">func BuildOptions(data []byte) *Options</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#NewOptions">func NewOptions() *Options</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Options.GetField">func (c *Options) GetField(group string, key string) string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Options.GetHeader">func (c *Options) GetHeader(key string) string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Options.GetHeaders">func (c *Options) GetHeaders() map[string]string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Options.GetParam">func (c *Options) GetParam(key string) string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Options.GetParams">func (c *Options) GetParams() map[string]string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Options.Marshal">func (c *Options) Marshal() []byte</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Options.SetField">func (c *Options) SetField(group string, key string, value string)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Options.SetHeader">func (c *Options) SetHeader(key string, value string)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Options.SetHeaders">func (c *Options) SetHeaders(params map[string]string)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Options.SetParam">func (c *Options) SetParam(key string, value string)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Options.SetParams">func (c *Options) SetParams(params map[string]string)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Options.Unmarshal">func (c *Options) Unmarshal(data []byte) *Options</a></dd>
+				
+			
+				
+				<dd><a href="index.html#Payload">type Payload</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#BuildPayload">func BuildPayload(body []byte, options []byte) Payload</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#NewPayload">func NewPayload(body []byte, options []byte) *Payload</a></dd>
+				
+				
+			
+				
+				<dd><a href="index.html#Server">type Server</a></dd>
+				
+				
+			
+			
+			</dl>
+			</div><!-- #manual-nav -->
+
+		
+
+		
+			<h4>Package files</h4>
+			<p>
+			<span style="font-size:90%">
+			
+				<a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/channel.go">channel.go</a>
+			
+				<a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/client.go">client.go</a>
+			
+				<a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/handler.go">handler.go</a>
+			
+				<a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/midleware.go">midleware.go</a>
+			
+				<a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/options.go">options.go</a>
+			
+				<a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/payload.go">payload.go</a>
+			
+				<a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/server.go">server.go</a>
+			
+				<a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/status.go">status.go</a>
+			
+			</span>
+			</p>
+		
+		</div><!-- .expanded -->
+		</div><!-- #pkg-index -->
+
+		<div id="pkg-callgraph" class="toggle" style="display: none">
+		<div class="collapsed">
+			<h2 class="toggleButton" title="Click to show Internal Call Graph section">Internal call graph ▹</h2>
+		</div> <!-- .expanded -->
+		<div class="expanded">
+			<h2 class="toggleButton" title="Click to hide Internal Call Graph section">Internal call graph ▾</h2>
+			<p>
+			  In the call graph viewer below, each node
+			  is a function belonging to this package
+			  and its children are the functions it
+			  calls&mdash;perhaps dynamically.
+			</p>
+			<p>
+			  The root nodes are the entry points of the
+			  package: functions that may be called from
+			  outside the package.
+			  There may be non-exported or anonymous
+			  functions among them if they are called
+			  dynamically from another package.
+			</p>
+			<p>
+			  Click a node to visit that function's source code.
+			  From there you can visit its callers by
+			  clicking its declaring <code>func</code>
+			  token.
+			</p>
+			<p>
+			  Functions may be omitted if they were
+			  determined to be unreachable in the
+			  particular programs or tests that were
+			  analyzed.
+			</p>
+			<!-- Zero means show all package entry points. -->
+			<ul style="margin-left: 0.5in" id="callgraph-0" class="treeview"></ul>
+		</div>
+		</div> <!-- #pkg-callgraph -->
+
+		
+			<h2 id="pkg-constants">Constants</h2>
+			
+				
+				<pre>const (
+    <span id="StatusContinue">StatusContinue</span>           = 100 <span class="comment">// RFC 7231, 6.2.1</span>
+    <span id="StatusSwitchingProtocols">StatusSwitchingProtocols</span> = 101 <span class="comment">// RFC 7231, 6.2.2</span>
+    <span id="StatusProcessing">StatusProcessing</span>         = 102 <span class="comment">// RFC 2518, 10.1</span>
+
+    <span id="StatusOK">StatusOK</span>                   = 200 <span class="comment">// RFC 7231, 6.3.1</span>
+    <span id="StatusCreated">StatusCreated</span>              = 201 <span class="comment">// RFC 7231, 6.3.2</span>
+    <span id="StatusAccepted">StatusAccepted</span>             = 202 <span class="comment">// RFC 7231, 6.3.3</span>
+    <span id="StatusNonAuthoritativeInfo">StatusNonAuthoritativeInfo</span> = 203 <span class="comment">// RFC 7231, 6.3.4</span>
+    <span id="StatusNoContent">StatusNoContent</span>            = 204 <span class="comment">// RFC 7231, 6.3.5</span>
+    <span id="StatusResetContent">StatusResetContent</span>         = 205 <span class="comment">// RFC 7231, 6.3.6</span>
+    <span id="StatusPartialContent">StatusPartialContent</span>       = 206 <span class="comment">// RFC 7233, 4.1</span>
+    <span id="StatusMultiStatus">StatusMultiStatus</span>          = 207 <span class="comment">// RFC 4918, 11.1</span>
+    <span id="StatusAlreadyReported">StatusAlreadyReported</span>      = 208 <span class="comment">// RFC 5842, 7.1</span>
+    <span id="StatusIMUsed">StatusIMUsed</span>               = 226 <span class="comment">// RFC 3229, 10.4.1</span>
+
+    <span id="StatusMultipleChoices">StatusMultipleChoices</span>  = 300 <span class="comment">// RFC 7231, 6.4.1</span>
+    <span id="StatusMovedPermanently">StatusMovedPermanently</span> = 301 <span class="comment">// RFC 7231, 6.4.2</span>
+    <span id="StatusFound">StatusFound</span>            = 302 <span class="comment">// RFC 7231, 6.4.3</span>
+    <span id="StatusSeeOther">StatusSeeOther</span>         = 303 <span class="comment">// RFC 7231, 6.4.4</span>
+    <span id="StatusNotModified">StatusNotModified</span>      = 304 <span class="comment">// RFC 7232, 4.1</span>
+    <span id="StatusUseProxy">StatusUseProxy</span>         = 305 <span class="comment">// RFC 7231, 6.4.5</span>
+
+    <span id="StatusTemporaryRedirect">StatusTemporaryRedirect</span> = 307 <span class="comment">// RFC 7231, 6.4.7</span>
+    <span id="StatusPermanentRedirect">StatusPermanentRedirect</span> = 308 <span class="comment">// RFC 7538, 3</span>
+
+    <span id="StatusBadRequest">StatusBadRequest</span>                   = 400 <span class="comment">// RFC 7231, 6.5.1</span>
+    <span id="StatusUnauthorized">StatusUnauthorized</span>                 = 401 <span class="comment">// RFC 7235, 3.1</span>
+    <span id="StatusPaymentRequired">StatusPaymentRequired</span>              = 402 <span class="comment">// RFC 7231, 6.5.2</span>
+    <span id="StatusForbidden">StatusForbidden</span>                    = 403 <span class="comment">// RFC 7231, 6.5.3</span>
+    <span id="StatusNotFound">StatusNotFound</span>                     = 404 <span class="comment">// RFC 7231, 6.5.4</span>
+    <span id="StatusMethodNotAllowed">StatusMethodNotAllowed</span>             = 405 <span class="comment">// RFC 7231, 6.5.5</span>
+    <span id="StatusNotAcceptable">StatusNotAcceptable</span>                = 406 <span class="comment">// RFC 7231, 6.5.6</span>
+    <span id="StatusProxyAuthRequired">StatusProxyAuthRequired</span>            = 407 <span class="comment">// RFC 7235, 3.2</span>
+    <span id="StatusRequestTimeout">StatusRequestTimeout</span>               = 408 <span class="comment">// RFC 7231, 6.5.7</span>
+    <span id="StatusConflict">StatusConflict</span>                     = 409 <span class="comment">// RFC 7231, 6.5.8</span>
+    <span id="StatusGone">StatusGone</span>                         = 410 <span class="comment">// RFC 7231, 6.5.9</span>
+    <span id="StatusLengthRequired">StatusLengthRequired</span>               = 411 <span class="comment">// RFC 7231, 6.5.10</span>
+    <span id="StatusPreconditionFailed">StatusPreconditionFailed</span>           = 412 <span class="comment">// RFC 7232, 4.2</span>
+    <span id="StatusRequestEntityTooLarge">StatusRequestEntityTooLarge</span>        = 413 <span class="comment">// RFC 7231, 6.5.11</span>
+    <span id="StatusRequestURITooLong">StatusRequestURITooLong</span>            = 414 <span class="comment">// RFC 7231, 6.5.12</span>
+    <span id="StatusUnsupportedMediaType">StatusUnsupportedMediaType</span>         = 415 <span class="comment">// RFC 7231, 6.5.13</span>
+    <span id="StatusRequestedRangeNotSatisfiable">StatusRequestedRangeNotSatisfiable</span> = 416 <span class="comment">// RFC 7233, 4.4</span>
+    <span id="StatusExpectationFailed">StatusExpectationFailed</span>            = 417 <span class="comment">// RFC 7231, 6.5.14</span>
+    <span id="StatusTeapot">StatusTeapot</span>                       = 418 <span class="comment">// RFC 7168, 2.3.3</span>
+    <span id="StatusUnprocessableEntity">StatusUnprocessableEntity</span>          = 422 <span class="comment">// RFC 4918, 11.2</span>
+    <span id="StatusLocked">StatusLocked</span>                       = 423 <span class="comment">// RFC 4918, 11.3</span>
+    <span id="StatusFailedDependency">StatusFailedDependency</span>             = 424 <span class="comment">// RFC 4918, 11.4</span>
+    <span id="StatusUpgradeRequired">StatusUpgradeRequired</span>              = 426 <span class="comment">// RFC 7231, 6.5.15</span>
+    <span id="StatusPreconditionRequired">StatusPreconditionRequired</span>         = 428 <span class="comment">// RFC 6585, 3</span>
+    <span id="StatusTooManyRequests">StatusTooManyRequests</span>              = 429 <span class="comment">// RFC 6585, 4</span>
+    <span id="StatusRequestHeaderFieldsTooLarge">StatusRequestHeaderFieldsTooLarge</span>  = 431 <span class="comment">// RFC 6585, 5</span>
+    <span id="StatusUnavailableForLegalReasons">StatusUnavailableForLegalReasons</span>   = 451 <span class="comment">// RFC 7725, 3</span>
+
+    <span id="StatusInternalServerError">StatusInternalServerError</span>           = 500 <span class="comment">// RFC 7231, 6.6.1</span>
+    <span id="StatusNotImplemented">StatusNotImplemented</span>                = 501 <span class="comment">// RFC 7231, 6.6.2</span>
+    <span id="StatusBadGateway">StatusBadGateway</span>                    = 502 <span class="comment">// RFC 7231, 6.6.3</span>
+    <span id="StatusServiceUnavailable">StatusServiceUnavailable</span>            = 503 <span class="comment">// RFC 7231, 6.6.4</span>
+    <span id="StatusGatewayTimeout">StatusGatewayTimeout</span>                = 504 <span class="comment">// RFC 7231, 6.6.5</span>
+    <span id="StatusHTTPVersionNotSupported">StatusHTTPVersionNotSupported</span>       = 505 <span class="comment">// RFC 7231, 6.6.6</span>
+    <span id="StatusVariantAlsoNegotiates">StatusVariantAlsoNegotiates</span>         = 506 <span class="comment">// RFC 2295, 8.1</span>
+    <span id="StatusInsufficientStorage">StatusInsufficientStorage</span>           = 507 <span class="comment">// RFC 4918, 11.5</span>
+    <span id="StatusLoopDetected">StatusLoopDetected</span>                  = 508 <span class="comment">// RFC 5842, 7.2</span>
+    <span id="StatusNotExtended">StatusNotExtended</span>                   = 510 <span class="comment">// RFC 2774, 7</span>
+    <span id="StatusNetworkAuthenticationRequired">StatusNetworkAuthenticationRequired</span> = 511 <span class="comment">// RFC 6585, 6</span>
+)</pre>
+			
+		
+		
+		
+		
+			
+			
+			<h2 id="Channel">type <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/channel.go?s=872:917#L8">Channel</a>
+				<a class="permalink" href="index.html#Channel">&#xb6;</a>
+			</h2>
+			<p>
+Channel is the only and main way to transport data from Handlers to receivers. It contains a payload struct field
+with two nested fields payload.Options and payload.Body.
+</p>
+<p>
+Channel exists only in network.Handler, network.Middleware and network.Client::Listen files as parameter for those
+functions
+</p>
+<p>
+The payload.Options can be used in order to transport some options via options.Headers or some parameters via
+options.Params. The options.Body is similar with http body and used in order to transfer raw content.
+</p>
+<p>
+An example for usage could be:
+</p>
+<pre>func handler(channel *network.Channel) {
+	payload := channel.Receive() // Receive the payload here
+	options := network.BuildOptions(payload.Options) // Convert the received options to options struct
+	payload.Body = payload.Body + []byte(&#34; sub-fix&#34;) // Change the body
+}
+</pre>
+
+			<pre>type Channel struct {
+    <span class="comment">// contains filtered or unexported fields</span>
+}</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="NewChannel">func <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/channel.go?s=1470:1511#L21">NewChannel</a>
+					<a class="permalink" href="index.html#NewChannel">&#xb6;</a>
+				</h3>
+				<pre>func NewChannel(channelSize <a href="../../../../builtin/index.html#int">int</a>) *<a href="index.html#Channel">Channel</a></pre>
+				<p>
+NewChannel create a new Channel which contains a new payload object.
+</p>
+<p>
+The channel size have to be set as parameter.
+</p>
+<p>
+The channel size is how big the channel will be. The buffer size is the number of elements that can be sent to the
+channel without the send blocking. By default, a channel has a buffer size of 0 (you get this with make(chan int)).
+This means that every single send will block until another goroutine receives from the channel.
+</p>
+<p>
+A channel of buffer size 1 can hold 1 element until sending blocks, so you&#39;d get.
+</p>
+
+				
+				
+			
+
+			
+				
+				<h3 id="Channel.Receive">func (*Channel) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/channel.go?s=1787:1822#L31">Receive</a>
+					<a class="permalink" href="index.html#Channel.Receive">&#xb6;</a>
+				</h3>
+				<pre>func (c *<a href="index.html#Channel">Channel</a>) Receive() <a href="index.html#Payload">Payload</a></pre>
+				<p>
+Receive data from channel and return it. The function return a Payload.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="Channel.Send">func (*Channel) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/channel.go?s=1645:1684#L26">Send</a>
+					<a class="permalink" href="index.html#Channel.Send">&#xb6;</a>
+				</h3>
+				<pre>func (c *<a href="index.html#Channel">Channel</a>) Send(payload <a href="index.html#Payload">Payload</a>)</pre>
+				<p>
+Send method get a payload object and send it through the channel.
+</p>
+
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="Client">type <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/client.go?s=1649:1739#L26">Client</a>
+				<a class="permalink" href="index.html#Client">&#xb6;</a>
+			</h2>
+			<p>
+Client interface describes the protocols client models. It contains from two function the Send which is responsible
+to send the payload and the Close function which closes the opened connection is exists.
+</p>
+<h3 id="hdr-Send_Function">Send Function</h3>
+<p>
+Send function sends a payload to other servers.
+</p>
+<p>
+The first parameter is the conf which is a string array and could
+contains the URL or the method [POST, GET, ...]. In order to make it simpler each network provider (http, grpc, ...)
+have a SetPath(...) method which builds the conf parameter.
+</p>
+<p>
+The second parameter is the payload type of network.Payload. The payload could be created with function
+network.BuildPayload(). The payload.Options can be used in order to transport some options via options.Headers
+or some parameters via options.Params. The options.Body is similar with http body and used in order to
+transfer raw content.
+</p>
+<p>
+Data tree:
+</p>
+<pre> Payload:- contains two fields
+		|- Body: Used to transfer the raw content.
+		|- Options: Options contains the Params, Headers a fields and Custom fields.
+			|
+			|- Params: We cannot set the params, only server can set this in order to return it. Params could contain
+			| for example the url-path parameters. If the param is set the server will ignore it.
+			|
+			|- Header: We can set headers in order to tell to server to change a behavior.
+			|
+			|- Fields: It contains custom fields for extreme cases.
+</pre>
+<p>
+The Send function is will a payload object if server respond or an error if something go wrong.
+</p>
+<h3 id="hdr-Close_Function">Close Function</h3>
+<p>
+Close function closes the connection if exists and is open.
+</p>
+
+			<pre>type Client interface {
+    Send(conf []<a href="../../../../builtin/index.html#string">string</a>, payload <a href="index.html#Payload">Payload</a>) (*<a href="index.html#Payload">Payload</a>, <a href="../../../../builtin/index.html#error">error</a>)
+    Close()
+}</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="Handler">type <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/handler.go?s=1241:1275#L13">Handler</a>
+				<a class="permalink" href="index.html#Handler">&#xb6;</a>
+			</h2>
+			<p>
+Handler is a type of function which has a parameter a network.Channel. The handler used at network.Client::Send and
+network.Server::Listen function in order to define a handler function which will processes the request. Also handler
+defined at network.Middleware.
+</p>
+<p>
+Channel is the only and main way to transport data from Handlers to receivers. It contains a payload struct field
+with two nested fields payload.Options and payload.Body.
+</p>
+<p>
+Channel exists only in network.Handler, network.Middleware and network.Client::Listen files as parameter for those
+functions
+</p>
+<p>
+The payload.Options can be used in order to transport some options via options.Headers or some parameters via
+options.Params. The options.Body is similar with http body and used in order to transfer raw content.
+</p>
+<p>
+An example for usage could be:
+</p>
+<pre>func handler(channel *network.Channel) {
+	payload := channel.Receive() // Receive the payload here
+	options := network.BuildOptions(payload.Options) // Convert the received options to options struct
+	payload.Body = payload.Body + []byte(&#34; sub-fix&#34;) // Change the body
+	chanel.send(network.BuildPayload(payload.Body, options.Marshal())) // return the payload
+}
+</pre>
+
+			<pre>type Handler func(chanel *<a href="index.html#Channel">Channel</a>)</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="Middleware">type <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/midleware.go?s=1281:1335#L14">Middleware</a>
+				<a class="permalink" href="index.html#Middleware">&#xb6;</a>
+			</h2>
+			<p>
+Middleware is a type of function which executes before network.handler function. It has two parameters the
+network.Handler and the network.channel. It used only at network.Server::Listen function. Usually the middleware
+type of function could be nil.
+</p>
+<p>
+Handler parameter is used as handler function which will handler a specif request.
+</p>
+<p>
+Channel parameter is the only and main way to transport data from Handlers to receivers. It contains a payload struct
+field with two nested fields payload.Options and payload.Body.
+</p>
+<p>
+The Middleware is responsible to call or not the handler function. Also can edit the network.Channel data that
+handler will get from channel parameter.
+</p>
+<p>
+An example for usage could be:
+</p>
+<pre>func middleware(handler Handler, chanel *Channel) {
+	payload := channel.Receive() // Receive the payload here
+	options := network.BuildOptions(payload.Options) // Convert the received options to options struct
+	options.SetHeader(&#34;Auth-Token&#34;, &#34;@#$fsf2hkj42@#@#&#34;) // Add an extra header
+	payload.Body = payload.Body + []byte(&#34; sub-fix&#34;) // Change the body
+	chanel.send(network.BuildPayload(payload.Body, options.Marshal())) // Add a new payload
+	handler(chanel) // Call the handler with new channel
+}
+</pre>
+
+			<pre>type Middleware func(handler <a href="index.html#Handler">Handler</a>, chanel *<a href="index.html#Channel">Channel</a>)</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="Options">type <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/options.go?s=763:882#L12">Options</a>
+				<a class="permalink" href="index.html#Options">&#xb6;</a>
+			</h2>
+			<p>
+Options struct defines the parameters that we can pass over network. It contains tree layers of parameters that
+could be defined.
+</p>
+<p>
+The Headers
+</p>
+<pre>Header: Fields[&#34;HEADERS&#34;][&#34;ANYTHING&#34;] = &#34;STRING VALUE&#34;
+</pre>
+<p>
+The headers are used to passed an options in order to tell to server to change a process or to check something.
+Headers are not parameters.
+</p>
+<p>
+The Params
+</p>
+<pre>Header: Fields[&#34;PARAMS&#34;][&#34;ANYTHING&#34;] = &#34;STRING VALUE&#34;
+</pre>
+<p>
+The params are set by the server only and defines the parameters that could be set. e.g. HTTP url or path params.
+</p>
+<p>
+Custom
+</p>
+<pre>Header: Fields[&#34;ANYTHING&#34;][&#34;ANYTHING&#34;] = &#34;STRING VALUE&#34;
+</pre>
+<p>
+Custom fields are used if we want to set something completely custom, it&#39;s good be avoid.
+</p>
+
+			<pre>type Options struct {
+
+<span id="Options.Fields"></span>    <span class="comment">// Fields are general properties may client need to know</span>
+    Fields map[<a href="../../../../builtin/index.html#string">string</a>]map[<a href="../../../../builtin/index.html#string">string</a>]<a href="../../../../builtin/index.html#string">string</a>
+}</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="BuildOptions">func <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/options.go?s=1142:1181#L24">BuildOptions</a>
+					<a class="permalink" href="index.html#BuildOptions">&#xb6;</a>
+				</h3>
+				<pre>func BuildOptions(data []<a href="../../../../builtin/index.html#byte">byte</a>) *<a href="index.html#Options">Options</a></pre>
+				<p>
+BuildOptions receives bytes as parameter and convert them to Option object.
+</p>
+
+				
+				
+			
+				
+				<h3 id="NewOptions">func <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/options.go?s=970:996#L19">NewOptions</a>
+					<a class="permalink" href="index.html#NewOptions">&#xb6;</a>
+				</h3>
+				<pre>func NewOptions() *<a href="index.html#Options">Options</a></pre>
+				<p>
+NewOptions create a Option object, initialize the struct properties and returns it
+</p>
+
+				
+				
+			
+
+			
+				
+				<h3 id="Options.GetField">func (*Options) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/options.go?s=3260:3319#L107">GetField</a>
+					<a class="permalink" href="index.html#Options.GetField">&#xb6;</a>
+				</h3>
+				<pre>func (c *<a href="index.html#Options">Options</a>) GetField(group <a href="../../../../builtin/index.html#string">string</a>, key <a href="../../../../builtin/index.html#string">string</a>) <a href="../../../../builtin/index.html#string">string</a></pre>
+				<p>
+GetField return the value of a Field. The return value is a string.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="Options.GetHeader">func (*Options) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/options.go?s=2283:2329#L70">GetHeader</a>
+					<a class="permalink" href="index.html#Options.GetHeader">&#xb6;</a>
+				</h3>
+				<pre>func (c *<a href="index.html#Options">Options</a>) GetHeader(key <a href="../../../../builtin/index.html#string">string</a>) <a href="../../../../builtin/index.html#string">string</a></pre>
+				<p>
+GetHeader get a header parameter
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="Options.GetHeaders">func (*Options) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/options.go?s=2035:2083#L60">GetHeaders</a>
+					<a class="permalink" href="index.html#Options.GetHeaders">&#xb6;</a>
+				</h3>
+				<pre>func (c *<a href="index.html#Options">Options</a>) GetHeaders() map[<a href="../../../../builtin/index.html#string">string</a>]<a href="../../../../builtin/index.html#string">string</a></pre>
+				<p>
+GetHeaders get the header parameters
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="Options.GetParam">func (*Options) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/options.go?s=1692:1737#L47">GetParam</a>
+					<a class="permalink" href="index.html#Options.GetParam">&#xb6;</a>
+				</h3>
+				<pre>func (c *<a href="index.html#Options">Options</a>) GetParam(key <a href="../../../../builtin/index.html#string">string</a>) <a href="../../../../builtin/index.html#string">string</a></pre>
+				<p>
+GetParam get a parameter
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="Options.GetParams">func (*Options) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/options.go?s=1464:1511#L37">GetParams</a>
+					<a class="permalink" href="index.html#Options.GetParams">&#xb6;</a>
+				</h3>
+				<pre>func (c *<a href="index.html#Options">Options</a>) GetParams() map[<a href="../../../../builtin/index.html#string">string</a>]<a href="../../../../builtin/index.html#string">string</a></pre>
+				<p>
+GetParams get the parameters
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="Options.Marshal">func (*Options) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/options.go?s=2473:2507#L75">Marshal</a>
+					<a class="permalink" href="index.html#Options.Marshal">&#xb6;</a>
+				</h3>
+				<pre>func (c *<a href="index.html#Options">Options</a>) Marshal() []<a href="../../../../builtin/index.html#byte">byte</a></pre>
+				<p>
+Marshal return the object to bytes in order to be able to transfer it over HTTP or GRPC or whatever
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="Options.SetField">func (*Options) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/options.go?s=2938:3004#L96">SetField</a>
+					<a class="permalink" href="index.html#Options.SetField">&#xb6;</a>
+				</h3>
+				<pre>func (c *<a href="index.html#Options">Options</a>) SetField(group <a href="../../../../builtin/index.html#string">string</a>, key <a href="../../../../builtin/index.html#string">string</a>, value <a href="../../../../builtin/index.html#string">string</a>)</pre>
+				<p>
+SetField create a Fields map[string]map[string]string. We need this method in order to initialize the map.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="Options.SetHeader">func (*Options) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/options.go?s=2153:2206#L65">SetHeader</a>
+					<a class="permalink" href="index.html#Options.SetHeader">&#xb6;</a>
+				</h3>
+				<pre>func (c *<a href="index.html#Options">Options</a>) SetHeader(key <a href="../../../../builtin/index.html#string">string</a>, value <a href="../../../../builtin/index.html#string">string</a>)</pre>
+				<p>
+SetHeader set a header parameter
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="Options.SetHeaders">func (*Options) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/options.go?s=1832:1886#L52">SetHeaders</a>
+					<a class="permalink" href="index.html#Options.SetHeaders">&#xb6;</a>
+				</h3>
+				<pre>func (c *<a href="index.html#Options">Options</a>) SetHeaders(params map[<a href="../../../../builtin/index.html#string">string</a>]<a href="../../../../builtin/index.html#string">string</a>)</pre>
+				<p>
+SetHeaders re-set the hole header parameters fields
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="Options.SetParam">func (*Options) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/options.go?s=1572:1624#L42">SetParam</a>
+					<a class="permalink" href="index.html#Options.SetParam">&#xb6;</a>
+				</h3>
+				<pre>func (c *<a href="index.html#Options">Options</a>) SetParam(key <a href="../../../../builtin/index.html#string">string</a>, value <a href="../../../../builtin/index.html#string">string</a>)</pre>
+				<p>
+SetParam set a parameter
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="Options.SetParams">func (*Options) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/options.go?s=1271:1324#L29">SetParams</a>
+					<a class="permalink" href="index.html#Options.SetParams">&#xb6;</a>
+				</h3>
+				<pre>func (c *<a href="index.html#Options">Options</a>) SetParams(params map[<a href="../../../../builtin/index.html#string">string</a>]<a href="../../../../builtin/index.html#string">string</a>)</pre>
+				<p>
+SetParams re-set the hole parameters fields
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="Options.Unmarshal">func (*Options) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/options.go?s=2655:2704#L84">Unmarshal</a>
+					<a class="permalink" href="index.html#Options.Unmarshal">&#xb6;</a>
+				</h3>
+				<pre>func (c *<a href="index.html#Options">Options</a>) Unmarshal(data []<a href="../../../../builtin/index.html#byte">byte</a>) *<a href="index.html#Options">Options</a></pre>
+				<p>
+Unmarshal convert an Option object from bytes to an actually object.
+</p>
+
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="Payload">type <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/payload.go?s=751:806#L8">Payload</a>
+				<a class="permalink" href="index.html#Payload">&#xb6;</a>
+			</h2>
+			<p>
+Payload struct define the payload that could be transferred over network protocol providers (HTTP, GRPC, AMQP)
+</p>
+<p>
+// Data tree:
+</p>
+<pre> Payload:- contains two fields
+		|- Body: Used to transfer the raw content.
+		|- Options: Options contains the Params, Headers a fields and Custom fields.
+			|
+			|- Params: We cannot set the params, only server can set this in order to return it. Params could contain
+			| for example the url-path parameters. If the param is set the server will ignore it.
+			|
+			|- Header: We can set headers in order to tell to server to change a behavior.
+			|
+			|- Fields: It contains custom fields for extreme cases.
+</pre>
+<p>
+The payload also used as channel type through network.Channel.
+</p>
+
+			<pre>type Payload struct {
+<span id="Payload.Body"></span>    Body    []<a href="../../../../builtin/index.html#byte">byte</a>
+<span id="Payload.Options"></span>    Options []<a href="../../../../builtin/index.html#byte">byte</a>
+}</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="BuildPayload">func <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/payload.go?s=993:1047#L19">BuildPayload</a>
+					<a class="permalink" href="index.html#BuildPayload">&#xb6;</a>
+				</h3>
+				<pre>func BuildPayload(body []<a href="../../../../builtin/index.html#byte">byte</a>, options []<a href="../../../../builtin/index.html#byte">byte</a>) <a href="index.html#Payload">Payload</a></pre>
+				<p>
+BuildPayload return a new payload
+</p>
+
+				
+				
+			
+				
+				<h3 id="NewPayload">func <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/payload.go?s=850:903#L14">NewPayload</a>
+					<a class="permalink" href="index.html#NewPayload">&#xb6;</a>
+				</h3>
+				<pre>func NewPayload(body []<a href="../../../../builtin/index.html#byte">byte</a>, options []<a href="../../../../builtin/index.html#byte">byte</a>) *<a href="index.html#Payload">Payload</a></pre>
+				<p>
+NewPayload return a new payload object
+</p>
+
+				
+				
+			
+
+			
+		
+			
+			
+			<h2 id="Server">type <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/server.go?s=3149:3260#L68">Server</a>
+				<a class="permalink" href="index.html#Server">&#xb6;</a>
+			</h2>
+			<p>
+Server is an interface that describes the Server implementation of transfer protocol providers. It&#39;s responsible to
+start the server and set up the listeners in order to process the requests.
+</p>
+<h3 id="hdr-Serve">Serve</h3>
+<p>
+Serve which is responsible to start the server. It gets a address string as parameters which should have the
+following format &lt;address&gt;:&lt;port&gt;
+</p>
+<h3 id="hdr-Listen">Listen</h3>
+<p>
+Listen function creates a handler for a specific endpoint. The parameters are
+</p>
+<p>
+conf: (required) Conf parameter describes the options that the listen needs in order to be created.
+</p>
+<p>
+e.g. The conf could be only a path but in case of HTTP protocol the method type is need. Each protocol providers
+has a method called SetPath which a conf.
+</p>
+<p>
+Handler: (required) Handler is a function type of func(chanel *network.Channel). The Channel contains two method the
+send method and the receive functions. The send function is used to send a payload and receive function to receive
+the payload.
+</p>
+<p>
+Middleware: (optional) Middleware is a type of function which executes before network.handler function. It has
+two parameters the network.Handler and the network.channel. It used only at network.Server::Listen function. Usually
+the middleware type of function could be nil.
+The Middleware is responsible to call or not the handler function. Also can edit the network.Channel data that
+handler will get from channel parameter.
+</p>
+<p>
+Data tree:
+</p>
+<pre> Payload:- contains two fields
+		|- Body: Used to transfer the raw content.
+		|- Options: Options contains the Params, Headers a fields and Custom fields.
+			|
+			|- Params: We cannot set the params, only server can set this in order to return it. Params could contain
+			| for example the url-path parameters. If the param is set the server will ignore it.
+			|
+			|- Header: We can set headers in order to tell to server to change a behavior.
+			|
+			|- Fields: It contains custom fields for extreme cases.
+</pre>
+<p>
+The payload also used as channel type through network.Channel.
+</p>
+<p>
+Example:
+</p>
+<pre>var handlerGet = func(channel *network.Channel) {
+	// Receive the payload
+	receive := channel.Receive()
+
+	// Unmarshal options, change them and send them back
+	options := network.NewOptions().Unmarshal(receive.Options)
+
+	replyOptions := network.NewOptions()
+
+	replyOptions.SetHeader(&#34;Custom&#34;, options.GetHeader(&#34;Custom&#34;)+&#34; response&#34;)
+
+	// Create the new payload
+	payload := network.BuildPayload([]byte(options.GetParam(&#34;foo&#34;)+&#34; response&#34;), replyOptions.Marshal())
+
+	// Send it back
+	channel.Send(payload)
+}
+
+server := nethttp.NewServer(nil)
+server.Listen(nethttp.SetPath(&#34;/http&#34;, nethttp.Get), handlerGet, nil)
+server.Serve(&#34;localhost:7000&#34;)
+
+// Send a request
+// Create a payload
+options := network.NewOptions()
+
+options.SetHeader(&#34;Custom&#34;, &#34;header-value&#34;)
+
+payload := network.BuildPayload(nil, options.Marshal())
+
+// Send the payload
+response, err := nethttp.NewClient().
+  Send(nethttp.SetPath(&#34;<a href="http://localhost:7000/http?foo=bar">http://localhost:7000/http?foo=bar</a>&#34;, nethttp.Get), payload)
+</pre>
+
+			<pre>type Server interface {
+    Serve(address <a href="../../../../builtin/index.html#string">string</a>)
+    Listen(conf []<a href="../../../../builtin/index.html#string">string</a>, handler <a href="index.html#Handler">Handler</a>, middleware <a href="index.html#Middleware">Middleware</a>)
+}</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+	
+
+	
+
+
+
+
+
+	
+	
+		<h2 id="pkg-subdirectories">Subdirectories</h2>
+	
+	
+
+
+	<div class="pkg-dir">
+		<table>
+			<tr>
+				<th class="pkg-name">Name</th>
+				<th class="pkg-synopsis">Synopsis</th>
+			</tr>
+
+			
+			<tr>
+				<td colspan="2"><a href="../index.html">..</a></td>
+			</tr>
+			
+
+			
+				
+					<tr>
+						<td class="pkg-name" style="padding-left: 0px;">
+							<a href="netamqp/index.html">netamqp</a>
+						</td>
+						<td class="pkg-synopsis">
+							
+						</td>
+					</tr>
+				
+			
+				
+					<tr>
+						<td class="pkg-name" style="padding-left: 0px;">
+							<a href="netgrpc/index.html">netgrpc</a>
+						</td>
+						<td class="pkg-synopsis">
+							
+						</td>
+					</tr>
+				
+			
+				
+					<tr>
+						<td class="pkg-name" style="padding-left: 20px;">
+							<a href="netgrpc/proto/index.html">proto</a>
+						</td>
+						<td class="pkg-synopsis">
+							Package serve is a generated protocol buffer package.
+						</td>
+					</tr>
+				
+			
+				
+					<tr>
+						<td class="pkg-name" style="padding-left: 0px;">
+							<a href="nethttp/index.html">nethttp</a>
+						</td>
+						<td class="pkg-synopsis">
+							
+						</td>
+					</tr>
+				
+			
+		</table>
+	</div>
+
+
+	
+
+
+
+<div id="footer">
+Build version go1.9.<br>
+Except as <a href="https://developers.google.com/site-policies#restrictions">noted</a>,
+the content of this page is licensed under the
+Creative Commons Attribution 3.0 License,
+and code is licensed under a <a href="http://localhost:6060/LICENSE">BSD license</a>.<br>
+<a href="http://localhost:6060/doc/tos.html">Terms of Service</a> | 
+<a href="http://www.google.com/intl/en/policies/privacy/">Privacy Policy</a>
+</div>
+
+</div><!-- .container -->
+</div><!-- #page -->
+
+<!-- TODO(adonovan): load these from <head> using "defer" attribute? -->
+<script type="text/javascript" src="../../../../../lib/godoc/jquery.js"></script>
+<script type="text/javascript" src="../../../../../lib/godoc/jquery.treeview.js"></script>
+<script type="text/javascript" src="../../../../../lib/godoc/jquery.treeview.edit.js"></script>
+
+
+<script>var goVersion = "go1.9";</script>
+<script type="text/javascript" src="../../../../../lib/godoc/godocs.js"></script>
+
+</body>
+</html>
+

@@ -1,8 +1,18 @@
 package blunder
 
-// Manager describes the error which will handle all the error according to the following specific flags. Some of the
-// flag could be importance, priority, store, fatal, etc... The Error manager will send the error at third party
-// provider if needed in order to store it or analyze it. Those third party provider could be local micro-services.
+// Manager struct describes the errors, the actions after an error occur and the tracking of it. Manager struct
+// contains the following fields
+//
+// importance: Defines how important an error could be and how handle it. It's an embedded struct that helps to
+// prioritize the error.
+//
+// message: Defines the error message
+//
+// error: Is the actual error
+//
+// Example:
+//  err := blunder.Set("This is the message", errors.New("sample error"))
+//  err.SetPanicError()
 type Manager struct {
 
 	// The importance values are specific values which define when and how we will handle the following error.
@@ -15,10 +25,10 @@ type Manager struct {
 	err error
 }
 
-// Set the error message and the error object. The message could pass as string  parameter as the error object. The
-// function will return a Manager object. The error manager struct embedded the importance stuck in order to be
-// able to set the error. So after e := error.Manager(...) we could use the following practise e.SetFatal() in order
-// to set the importance.
+// Set the error message and the error object. It gets two parameters the message parameter as string and the error
+// object. The function will return a Manager object.
+//
+// The Manager struct embedded the importance struct in order to be able prioritize it.
 func Set(message string, err error) *Manager {
 	manager := &Manager{}
 	manager.message = message
@@ -27,7 +37,7 @@ func Set(message string, err error) *Manager {
 	return manager
 }
 
-// Handle the error according to struct properties. If the err object is nill the the handle function will silence quit,
+// Handle the error according to properties. If the Manger.err object is nil the handle function will silence quit,
 // else will check each case of importance.
 func (m *Manager) Handle() {
 

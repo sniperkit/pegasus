@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-// Retries function execute the callable function that takes as parameter for X times with sleep.
+// Retries function call the callable function that takes as parameter for X times with sleep.
 // The important thing that you have to know is that callable parameter must to be boolean and
 // returns true if wants to continue running. An example could be Retries(4, 3, func() bool { return true })
 // the function above will run 4 times but Retries(4, 3, func() bool { return false }) will run only once.

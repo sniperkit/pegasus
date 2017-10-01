@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#375EAB">
+
+  <title>netamqp - The Go Programming Language</title>
+
+<link type="text/css" rel="stylesheet" href="../../../../../../lib/godoc/style.css">
+
+<link rel="stylesheet" href="../../../../../../lib/godoc/jquery.treeview.css">
+<script type="text/javascript">window.initFuncs = [];</script>
+</head>
+<body>
+
+<div id='lowframe' style="position: fixed; bottom: 0; left: 0; height: 0; width: 100%; border-top: thin solid grey; background-color: white; overflow: auto;">
+...
+</div><!-- #lowframe -->
+
+<div id="topbar" class="wide"><div class="container">
+<div class="top-heading" id="heading-wide"><a href="http://localhost:6060/">The Go Programming Language</a></div>
+<div class="top-heading" id="heading-narrow"><a href="http://localhost:6060/">Go</a></div>
+<a href="index.html#" id="menu-button"><span id="menu-button-arrow">&#9661;</span></a>
+<form method="GET" action="http://localhost:6060/search">
+<div id="menu">
+<a href="http://localhost:6060/doc/">Documents</a>
+<a href="http://localhost:6060/pkg/">Packages</a>
+<a href="http://localhost:6060/project/">The Project</a>
+<a href="http://localhost:6060/help/">Help</a>
+<a href="http://localhost:6060/blog/">Blog</a>
+
+<input type="text" id="search" name="q" class="inactive" value="Search" placeholder="Search">
+</div>
+</form>
+
+</div></div>
+
+
+
+<div id="page" class="wide">
+<div class="container">
+
+
+  <h1>
+    Package netamqp
+    <span class="text-muted"></span>
+  </h1>
+
+
+
+
+
+
+
+<div id="nav"></div>
+
+
+<!--
+	Copyright 2009 The Go Authors. All rights reserved.
+	Use of this source code is governed by a BSD-style
+	license that can be found in the LICENSE file.
+-->
+<!--
+	Note: Static (i.e., not template-generated) href and id
+	attributes start with "pkg-" to make it impossible for
+	them to conflict with generated attributes (some of which
+	correspond to Go identifiers).
+-->
+
+	<script type='text/javascript'>
+	document.ANALYSIS_DATA = null;
+	document.CALLGRAPH = null;
+	</script>
+
+	
+		
+		<div id="short-nav">
+			<dl>
+			<dd><code>import "bitbucket.org/code_horse/pegasus/network/netamqp"</code></dd>
+			</dl>
+			<dl>
+			<dd><a href="index.html#pkg-overview" class="overviewLink">Overview</a></dd>
+			<dd><a href="index.html#pkg-index" class="indexLink">Index</a></dd>
+			
+			
+			</dl>
+		</div>
+		<!-- The package's Name is printed as title by the top-level template -->
+		<div id="pkg-overview" class="toggleVisible">
+			<div class="collapsed">
+				<h2 class="toggleButton" title="Click to show Overview section">Overview ▹</h2>
+			</div>
+			<div class="expanded">
+				<h2 class="toggleButton" title="Click to hide Overview section">Overview ▾</h2>
+				
+			</div>
+		</div>
+		
+
+		<div id="pkg-index" class="toggleVisible">
+		<div class="collapsed">
+			<h2 class="toggleButton" title="Click to show Index section">Index ▹</h2>
+		</div>
+		<div class="expanded">
+			<h2 class="toggleButton" title="Click to hide Index section">Index ▾</h2>
+
+		<!-- Table of contents for API; must be named manual-nav to turn off auto nav. -->
+			<div id="manual-nav">
+			<dl>
+			
+			
+				<dd><a href="index.html#pkg-variables">Variables</a></dd>
+			
+			
+				
+				<dd><a href="index.html#SetPath">func SetPath(path string) []string</a></dd>
+			
+			
+				
+				<dd><a href="index.html#Client">type Client</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Client.Close">func (c Client) Close()</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Client.Send">func (c Client) Send(conf []string, payload network.Payload) (*network.Payload, error)</a></dd>
+				
+			
+				
+				<dd><a href="index.html#Server">type Server</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Server.Listen">func (s Server) Listen(conf []string, handler network.Handler, middleware network.Middleware)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Server.Serve">func (s *Server) Serve(address string)</a></dd>
+				
+			
+			
+			</dl>
+			</div><!-- #manual-nav -->
+
+		
+
+		
+			<h4>Package files</h4>
+			<p>
+			<span style="font-size:90%">
+			
+				<a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/netamqp/client.go">client.go</a>
+			
+				<a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/netamqp/publishing.go">publishing.go</a>
+			
+				<a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/netamqp/server.go">server.go</a>
+			
+			</span>
+			</p>
+		
+		</div><!-- .expanded -->
+		</div><!-- #pkg-index -->
+
+		<div id="pkg-callgraph" class="toggle" style="display: none">
+		<div class="collapsed">
+			<h2 class="toggleButton" title="Click to show Internal Call Graph section">Internal call graph ▹</h2>
+		</div> <!-- .expanded -->
+		<div class="expanded">
+			<h2 class="toggleButton" title="Click to hide Internal Call Graph section">Internal call graph ▾</h2>
+			<p>
+			  In the call graph viewer below, each node
+			  is a function belonging to this package
+			  and its children are the functions it
+			  calls&mdash;perhaps dynamically.
+			</p>
+			<p>
+			  The root nodes are the entry points of the
+			  package: functions that may be called from
+			  outside the package.
+			  There may be non-exported or anonymous
+			  functions among them if they are called
+			  dynamically from another package.
+			</p>
+			<p>
+			  Click a node to visit that function's source code.
+			  From there you can visit its callers by
+			  clicking its declaring <code>func</code>
+			  token.
+			</p>
+			<p>
+			  Functions may be omitted if they were
+			  determined to be unreachable in the
+			  particular programs or tests that were
+			  analyzed.
+			</p>
+			<!-- Zero means show all package entry points. -->
+			<ul style="margin-left: 0.5in" id="callgraph-0" class="treeview"></ul>
+		</div>
+		</div> <!-- #pkg-callgraph -->
+
+		
+		
+			<h2 id="pkg-variables">Variables</h2>
+			
+				<p>
+NewClient connects to a RabbitMQ server, initialize a netamqp.Client object and returns a network.Client
+</p>
+
+				<pre>var <span id="NewClient">NewClient</span> = func(address <a href="../../../../../builtin/index.html#string">string</a>) <a href="../index.html">network</a>.<a href="../index.html#Client">Client</a> {
+
+    var <span id="connection">connection</span> *<a href="http://localhost:6060/pkg/github.com/streadway/amqp/">amqp</a>.<a href="http://localhost:6060/pkg/github.com/streadway/amqp/#Connection">Connection</a>
+    var <span id="err">err</span> <a href="../../../../../builtin/index.html#error">error</a>
+
+    <a href="../../helpers/index.html">helpers</a>.<a href="../../helpers/index.html#Retries">Retries</a>(<a href="index.html#RetriesTimes">RetriesTimes</a>, <a href="index.html#Sleep">Sleep</a>, func(...interface{}) <a href="../../../../../builtin/index.html#bool">bool</a> {
+        connection, err = <a href="http://localhost:6060/pkg/github.com/streadway/amqp/">amqp</a>.<a href="http://localhost:6060/pkg/github.com/streadway/amqp/#Dial">Dial</a>(address)
+        if err != <a href="../../../../../builtin/index.html#nil">nil</a> {
+            return <a href="../../../../../builtin/index.html#true">true</a>
+        }
+        return <a href="../../../../../builtin/index.html#false">false</a>
+    })
+
+    if connection == <a href="../../../../../builtin/index.html#nil">nil</a> {
+
+        <a href="../../../../../builtin/index.html#panic">panic</a>(&#34;Cannot connect to RabbitMQ server&#34;)
+    }
+
+    return &amp;<a href="index.html#Client">Client</a>{<a href="index.html#Client.connection">connection</a>: connection}
+}</pre>
+			
+				<p>
+NewServer return a network.Server object
+</p>
+
+				<pre>var <span id="NewServer">NewServer</span> = func() <a href="../index.html">network</a>.<a href="../index.html#Server">Server</a> {
+
+    return &amp;<a href="index.html#Server">Server</a>{}
+}</pre>
+			
+				<p>
+RetriesTimes for reconnect with the server
+</p>
+
+				<pre>var <span id="RetriesTimes">RetriesTimes</span> = 10</pre>
+			
+				<p>
+Sleep delay between calls
+</p>
+
+				<pre>var <span id="Sleep">Sleep</span> = 5</pre>
+			
+		
+		
+			
+			
+			<h2 id="SetPath">func <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/netamqp/server.go?s=580:614#L17">SetPath</a>
+				<a class="permalink" href="index.html#SetPath">&#xb6;</a>
+			</h2>
+			<pre>func SetPath(path <a href="../../../../../builtin/index.html#string">string</a>) []<a href="../../../../../builtin/index.html#string">string</a></pre>
+			<p>
+SetPath get a path as parameter and return an array. It use for Server.Listen.
+</p>
+
+			
+			
+
+		
+		
+			
+			
+			<h2 id="Client">type <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/netamqp/client.go?s=258:309#L1">Client</a>
+				<a class="permalink" href="index.html#Client">&#xb6;</a>
+			</h2>
+			<p>
+Client implements the network.Client interface. Client handles the remote calls via RabbitMQ (AMQP) protocol
+</p>
+
+			<pre>type Client struct {
+    <span class="comment">// contains filtered or unexported fields</span>
+}</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+				
+				<h3 id="Client.Close">func (Client) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/netamqp/client.go?s=2105:2128#L89">Close</a>
+					<a class="permalink" href="index.html#Client.Close">&#xb6;</a>
+				</h3>
+				<pre>func (c <a href="index.html#Client">Client</a>) Close()</pre>
+				<p>
+Close close the current connection
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="Client.Send">func (Client) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/netamqp/client.go?s=926:1012#L27">Send</a>
+					<a class="permalink" href="index.html#Client.Send">&#xb6;</a>
+				</h3>
+				<pre>func (c <a href="index.html#Client">Client</a>) Send(conf []<a href="../../../../../builtin/index.html#string">string</a>, payload <a href="../index.html">network</a>.<a href="../index.html#Payload">Payload</a>) (*<a href="../index.html">network</a>.<a href="../index.html#Payload">Payload</a>, <a href="../../../../../builtin/index.html#error">error</a>)</pre>
+				<p>
+Send is responsible to send data in RabbitMQ server
+</p>
+
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="Server">type <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/netamqp/server.go?s=339:390#L6">Server</a>
+				<a class="permalink" href="index.html#Server">&#xb6;</a>
+			</h2>
+			<p>
+Server struct implements the network.Server interface for RabbitMQ services.
+</p>
+
+			<pre>type Server struct {
+    <span class="comment">// contains filtered or unexported fields</span>
+}</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+				
+				<h3 id="Server.Listen">func (Server) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/netamqp/server.go?s=1308:1401#L45">Listen</a>
+					<a class="permalink" href="index.html#Server.Listen">&#xb6;</a>
+				</h3>
+				<pre>func (s <a href="index.html#Server">Server</a>) Listen(conf []<a href="../../../../../builtin/index.html#string">string</a>, handler <a href="../index.html">network</a>.<a href="../index.html#Handler">Handler</a>, middleware <a href="../index.html">network</a>.<a href="../index.html#Middleware">Middleware</a>)</pre>
+				<p>
+Listen method start a new worker which is listing to a specif queue.
+</p>
+
+				
+				
+				
+			
+				
+				<h3 id="Server.Serve">func (*Server) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/netamqp/server.go?s=786:824#L23">Serve</a>
+					<a class="permalink" href="index.html#Server.Serve">&#xb6;</a>
+				</h3>
+				<pre>func (s *<a href="index.html#Server">Server</a>) Serve(address <a href="../../../../../builtin/index.html#string">string</a>)</pre>
+				<p>
+Serve method (network.Server) start the RabbitMQ server for a specif address. The have to has the right format
+in order &lt;address&gt;:&lt;port&gt;
+</p>
+
+				
+				
+				
+			
+		
+	
+
+	
+
+
+
+
+
+
+
+<div id="footer">
+Build version go1.9.<br>
+Except as <a href="https://developers.google.com/site-policies#restrictions">noted</a>,
+the content of this page is licensed under the
+Creative Commons Attribution 3.0 License,
+and code is licensed under a <a href="http://localhost:6060/LICENSE">BSD license</a>.<br>
+<a href="http://localhost:6060/doc/tos.html">Terms of Service</a> | 
+<a href="http://www.google.com/intl/en/policies/privacy/">Privacy Policy</a>
+</div>
+
+</div><!-- .container -->
+</div><!-- #page -->
+
+<!-- TODO(adonovan): load these from <head> using "defer" attribute? -->
+<script type="text/javascript" src="../../../../../../lib/godoc/jquery.js"></script>
+<script type="text/javascript" src="../../../../../../lib/godoc/jquery.treeview.js"></script>
+<script type="text/javascript" src="../../../../../../lib/godoc/jquery.treeview.edit.js"></script>
+
+
+<script>var goVersion = "go1.9";</script>
+<script type="text/javascript" src="../../../../../../lib/godoc/godocs.js"></script>
+
+</body>
+</html>
+

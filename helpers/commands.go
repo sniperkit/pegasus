@@ -3,15 +3,13 @@ package helpers
 import (
 	"bitbucket.org/code_horse/pegasus/blunder"
 	"errors"
+	"net/url"
 	"os/exec"
 	"strings"
-	"net/url"
 )
 
-var (
-	// GetContainerIDScriptPath is the shell script file path which returns the docker container id
-	GetContainerIDScriptPath = "./scripts/get_container_id.sh"
-)
+// GetContainerIDScriptPath is the shell script file path which returns the docker container id
+var GetContainerIDScriptPath = "./scripts/get_container_id.sh"
 
 // GetContainerID returns the docker running container id as string. It needs the ./scripts/get_container_id.sh
 // in order to get get container id. If something go wrong then it will returns "Container ID not found"
