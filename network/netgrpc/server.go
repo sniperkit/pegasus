@@ -11,7 +11,9 @@ import (
 	"net"
 )
 
-// Server is the manger of GRPC server. It's responsible to configure the server in order to run properly.
+// Server implements the network.Server
+// Server is the manger of GRPC server. It's responsible to configure the server and the handlers in order to run
+// properly.
 type Server struct {
 
 	// Router handler the listener handlers

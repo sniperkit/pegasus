@@ -10,6 +10,7 @@ import (
 	"strings"
 )
 
+// Server implements the network.Server
 // Server struct is responsible for http server. It manages connections and configuration may needed in order to ensure
 // that the http server works properly
 type Server struct {

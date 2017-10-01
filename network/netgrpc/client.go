@@ -9,7 +9,8 @@ import (
 	"google.golang.org/grpc"
 )
 
-// Client struct describe the GRPC client. It contains all the functionality in order to talk to another server.
+// Client implements the network.Client. Client struct describe the GRPC client. It contains all the functionality in
+// order to talk to another server.
 type Client struct {
 
 	// Connection is the connection of GRPC server

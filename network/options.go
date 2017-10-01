@@ -4,8 +4,21 @@ import (
 	"encoding/json"
 )
 
-// Options struct define the parameters that we can pass over network. The path is the main identifier the of the
-// options could go at fields property. The Options transferred to the (order side) client always.
+// Options struct defines the parameters that we can pass over network. It contains tree layers of parameters that
+// could be defined.
+//
+// The Headers
+//  Header: Fields["HEADERS"]["ANYTHING"] = "STRING VALUE"
+// The headers are used to passed an options in order to tell to server to change a process or to check something.
+// Headers are not parameters.
+//
+// The Params
+//  Header: Fields["PARAMS"]["ANYTHING"] = "STRING VALUE"
+// The params are set by the server only and defines the parameters that could be set. e.g. HTTP url or path params.
+//
+// Custom
+//  Header: Fields["ANYTHING"]["ANYTHING"] = "STRING VALUE"
+// Custom fields are used if we want to set something completely custom, it's good be avoid.
 type Options struct {
 
 	// Fields are general properties may client need to know
@@ -68,7 +81,7 @@ func (c *Options) GetHeader(key string) string {
 	return c.GetField("HEADERS", key)
 }
 
-// Marshal return the hole object to byte in order to be able to transfer it over HTTP or GRPC or whatever
+// Marshal return the object to bytes in order to be able to transfer it over HTTP or GRPC or whatever
 func (c *Options) Marshal() []byte {
 	b, err := json.Marshal(c)
 	if err != nil {
@@ -89,9 +102,7 @@ func (c *Options) Unmarshal(data []byte) *Options {
 	return c
 }
 
-// SetField create a Fields map[string]map[string]string. We need this method in order to initialize the map each
-// time when a new group (the first map is known as group) is created. The parameters are the group which is a key
-// for the first mapper, the key which for the previous group and the value.
+// SetField create a Fields map[string]map[string]string. We need this method in order to initialize the map.
 func (c *Options) SetField(group string, key string, value string) {
 	if c.Fields == nil {
 		c.Fields = make(map[string]map[string]string)

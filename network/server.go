@@ -1,38 +1,81 @@
 package network
 
-// Server is an interface that describes the Server struct. It's responsible to start the server and set up the
-// listeners
+// Server is an interface that describes the Server implementation of transfer protocol providers. It's responsible to
+// start the server and set up the listeners in order to process the requests.
+//
+// Serve
+//
+// Serve which is responsible to start the server. It gets a address string as parameters which should have the
+// following format <address>:<port>
+//
+// Listen
+//
+// Listen function creates a handler for a specific endpoint. The parameters are
+//
+// conf: (required) Conf parameter describes the options that the listen needs in order to be created.
+//
+// e.g. The conf could be only a path but in case of HTTP protocol the method type is need. Each protocol providers
+// has a method called SetPath which a conf.
+//
+// Handler: (required) Handler is a function type of func(chanel *network.Channel). The Channel contains two method the
+// send method and the receive functions. The send function is used to send a payload and receive function to receive
+// the payload.
+//
+// Middleware: (optional) Middleware is a type of function which executes before network.handler function. It has
+// two parameters the network.Handler and the network.channel. It used only at network.Server::Listen function. Usually
+// the middleware type of function could be nil.
+// The Middleware is responsible to call or not the handler function. Also can edit the network.Channel data that
+// handler will get from channel parameter.
+//
+// Data tree:
+//  Payload:- contains two fields
+// 		|- Body: Used to transfer the raw content.
+//		|- Options: Options contains the Params, Headers a fields and Custom fields.
+//			|
+//			|- Params: We cannot set the params, only server can set this in order to return it. Params could contain
+//			| for example the url-path parameters. If the param is set the server will ignore it.
+//			|
+//			|- Header: We can set headers in order to tell to server to change a behavior.
+//			|
+//			|- Fields: It contains custom fields for extreme cases.
+//
+// The payload also used as channel type through network.Channel.
+//
+// Example:
+//  var handlerGet = func(channel *network.Channel) {
+//  	// Receive the payload
+//  	receive := channel.Receive()
+//
+//  	// Unmarshal options, change them and send them back
+//  	options := network.NewOptions().Unmarshal(receive.Options)
+//
+//  	replyOptions := network.NewOptions()
+//
+//  	replyOptions.SetHeader("Custom", options.GetHeader("Custom")+" response")
+//
+//  	// Create the new payload
+//  	payload := network.BuildPayload([]byte(options.GetParam("foo")+" response"), replyOptions.Marshal())
+//
+//  	// Send it back
+//  	channel.Send(payload)
+//  }
+//
+//  server := nethttp.NewServer(nil)
+//  server.Listen(nethttp.SetPath("/http", nethttp.Get), handlerGet, nil)
+//  server.Serve("localhost:7000")
+//
+//  // Send a request
+//  // Create a payload
+//  options := network.NewOptions()
+//
+//  options.SetHeader("Custom", "header-value")
+//
+//  payload := network.BuildPayload(nil, options.Marshal())
+//
+//  // Send the payload
+//  response, err := nethttp.NewClient().
+//    Send(nethttp.SetPath("http://localhost:7000/http?foo=bar", nethttp.Get), payload)
 type Server interface {
-
-	// Serve function start the server for the configured router and giver address. The address must have the following
-	// format <address>:<port>
 	Serve(address string)
-
-	// Listen function creates a handler for a specific endpoint. It gets the path string unique key, the handler
-	// which is a function and the middleware which also is a function.
-	//
-	// Handler: 	(required) Handler is a function type of func(chanel *Channel). The Channel contains two method the
-	// 				send method and the receive functions. The send method could send a payload to the other side
-	// 				(server-client) and receive function return the payload.
-	//
-	//				Payload: The payload contains two fields:
-	// 							Body: 		Which is the raw content
-	//							Options: 	Which have the Header that tell to the server what to change and how to
-	// 										process with the request and params which is set with all possible
-	// 										parameters that can pass except the Body.
-	// 										e.g. HTTP get prams, HTTP url params
-	// 						Usually we build the payload.Options to network.Option content in order to have access to
-	//						those fields.
-	//						e.g. 	receive := channel.Receive() // return a network.Payload object
-	//								options := network.NewOptions().Unmarshal(receive.Options)
-	//								paramName := options.GetParam("name") // Get the name param
-	//								options.SetHeader("foo", "bar") // Set a custom header
-	//								p := network.BuildPayload([]byte("body"), options.Marshal())
-	//								channel.Send(p)
-	//
-	// Middleware: 	 (optional) Middleware receive the network.Payload param and the network.Handler and executes first
-	//				  This is responsible to add more parameter to handler and execute the handler function or not. At
-	//				  Middleware for example you can check a authentication or authorization key, set the current user,
-	//				  transform parameters, etc ...
-	Listen(path []string, handler Handler, middleware Middleware)
+	Listen(conf []string, handler Handler, middleware Middleware)
 }
