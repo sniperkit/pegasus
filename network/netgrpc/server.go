@@ -51,14 +51,14 @@ func (s *Server) Serve(address string) {
 
 // Listen function creates a handler for a specific endpoint. It gets the path string unique key, the handler
 // which is a function and the middleware which also is a function.
-func (s *Server) Listen(path []string, handler network.Handler, middleware network.Middleware) {
+func (s Server) Listen(path []string, handler network.Handler, middleware network.Middleware) {
 	s.Router.Add(path[0], handler, middleware)
 }
 
 // HandlerSync is the method which send and receive the messages between the GRPC server. This is the brain of GRPC
 // transportation. The first parameter is the context from GRPC the second is the HandlerRequest which container all
 // the new messages. The function returns a HandlerReply or an error if something happens.
-func (s *Server) HandlerSync(ctx context.Context, in *pb.HandlerRequest) (*pb.HandlerReply, error) {
+func (s Server) HandlerSync(ctx context.Context, in *pb.HandlerRequest) (*pb.HandlerReply, error) {
 
 	// Unmarshal the options
 	options := &network.Options{}
@@ -90,7 +90,7 @@ func (s *Server) HandlerSync(ctx context.Context, in *pb.HandlerRequest) (*pb.Ha
 
 // Handler soon you will me deleted
 // todo: [fix] [A005] Regenerate the protoc, and delete this method
-func (s *Server) Handler(stream pb.Serve_HandlerServer) error {
+func (Server) Handler(stream pb.Serve_HandlerServer) error {
 	return errors.New("Not yet implement")
 }
 

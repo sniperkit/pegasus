@@ -26,7 +26,7 @@ var NewClient = func(address string) network.Client {
 
 // Send function sends a payload to a GRPC server. It gets the string path which is the unique id and the payload
 // object.
-func (c *Client) Send(path []string, payload network.Payload) (*network.Payload, error) {
+func (c Client) Send(path []string, payload network.Payload) (*network.Payload, error) {
 
 	connection := pb.NewServeClient(c.Connection)
 
@@ -53,13 +53,13 @@ func (c *Client) Send(path []string, payload network.Payload) (*network.Payload,
 }
 
 // Close terminate the connection immediately.
-func (c *Client) Close() {
+func (c Client) Close() {
 	c.Connection.Close()
 }
 
 // connect used to connect with another GRPC service. The first parameter is address and returns the connection
 // and ServeClient from proto buff
-func (c *Client) connect(address string) *grpc.ClientConn {
+func (Client) connect(address string) *grpc.ClientConn {
 
 	var conn *grpc.ClientConn
 	var err error

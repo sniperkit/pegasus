@@ -11,3 +11,4 @@ func TestNetamqp(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Netamqp Suite")
 }
+

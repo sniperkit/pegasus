@@ -33,11 +33,11 @@ func NewChannel(channelSize int) *Channel {
 }
 
 // Send method get a payload object and send it through the channel.
-func (c *Channel) Send(payload Payload) {
+func (c Channel) Send(payload Payload) {
 	c.payload <- payload
 }
 
 // Receive data from channel and return it. The function return a Payload.
-func (c *Channel) Receive() Payload {
+func (c Channel) Receive() Payload {
 	return <-c.payload
 }

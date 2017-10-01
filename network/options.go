@@ -44,17 +44,17 @@ func (c *Options) SetParams(params map[string]string) {
 }
 
 // GetParams get the parameters
-func (c *Options) GetParams() map[string]string {
+func (c Options) GetParams() map[string]string {
 	return c.Fields["PARAMS"]
 }
 
 // SetParam set a parameter
-func (c *Options) SetParam(key string, value string) {
+func (c Options) SetParam(key string, value string) {
 	c.SetField("PARAMS", key, value)
 }
 
 // GetParam get a parameter
-func (c *Options) GetParam(key string) string {
+func (c Options) GetParam(key string) string {
 	return c.GetField("PARAMS", key)
 }
 
@@ -67,22 +67,22 @@ func (c *Options) SetHeaders(params map[string]string) {
 }
 
 // GetHeaders get the header parameters
-func (c *Options) GetHeaders() map[string]string {
+func (c Options) GetHeaders() map[string]string {
 	return c.Fields["HEADERS"]
 }
 
 // SetHeader set a header parameter
-func (c *Options) SetHeader(key string, value string) {
+func (c Options) SetHeader(key string, value string) {
 	c.SetField("HEADERS", key, value)
 }
 
 // GetHeader get a header parameter
-func (c *Options) GetHeader(key string) string {
+func (c Options) GetHeader(key string) string {
 	return c.GetField("HEADERS", key)
 }
 
 // Marshal return the object to bytes in order to be able to transfer it over HTTP or GRPC or whatever
-func (c *Options) Marshal() []byte {
+func (c Options) Marshal() []byte {
 	b, err := json.Marshal(c)
 	if err != nil {
 		panic(err)
@@ -114,7 +114,7 @@ func (c *Options) SetField(group string, key string, value string) {
 }
 
 // GetField return the value of a Field. The return value is a string.
-func (c *Options) GetField(group string, key string) string {
+func (c Options) GetField(group string, key string) string {
 	if c.Fields == nil {
 		return ""
 	}

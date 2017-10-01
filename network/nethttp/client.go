@@ -22,7 +22,7 @@ var NewClient = func() network.Client {
 
 // Send function sends a payload to other servers. It gets the string path which is the unique id and the payload
 // object. The path may use other function ir order to generate the format for each provider.
-func (c *Client) Send(conf []string, payload network.Payload) (*network.Payload, error) {
+func (c Client) Send(conf []string, payload network.Payload) (*network.Payload, error) {
 
 	path := conf[0]
 	method := conf[1]
@@ -81,5 +81,5 @@ func (c *Client) Send(conf []string, payload network.Payload) (*network.Payload,
 }
 
 // Close terminal the current connection.
-func (c *Client) Close() {
+func (Client) Close() {
 }

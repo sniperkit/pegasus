@@ -35,7 +35,7 @@ func SetPath(path string, method Method) []string {
 }
 
 // Serve function start the server for a specific part and port
-func (s *Server) Serve(path string) {
+func (s Server) Serve(path string) {
 	go func() {
 		err := http.ListenAndServe(path, s.Router)
 		if err != nil {
@@ -46,7 +46,7 @@ func (s *Server) Serve(path string) {
 
 // Listen function creates a handler for a specific endpoint. It gets the path string unique key, the handler
 // which is a function and the middleware which also is a function.
-func (s *Server) Listen(paths []string, handler network.Handler, middleware network.Middleware) {
+func (s Server) Listen(paths []string, handler network.Handler, middleware network.Middleware) {
 
 	path := paths[0]
 	method := paths[1]
@@ -66,8 +66,6 @@ func (s *Server) Listen(paths []string, handler network.Handler, middleware netw
 			options.SetParam(pathKey, pathVar)
 		}
 
-		//todo: [fix] [A008] Add url path params
-
 		// Parse and set the body
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
@@ -81,7 +79,7 @@ func (s *Server) Listen(paths []string, handler network.Handler, middleware netw
 		// Get the payload
 		requestPayload := network.BuildPayload(body, options.Marshal())
 
-		// Load the payload to the channel
+		// Send the payload
 		channel.Send(requestPayload)
 
 		// Start the handler
@@ -119,9 +117,9 @@ func (s *Server) Listen(paths []string, handler network.Handler, middleware netw
 
 }
 
-// Set a map of strings keys and strings values of given http headers. Receives
+// setHeaders sets a map of strings keys and strings values of given http headers. Receives
 // a http header object and returns a map object map[string]string.
-func (s *Server) setHeaders(headers http.Header) map[string]string {
+func (Server) setHeaders(headers http.Header) map[string]string {
 	mapper := make(map[string]string)
 	for key, value := range headers {
 		mapper[key] = strings.Join(value, ",")
@@ -129,9 +127,9 @@ func (s *Server) setHeaders(headers http.Header) map[string]string {
 	return mapper
 }
 
-// Set a map of strings keys and strings values of given url query params. Receives
+// setQueryParams sets a map of strings keys and strings values of given url query params. Receives
 // a http header object and returns a map object map[string]string.
-func (s *Server) setQueryParams(params url.Values) map[string]string {
+func (Server) setQueryParams(params url.Values) map[string]string {
 	mapper := make(map[string]string)
 	for key, value := range params {
 		mapper[key] = strings.Join(value, ",")
