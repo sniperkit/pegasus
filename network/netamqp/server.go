@@ -17,19 +17,19 @@ type Server struct {
 	connection *amqp.Connection
 }
 
-// NewServer return a network.Server object
+// NewServer returns a network.Server object
 var NewServer = func() network.Server {
 
 	return &Server{}
 }
 
-// SetPath get a path as parameter and return an array. It use for Server.Listen.
+// SetPath gets a path as parameter and returns an array. It uses for Server.Listen.
 func SetPath(path string) []string {
 	return []string{path}
 }
 
-// Serve method (network.Server) start the RabbitMQ server for a specif address. The have to has the right format
-// in order <address>:<port>
+// Serve method (network.Server) starts the RabbitMQ server for a specif address. It should have the right format
+// <address>:<port>
 func (s *Server) Serve(address string) {
 	var connection *amqp.Connection
 	var err error
@@ -51,7 +51,7 @@ func (s *Server) Serve(address string) {
 	s.connection = connection
 }
 
-// Listen method start a new worker which is listing to a specif queue.
+// Listen method starts a new worker which is listening to a specific queue.
 func (s Server) Listen(conf []string, handler network.Handler, middleware network.Middleware) {
 
 	path := conf[0]

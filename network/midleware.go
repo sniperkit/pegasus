@@ -1,8 +1,7 @@
 package network
-
-// Middleware is a type of function which executes before network.handler function. It has two parameters the
-// network.Handler and the network.channel. It used only at network.Server::Listen function. Usually the middleware
-// type of function could be nil.
+// Middleware is a type of function which is executed before network.handler function. It has two parameters the
+// network.Handler and the network.channel. It is used only at network.Server::Listen function. Usually the middleware
+// type of function would be nil.
 //
 // Handler parameter is used as handler function which will handler a specif request.
 //

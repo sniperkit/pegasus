@@ -6,12 +6,12 @@ import (
 	"time"
 )
 
-// publishing embeeds the amqp.Publishing struct in order to configure it properly.
+// publishing embeds the amqp.Publishing struct in order to configure it properly.
 type publishing struct {
 	amqp.Publishing
 }
 
-// configurePublishing configure the publishing method, assigning the headers value in publishing properties.
+// configurePublishing configures the publishing method, assigning the headers value in publishing properties.
 func (p publishing) configurePublishing(headers map[string]string) {
 
 	if headers["Content-Type"] != "" {

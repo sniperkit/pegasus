@@ -12,7 +12,7 @@ import (
 var GetContainerIDScriptPath = "./scripts/get_container_id.sh"
 
 // GetContainerID returns the docker running container id as string. It needs the ./scripts/get_container_id.sh
-// in order to get get container id. If something go wrong then it will returns "Container ID not found"
+// in order to get get container id. If something goes wrong then it will return "Container ID not found".
 func GetContainerID() string {
 	id, err := commandRunner(GetContainerIDScriptPath, "Container ID not found")
 	if err != nil {
@@ -21,8 +21,8 @@ func GetContainerID() string {
 	return id
 }
 
-// commandRunner will run a command. If the script runs successfully then will return the export data as string
-// if something don't go well then it will return an error with given error message.
+// commandRunner will run a command. If the script runs successfully then it will return the exported data as string
+// if something doesn't go well then it will return an error with the given error message.
 func commandRunner(command string, errMsg string) (string, error) {
 
 	var (

@@ -25,7 +25,7 @@ var _ = Describe("Commands", func() {
 				Expect(containerID).To(BeEquivalentTo("Container ID not found"))
 			})
 
-			It("should return the default error message for container id not found", func() {
+			It("should return the default error message for undefined container id", func() {
 				helpers.GetContainerIDScriptPath = `echo ""`
 				containerID := helpers.GetContainerID()
 				Expect(containerID).To(BeEquivalentTo("Container ID not found"))

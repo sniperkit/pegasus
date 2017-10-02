@@ -1,9 +1,9 @@
 package blunder
 
-// Manager struct describes the errors, the actions after an error occur and the tracking of it. Manager struct
+// Manager struct describes the errors, the actions after an error occurs and the tracking of it. Manager struct
 // contains the following fields
 //
-// importance: Defines how important an error could be and how handle it. It's an embedded struct that helps to
+// importance: Defines how important an error could be and how to handle it. It's an embedded struct that helps to
 // prioritize the error.
 //
 // message: Defines the error message
@@ -25,10 +25,10 @@ type Manager struct {
 	err error
 }
 
-// Set the error message and the error object. It gets two parameters the message parameter as string and the error
+// Set the error message and the error object. It gets two parameters: the message parameter as string and the error
 // object. The function will return a Manager object.
 //
-// The Manager struct embedded the importance struct in order to be able prioritize it.
+// The Manager struct embeds the importance struct in order to be able to prioritize it.
 func Set(message string, err error) *Manager {
 	manager := &Manager{}
 	manager.message = message
@@ -37,8 +37,8 @@ func Set(message string, err error) *Manager {
 	return manager
 }
 
-// Handle the error according to properties. If the Manger.err object is nil the handle function will silence quit,
-// else will check each case of importance.
+// Handle the error according to properties. If the Manger.err object is nil the handle function will silently quit,
+// otherwise it will check each case of importance stat
 func (m *Manager) Handle() {
 
 	if m.err == nil {

@@ -11,14 +11,14 @@ import (
 )
 
 // Server implements the network.Server
-// Server struct is responsible for http server. It manages connections and configuration may needed in order to ensure
-// that the http server works properly
+// Server struct is responsible for http server. It manages connections and configuration might be needed in order to
+// ensure that the http server works properly
 type Server struct {
 	// Router is responsible for handler and middleware
 	Router *mux.Router
 }
 
-// NewServer is constructor of Server struct. It initialize and return a Server object. It get a *mux.Router as
+// NewServer is a constructor of Server struct. It initializes and returns a Server object. It gets a *mux.Router as
 // parameter, if the router parameter is nil it will generate a new router and assign it to the object.
 var NewServer = func(router *mux.Router) network.Server {
 
@@ -29,12 +29,12 @@ var NewServer = func(router *mux.Router) network.Server {
 	return &Server{Router: router}
 }
 
-// SetPath get a path as parameter and return an array. It use for Server.Listen.
+// SetPath gets a path as parameter and returns an array. It is used for Server.Listen.
 func SetPath(path string, method Method) []string {
 	return []string{path, method.String()}
 }
 
-// Serve function start the server for a specific part and port
+// Serve function starts the server for a specific part and port.
 func (s Server) Serve(path string) {
 	go func() {
 		err := http.ListenAndServe(path, s.Router)
@@ -118,7 +118,7 @@ func (s Server) Listen(paths []string, handler network.Handler, middleware netwo
 }
 
 // setHeaders sets a map of strings keys and strings values of given http headers. Receives
-// a http header object and returns a map object map[string]string.
+// an http header object and returns a map object map[string]string.
 func (Server) setHeaders(headers http.Header) map[string]string {
 	mapper := make(map[string]string)
 	for key, value := range headers {
@@ -128,7 +128,7 @@ func (Server) setHeaders(headers http.Header) map[string]string {
 }
 
 // setQueryParams sets a map of strings keys and strings values of given url query params. Receives
-// a http header object and returns a map object map[string]string.
+// an http header object and returns a map object map[string]string.
 func (Server) setQueryParams(params url.Values) map[string]string {
 	mapper := make(map[string]string)
 	for key, value := range params {

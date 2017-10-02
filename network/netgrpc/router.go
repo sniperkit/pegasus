@@ -6,7 +6,8 @@ import "bitbucket.org/code_horse/pegasus/network"
 // server to know when to call each handler.
 type Router struct {
 
-	// PathWrapper is the mapper which has as a key the unique path (url) and as value the handler and the middleware
+	// PathWrapper is the mapper which has a key that points to a unique path (url) and is refering to the handler and
+	// the middleware
 	PathsWrapper map[string]*PathWrapper
 }
 

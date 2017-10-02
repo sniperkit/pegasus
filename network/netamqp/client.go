@@ -11,7 +11,7 @@ type Client struct {
 	connection *amqp.Connection
 }
 
-// NewClient connects to a RabbitMQ server, initialize a netamqp.Client object and returns a network.Client
+// NewClient connects to a RabbitMQ server, initializes a netamqp.Client object and returns a network.Client
 var NewClient = func(address string) network.Client {
 
 	var connection *amqp.Connection

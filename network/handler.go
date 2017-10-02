@@ -1,17 +1,17 @@
 package network
 
-// Handler is a type of function which has a parameter a network.Channel. The handler used at network.Client::Send and
-// network.Server::Listen function in order to define a handler function which will processes the request. Also handler
-// defined at network.Middleware.
+// Handler is a type of function which has a parameter a network.Channel. The handler was used at network.Client::Send &
+// network.Server::Listen function in order to define a handler function which will process the request. Also handler
+// is defined at network.Middleware.
 //
 // Channel is the only and main way to transport data from Handlers to receivers. It contains a payload struct field
 // with two nested fields payload.Options and payload.Body.
 //
-// Channel exists only in network.Handler, network.Middleware and network.Client::Listen files as parameter for those
+// Channel exists only in network.Handler, network.Middleware and network.Client::Listen files, as parameter for those
 // functions
 //
 // The payload.Options can be used in order to transport some options via options.Headers or some parameters via
-// options.Params. The options.Body is similar with http body and used in order to transfer raw content.
+// options.Params. The options.Body is similar with http body and is used in order to transfer raw content.
 //
 // An example for usage could be:
 //	func handler(channel *network.Channel) {

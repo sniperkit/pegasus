@@ -12,7 +12,7 @@ import (
 )
 
 // Server implements the network.Server
-// Server is the manger of GRPC server. It's responsible to configure the server and the handlers in order to run
+// Server is the manger of the GRPC server. It's responsible to configure the server and the handlers in order to run
 // properly.
 type Server struct {
 
@@ -26,8 +26,8 @@ type Server struct {
 	server *grpc.Server
 }
 
-// NewServer is the construct of Server struct. Generates and return a new Serve object. The parameter Router defines
-// the route manager which is responsible to call the handlers.
+// NewServer is the constructor of Server struct. It generates and returns a new Serve object. The parameter Router
+// defines the route manager which is responsible to call the handlers.
 var NewServer = func(router *Router) network.Server {
 
 	if router == nil {
@@ -37,13 +37,12 @@ var NewServer = func(router *Router) network.Server {
 	return &Server{Router: router}
 }
 
-// SetPath get a path as parameter and return an array. It use for Server.Listen.
+// SetPath gets a path as parameter and returns an array. It is used for Server.Listen.
 func SetPath(path string) []string {
 	return []string{path}
 }
-
-// Serve function start a new GRPC server. It gets a string which is the address ("localhost:50099") and the GRPC router
-// object which had been used before for listen methods that you want to configure.
+// Serve function starts a new GRPC server. It gets a string which is the address ("localhost:50099") and the GRPC
+// router object which had been used before for listen methods that you want to configure.
 func (s *Server) Serve(address string) {
 	s.address = address
 	go s.startServer()
@@ -55,8 +54,8 @@ func (s Server) Listen(path []string, handler network.Handler, middleware networ
 	s.Router.Add(path[0], handler, middleware)
 }
 
-// HandlerSync is the method which send and receive the messages between the GRPC server. This is the brain of GRPC
-// transportation. The first parameter is the context from GRPC the second is the HandlerRequest which container all
+// HandlerSync is the method which sends and receives the messages between the GRPC server. This is the brain of GRPC
+// transportation. The first parameter is the context from GRPC and  the second is the HandlerRequest which contains all
 // the new messages. The function returns a HandlerReply or an error if something happens.
 func (s Server) HandlerSync(ctx context.Context, in *pb.HandlerRequest) (*pb.HandlerReply, error) {
 

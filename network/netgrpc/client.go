@@ -52,12 +52,12 @@ func (c Client) Send(path []string, payload network.Payload) (*network.Payload, 
 	return pl, nil
 }
 
-// Close terminate the connection immediately.
+// Close terminates the connection immediately.
 func (c Client) Close() {
 	c.Connection.Close()
 }
 
-// connect used to connect with another GRPC service. The first parameter is address and returns the connection
+// connect is used to connect with other GRPC services. The first parameter is the address and returns the connection
 // and ServeClient from proto buff
 func (Client) connect(address string) *grpc.ClientConn {
 

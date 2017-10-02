@@ -8,13 +8,13 @@ import (
 	"strings"
 )
 
-// Client interface describes the protocols client model. Client keep the connections open for each protocol in order
-// close the connection should use the Close function. Send function used to send data to other servers.
+// Client interface describes the protocols client model. Client keeps the connections open for each protocol in order
+// close the connection should use the Close function. Send function is used to send data to other servers.
 type Client struct {
 	httpClient *http.Client
 }
 
-// NewClient generate and return a Client object.
+// NewClient generates and returns a Client object.
 var NewClient = func() network.Client {
 	client := &http.Client{}
 	return &Client{httpClient: client}

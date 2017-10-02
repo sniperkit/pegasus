@@ -5,7 +5,7 @@ package network
 //
 // Serve
 //
-// Serve which is responsible to start the server. It gets a address string as parameters which should have the
+// Serve which is responsible to start the server. It gets an address string as parameters which should have the
 // following format <address>:<port>
 //
 // Listen
@@ -14,26 +14,26 @@ package network
 //
 // conf: (required) Conf parameter describes the options that the listen needs in order to be created.
 //
-// e.g. The conf could be only a path but in case of HTTP protocol the method type is need. Each protocol providers
-// has a method called SetPath which a conf.
+// e.g. The conf can be only a path but in case of HTTP protocol the method type is needed. Each protocol providers
+// has a method called SetPath which is a conf.
 //
-// Handler: (required) Handler is a function type of func(chanel *network.Channel). The Channel contains two method the
-// send method and the receive functions. The send function is used to send a payload and receive function to receive
-// the payload.
+// Handler: (required) Handler is a function type of func(chanel *network.Channel). The Channel contains two functions
+// the send method and the receive functions. The send function is used to send a payload and the receive function to
+// receive the payload.
 //
-// Middleware: (optional) Middleware is a type of function which executes before network.handler function. It has
-// two parameters the network.Handler and the network.channel. It used only at network.Server::Listen function. Usually
-// the middleware type of function could be nil.
-// The Middleware is responsible to call or not the handler function. Also can edit the network.Channel data that
-// handler will get from channel parameter.
+// Middleware: (optional) Middleware is a type of function which is executed before network.handler function. It has
+// two parameters the network.Handler and the network.channel. It is used only at network.Server::Listen function.
+// Usually the middleware type of function could be nil.
+// The Middleware is responsible to call or not the handler function. Also it can edit the network.Channel data that
+// handler will get from the channel parameter.
 //
 // Data tree:
 //  Payload:- contains two fields
 // 		|- Body: Used to transfer the raw content.
-//		|- Options: Options contains the Params, Headers a fields and Custom fields.
+//		|- Options: Options contains the Params, Headers, and Custom fields.
 //			|
-//			|- Params: We cannot set the params, only server can set this in order to return it. Params could contain
-//			| for example the url-path parameters. If the param is set the server will ignore it.
+//			|- Params: We cannot set the params, only server can set this. Params could contain
+//			| for example the url-path parameters.
 //			|
 //			|- Header: We can set headers in order to tell to server to change a behavior.
 //			|
