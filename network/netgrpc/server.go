@@ -41,6 +41,7 @@ var NewServer = func(router *Router) network.Server {
 func SetPath(path string) []string {
 	return []string{path}
 }
+
 // Serve function starts a new GRPC server. It gets a string which is the address ("localhost:50099") and the GRPC
 // router object which had been used before for listen methods that you want to configure.
 func (s *Server) Serve(address string) {
@@ -69,7 +70,7 @@ func (s Server) HandlerSync(ctx context.Context, in *pb.HandlerRequest) (*pb.Han
 	params := network.Payload{Body: in.Content, Options: options.Marshal()}
 
 	// Create a chanel
-	channel := network.NewChannel(2000)
+	channel := network.NewChannel(1)
 
 	channel.Send(params)
 
