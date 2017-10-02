@@ -16,10 +16,10 @@ import (
 // properly.
 type Server struct {
 
-	// Router handler the listener handlers
+	// Router
 	Router *Router
 
-	// address defines the server IP and port and has value with the following format (<IP>:<PORT>)
+	// address defines the server IP and port (<IP>:<PORT>)
 	address string
 
 	// The server connection

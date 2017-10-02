@@ -8,8 +8,9 @@ import (
 	"strings"
 )
 
-// Client interface describes the protocols client model. Client keeps the connections open for each protocol in order
-// close the connection should use the Close function. Send function is used to send data to other servers.
+// Client interface describes the protocols client model. Client keeps the connections open for each protocol.
+// In order to close the connection the Close function should be used. Send function is used to send data
+// to other servers.
 type Client struct {
 	httpClient *http.Client
 }

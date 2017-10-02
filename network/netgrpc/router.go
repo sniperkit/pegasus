@@ -6,7 +6,7 @@ import "bitbucket.org/code_horse/pegasus/network"
 // server to know when to call each handler.
 type Router struct {
 
-	// PathWrapper is the mapper which has a key that points to a unique path (url) and is refering to the handler and
+	// PathWrapper is the mapper which has a key that points to a unique path (url) and is referring to the handler and
 	// the middleware
 	PathsWrapper map[string]*PathWrapper
 }
@@ -18,8 +18,7 @@ func NewRouter() *Router {
 	}
 }
 
-// Add is the function which add a new PathWrapper in Router struct. It gets the path as unique key, the handler which
-// is a function and the middleware which also is a function.
+// Add is the function which add a new PathWrapper in Router struct. It gets the path as a unique key.
 func (r *Router) Add(path string, handler network.Handler, middleware network.Middleware) {
 	r.PathsWrapper[path] = &PathWrapper{
 		Handler:    handler,

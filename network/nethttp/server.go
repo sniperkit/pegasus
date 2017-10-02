@@ -117,7 +117,7 @@ func (s Server) Listen(paths []string, handler network.Handler, middleware netwo
 
 }
 
-// setHeaders sets a map of strings keys and strings values of given http headers. Receives
+// setHeaders sets a map of string keys and string values of given http headers. Receives
 // an http header object and returns a map object map[string]string.
 func (Server) setHeaders(headers http.Header) map[string]string {
 	mapper := make(map[string]string)
@@ -127,7 +127,7 @@ func (Server) setHeaders(headers http.Header) map[string]string {
 	return mapper
 }
 
-// setQueryParams sets a map of strings keys and strings values of given url query params. Receives
+// setQueryParams sets a map of string keys and string values of given url query params. Receives
 // an http header object and returns a map object map[string]string.
 func (Server) setQueryParams(params url.Values) map[string]string {
 	mapper := make(map[string]string)
