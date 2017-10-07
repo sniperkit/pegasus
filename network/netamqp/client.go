@@ -8,17 +8,17 @@ import (
 
 // Client implements the network.Client interface. Client handles the remote calls via RabbitMQ (AMQP) protocol
 type Client struct {
-	connection *amqp.Connection
+	connection IConnection
 }
 
 // NewClient connects to a RabbitMQ server, initializes a netamqp.Client object and returns a network.Client
 var NewClient = func(address string) network.Client {
 
-	var connection *amqp.Connection
+	var connection IConnection
 	var err error
 
 	helpers.Retries(RetriesTimes, Sleep, func(...interface{}) bool {
-		connection, err = amqp.Dial(address)
+		connection, err = NewConnection(address)
 		if err != nil {
 			return true
 		}
@@ -42,6 +42,7 @@ func (c Client) Send(conf []string, payload network.Payload) (*network.Payload, 
 
 	// Create a new channel and make sure and channel will close when this function ends (defer)
 	channel, err := c.connection.Channel()
+
 	defer channel.Close()
 
 	// todo: [fix] [A002] Finish the Blunder package and throw an error
@@ -74,7 +75,9 @@ func (c Client) Send(conf []string, payload network.Payload) (*network.Payload, 
 
 	// Set the headers
 	for k, v := range options.GetHeaders() {
-		pub.Headers[k] = v
+		if helpers.IsAMQPValidHeader(k) {
+			pub.Headers[k] = v
+		}
 	}
 
 	pub.Body = body

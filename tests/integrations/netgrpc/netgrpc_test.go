@@ -58,19 +58,33 @@ var _ = Describe("Netgrpc", func() {
 			// Create a payload
 			options := network.NewOptions()
 			options.SetField("options", "value", "option")
+			options.SetHeader("HP-Whatever", "MQ-value")
+			options.SetHeader("MQ-Whatever", "HP-value")
+			options.SetHeader("GR-Whatever", "GR-value")
 			payload := network.BuildPayload([]byte("hello message"), options.Marshal())
 
 			// Send the payload
 			response, err := netgrpc.NewClient("localhost:50052").Send([]string{"/grpc/end-to-end"}, payload)
 
+			replyOptions := network.NewOptions().Unmarshal(response.Options)
+
 			It("Should not throw an error", func() {
 				Expect(err).To(BeNil())
 			})
 
+			It("Should return nil headers for HP-* and MQ-*", func() {
+				Expect(replyOptions.GetHeader("MQ-Custom")).To(BeEmpty())
+				Expect(replyOptions.GetHeader("HP-Custom")).To(BeEmpty())
+			})
+
+			It("Should return GR-* Header", func() {
+				Expect(replyOptions.GetHeader("GR-Whatever")).To(Equal("GR-value"))
+			})
+
 			It("The response should have the following values", func() {
 				Expect(response.Body).To(Equal([]byte("hello message response")))
-				options := network.NewOptions().Unmarshal(response.Options)
-				Expect(options.Fields["options"]["value"]).To(Equal("option response"))
+
+				Expect(replyOptions.Fields["options"]["value"]).To(Equal("option response"))
 			})
 		})
 
@@ -144,7 +158,9 @@ func handler(channel *network.Channel) {
 
 	// Unmarshal options, change them and send them back
 	options := network.NewOptions().Unmarshal(receive.Options)
+
 	options.SetField("options", "value", options.GetField("options", "value")+" response")
+	options.SetHeader("GR-Whatever", options.GetHeader("GR-Whatever"))
 
 	// Create the new payload
 	payload := network.BuildPayload([]byte(string(receive.Body)+" response"), options.Marshal())

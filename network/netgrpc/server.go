@@ -1,6 +1,7 @@
 package netgrpc
 
 import (
+	"bitbucket.org/code_horse/pegasus/helpers"
 	"bitbucket.org/code_horse/pegasus/network"
 	pb "bitbucket.org/code_horse/pegasus/network/netgrpc/proto"
 	"errors"
@@ -66,6 +67,12 @@ func (s Server) HandlerSync(ctx context.Context, in *pb.HandlerRequest) (*pb.Han
 
 	// Get the handler method for this request
 	pathWrapper := s.Router.PathsWrapper[in.Path]
+
+	for k, _ := range options.GetHeaders() {
+		if !helpers.IsGRPCValidHeader(k) {
+			delete(options.Fields["HEADERS"], k)
+		}
+	}
 
 	params := network.Payload{Body: in.Content, Options: options.Marshal()}
 

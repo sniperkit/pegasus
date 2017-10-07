@@ -72,7 +72,7 @@ var _ = Describe("General", func() {
 
 		serverHTTP.Listen(nethttp.SetPath("/hello/{id}", nethttp.Put), handler, nil)
 		serverGRPC.Listen(netgrpc.SetPath("/hello/{id}"), handler, nil)
-		serverAMQP.Listen(netamqp.SetPath("/hello/{id}"), handler, nil)
+		serverAMQP.Listen(netamqp.SetConf("/hello/{id}"), handler, nil)
 
 		serverHTTP.Serve("localhost:7001")
 		serverGRPC.Serve("localhost:50051")
@@ -121,7 +121,7 @@ var _ = Describe("General", func() {
 				options.SetHeader("Custom", "bar")
 				payload := network.BuildPayload([]byte("foo"), options.Marshal())
 
-				Expect(func() { clientHTTP.Send(netamqp.SetPath("/simple/handler"), payload) }).ToNot(Panic())
+				Expect(func() { clientHTTP.Send(netamqp.SetConf("/simple/handler"), payload) }).ToNot(Panic())
 			})
 		})
 

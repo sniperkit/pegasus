@@ -23,6 +23,10 @@ var _ = Describe("Netamqp", func() {
 
 		options := network.BuildOptions(receive.Options)
 
+		if options.GetHeader("HP-Custom") != "" || options.GetHeader("GR-Custom") != "" {
+			panic("Header should contains key with prefix HP-* or GR-*")
+		}
+
 		if string(receive.Body) != "foo middleware" {
 			failure <- true
 			panic("body should be equal to foo middleware")
@@ -62,7 +66,7 @@ var _ = Describe("Netamqp", func() {
 
 	server.Serve("amqp://guest:guest@localhost:5672/")
 
-	server.Listen(netamqp.SetPath("/simple/handler"), simpleHandler, middleware)
+	server.Listen(netamqp.SetConf("/simple/handler"), simpleHandler, middleware)
 
 	client := netamqp.NewClient("amqp://guest:guest@localhost:5672/")
 
@@ -71,9 +75,11 @@ var _ = Describe("Netamqp", func() {
 		It("Should not throw panic ", func() {
 			options := network.NewOptions()
 			options.SetHeader("Custom", "bar")
+			options.SetHeader("HP-Custom", "bar")
+			options.SetHeader("GR-Custom", "bar")
 			payload := network.BuildPayload([]byte("foo"), options.Marshal())
 
-			Expect(func() { client.Send(netamqp.SetPath("/simple/handler"), payload) }).ToNot(Panic())
+			Expect(func() { client.Send(netamqp.SetConf("/simple/handler"), payload) }).ToNot(Panic())
 
 			Expect(<-failure).To(BeFalse())
 		})

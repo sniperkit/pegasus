@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"bitbucket.org/code_horse/pegasus/helpers"
 )
 
 // Server implements the network.Server
@@ -98,10 +99,15 @@ func (s Server) Listen(paths []string, handler network.Handler, middleware netwo
 		// Get the headers from options
 		responseHeaders := responseOptions.GetHeaders()
 
+		// Set the default header of response to json
+		w.Header().Set("Content-Type", "application/json")
+
 		// Set the http headers
 		if responseHeaders != nil {
 			for key, value := range responseHeaders {
-				w.Header().Set(key, value)
+				if helpers.IsHTTPValidHeader(key) {
+					w.Header().Set(key, value)
+				}
 			}
 		}
 
@@ -122,7 +128,9 @@ func (s Server) Listen(paths []string, handler network.Handler, middleware netwo
 func (Server) setHeaders(headers http.Header) map[string]string {
 	mapper := make(map[string]string)
 	for key, value := range headers {
-		mapper[key] = strings.Join(value, ",")
+		if helpers.IsHTTPValidHeader(key) {
+			mapper[key] = strings.Join(value, ",")
+		}
 	}
 	return mapper
 }

@@ -16,6 +16,10 @@ var _ = Describe("Nethttp", func() {
 		// Unmarshal options, change them and send them back
 		options := network.NewOptions().Unmarshal(receive.Options)
 
+		if options.GetHeader("Content-Type") != "application/json" {
+			panic("The header Content-Type should have default value application/json")
+		}
+
 		replyOptions := network.NewOptions()
 
 		replyOptions.SetHeader("Custom", options.GetHeader("Custom")+" response")
@@ -135,6 +139,8 @@ var _ = Describe("Nethttp", func() {
 			options := network.NewOptions()
 
 			options.SetHeader("Custom", "header-value")
+			options.SetHeader("MQ-Custom", "mq-value")
+			options.SetHeader("GR-Custom", "gr-value")
 
 			payload := network.BuildPayload(nil, options.Marshal())
 
@@ -142,14 +148,24 @@ var _ = Describe("Nethttp", func() {
 			response, err := nethttp.NewClient().
 				Send(nethttp.SetPath("http://localhost:7000/http?foo=bar", nethttp.Get), payload)
 
+			replyOptions := network.NewOptions().Unmarshal(response.Options)
+
 			It("Should not throw an error", func() {
 				Expect(err).To(BeNil())
 			})
 
+			It("Should return a application/json as default Content-Type", func() {
+				Expect(replyOptions.GetHeader("Content-Type")).To(Equal("application/json"))
+			})
+
+			It("Should return nil headers for GR-* and MQ-*", func() {
+				Expect(replyOptions.GetHeader("MQ-Custom")).To(BeEmpty())
+				Expect(replyOptions.GetHeader("GR-Custom")).To(BeEmpty())
+			})
+
 			It("The response should have the following values", func() {
 				Expect(response.Body).To(Equal([]byte("bar response")))
-				options := network.NewOptions().Unmarshal(response.Options)
-				Expect(options.GetHeader("Custom")).To(Equal("header-value response"))
+				Expect(replyOptions.GetHeader("Custom")).To(Equal("header-value response"))
 			})
 		})
 

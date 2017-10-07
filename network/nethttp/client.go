@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"bitbucket.org/code_horse/pegasus/helpers"
 )
 
 // Client interface describes the protocols client model. Client keeps the connections open for each protocol.
@@ -43,14 +44,14 @@ func (c Client) Send(conf []string, payload network.Payload) (*network.Payload, 
 	httpOptions := network.BuildOptions(payload.Options)
 	headers := httpOptions.GetHeaders()
 
-	//todo: [fix] [A009] Implement one of those by default
-	//request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Content-Type", "text/plain")
+	request.Header.Set("Content-Type", "application/json")
 
 	if headers != nil {
 		//Set the HTTP request headers
 		for key, value := range headers {
-			request.Header.Set(key, value)
+			if helpers.IsHTTPValidHeader(key) {
+				request.Header.Set(key, value)
+			}
 		}
 	}
 
@@ -65,7 +66,9 @@ func (c Client) Send(conf []string, payload network.Payload) (*network.Payload, 
 
 	// Set the HTTP request headers
 	for key, value := range response.Header {
-		responseOptions.SetHeader(key, strings.Join(value, ","))
+		if helpers.IsHTTPValidHeader(key) {
+			responseOptions.SetHeader(key, strings.Join(value, ","))
+		}
 	}
 
 	// Close the body

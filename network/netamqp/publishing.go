@@ -12,7 +12,7 @@ type publishing struct {
 }
 
 // configurePublishing configures the publishing method, assigning the headers value in publishing properties.
-func (p publishing) configurePublishing(headers map[string]string) {
+func (p *publishing) configurePublishing(headers map[string]string) {
 
 	if headers["Content-Type"] != "" {
 		p.ContentType = headers["Content-Type"]
