@@ -1,7 +1,7 @@
 package helpers
 
 import (
-	"bitbucket.org/code_horse/pegasus/blunder"
+	"github.com/cpapidas/pegasus/blunder"
 	"errors"
 	"net/url"
 	"os/exec"

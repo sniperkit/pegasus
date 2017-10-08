@@ -1,10 +1,10 @@
 package general_test
 
 import (
-	"bitbucket.org/code_horse/pegasus/network"
-	"bitbucket.org/code_horse/pegasus/network/netamqp"
-	"bitbucket.org/code_horse/pegasus/network/netgrpc"
-	"bitbucket.org/code_horse/pegasus/network/nethttp"
+	"github.com/cpapidas/pegasus/network"
+	"github.com/cpapidas/pegasus/network/netamqp"
+	"github.com/cpapidas/pegasus/network/netgrpc"
+	"github.com/cpapidas/pegasus/network/nethttp"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

@@ -2,7 +2,7 @@ package mock_netamqp
 
 import (
 	"github.com/streadway/amqp"
-	"bitbucket.org/code_horse/pegasus/network/netamqp"
+	"github.com/cpapidas/pegasus/network/netamqp"
 )
 
 // MockConnection mock for amqp.Connection

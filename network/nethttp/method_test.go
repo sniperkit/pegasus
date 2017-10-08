@@ -1,7 +1,7 @@
 package nethttp_test
 
 import (
-	"bitbucket.org/code_horse/pegasus/network/nethttp"
+	"github.com/cpapidas/pegasus/network/nethttp"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

@@ -1,7 +1,7 @@
 package helpers_test
 
 import (
-	"bitbucket.org/code_horse/pegasus/helpers"
+	"github.com/cpapidas/pegasus/helpers"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

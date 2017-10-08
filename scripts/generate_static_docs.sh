@@ -2,7 +2,7 @@
 set -u
 
 DOC_DIR=godoc/docs
-PKG=bitbucket.org/code_horse/pegasus
+PKG=github.com/cpapidas/pegasus
 
 # Run a godoc server which we will scrape. Clobber the GOPATH to include
 # only our dependencies.

@@ -1,7 +1,7 @@
 package mock_netgrpc
 
 import (
-	pb "bitbucket.org/code_horse/pegasus/network/netgrpc/proto"
+	pb "github.com/cpapidas/pegasus/network/netgrpc/proto"
 	"context"
 	"google.golang.org/grpc"
 )

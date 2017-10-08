@@ -4,7 +4,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"errors"
-	"bitbucket.org/code_horse/pegasus/blunder"
+	"github.com/cpapidas/pegasus/blunder"
 )
 
 var _ = Describe("Error", func() {

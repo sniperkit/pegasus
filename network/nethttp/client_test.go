@@ -1,14 +1,14 @@
 package nethttp_test
 
 import (
-	"bitbucket.org/code_horse/pegasus/network/nethttp"
+	"github.com/cpapidas/pegasus/network/nethttp"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"reflect"
-	"bitbucket.org/code_horse/pegasus/tests/mocks/mock_http"
+	"github.com/cpapidas/pegasus/tests/mocks/mock_http"
 	"net/http"
-	"bitbucket.org/code_horse/pegasus/network"
+	"github.com/cpapidas/pegasus/network"
 	"bytes"
 	"io/ioutil"
 	"io"

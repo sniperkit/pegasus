@@ -77,7 +77,7 @@
 		
 		<div id="short-nav">
 			<dl>
-			<dd><code>import "bitbucket.org/code_horse/pegasus/network"</code></dd>
+			<dd><code>import "github.com/cpapidas/pegasus/network"</code></dd>
 			</dl>
 			<dl>
 			<dd><a href="index.html#pkg-overview" class="overviewLink">Overview</a></dd>
@@ -219,21 +219,21 @@
 			<p>
 			<span style="font-size:90%">
 			
-				<a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/channel.go">channel.go</a>
+				<a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/channel.go">channel.go</a>
 			
-				<a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/client.go">client.go</a>
+				<a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/client.go">client.go</a>
 			
-				<a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/handler.go">handler.go</a>
+				<a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/handler.go">handler.go</a>
 			
-				<a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/midleware.go">midleware.go</a>
+				<a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/midleware.go">midleware.go</a>
 			
-				<a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/options.go">options.go</a>
+				<a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/options.go">options.go</a>
 			
-				<a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/payload.go">payload.go</a>
+				<a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/payload.go">payload.go</a>
 			
-				<a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/server.go">server.go</a>
+				<a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/server.go">server.go</a>
 			
-				<a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/status.go">status.go</a>
+				<a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/status.go">status.go</a>
 			
 			</span>
 			</p>
@@ -355,7 +355,7 @@
 		
 			
 			
-			<h2 id="Channel">type <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/channel.go?s=872:917#L8">Channel</a>
+			<h2 id="Channel">type <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/channel.go?s=872:917#L8">Channel</a>
 				<a class="permalink" href="index.html#Channel">&#xb6;</a>
 			</h2>
 			<p>
@@ -394,7 +394,7 @@ An example for usage could be:
 
 			
 				
-				<h3 id="NewChannel">func <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/channel.go?s=1470:1511#L21">NewChannel</a>
+				<h3 id="NewChannel">func <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/channel.go?s=1470:1511#L21">NewChannel</a>
 					<a class="permalink" href="index.html#NewChannel">&#xb6;</a>
 				</h3>
 				<pre>func NewChannel(channelSize <a href="../../../../builtin/index.html#int">int</a>) *<a href="index.html#Channel">Channel</a></pre>
@@ -419,7 +419,7 @@ A channel of buffer size 1 can hold 1 element until sending blocks, so you&#39;d
 
 			
 				
-				<h3 id="Channel.Receive">func (*Channel) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/channel.go?s=1787:1822#L31">Receive</a>
+				<h3 id="Channel.Receive">func (*Channel) <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/channel.go?s=1787:1822#L31">Receive</a>
 					<a class="permalink" href="index.html#Channel.Receive">&#xb6;</a>
 				</h3>
 				<pre>func (c *<a href="index.html#Channel">Channel</a>) Receive() <a href="index.html#Payload">Payload</a></pre>
@@ -432,7 +432,7 @@ Receive data from channel and return it. The function return a Payload.
 				
 			
 				
-				<h3 id="Channel.Send">func (*Channel) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/channel.go?s=1645:1684#L26">Send</a>
+				<h3 id="Channel.Send">func (*Channel) <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/channel.go?s=1645:1684#L26">Send</a>
 					<a class="permalink" href="index.html#Channel.Send">&#xb6;</a>
 				</h3>
 				<pre>func (c *<a href="index.html#Channel">Channel</a>) Send(payload <a href="index.html#Payload">Payload</a>)</pre>
@@ -447,7 +447,7 @@ Send method get a payload object and send it through the channel.
 		
 			
 			
-			<h2 id="Client">type <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/client.go?s=1649:1739#L26">Client</a>
+			<h2 id="Client">type <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/client.go?s=1649:1739#L26">Client</a>
 				<a class="permalink" href="index.html#Client">&#xb6;</a>
 			</h2>
 			<p>
@@ -510,7 +510,7 @@ Close function closes the connection if exists and is open.
 		
 			
 			
-			<h2 id="Handler">type <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/handler.go?s=1241:1275#L13">Handler</a>
+			<h2 id="Handler">type <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/handler.go?s=1241:1275#L13">Handler</a>
 				<a class="permalink" href="index.html#Handler">&#xb6;</a>
 			</h2>
 			<p>
@@ -557,7 +557,7 @@ An example for usage could be:
 		
 			
 			
-			<h2 id="Middleware">type <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/midleware.go?s=1281:1335#L14">Middleware</a>
+			<h2 id="Middleware">type <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/midleware.go?s=1281:1335#L14">Middleware</a>
 				<a class="permalink" href="index.html#Middleware">&#xb6;</a>
 			</h2>
 			<p>
@@ -605,7 +605,7 @@ An example for usage could be:
 		
 			
 			
-			<h2 id="Options">type <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/options.go?s=763:882#L12">Options</a>
+			<h2 id="Options">type <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/options.go?s=763:882#L12">Options</a>
 				<a class="permalink" href="index.html#Options">&#xb6;</a>
 			</h2>
 			<p>
@@ -654,7 +654,7 @@ Custom fields are used if we want to set something completely custom, it&#39;s g
 
 			
 				
-				<h3 id="BuildOptions">func <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/options.go?s=1142:1181#L24">BuildOptions</a>
+				<h3 id="BuildOptions">func <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/options.go?s=1142:1181#L24">BuildOptions</a>
 					<a class="permalink" href="index.html#BuildOptions">&#xb6;</a>
 				</h3>
 				<pre>func BuildOptions(data []<a href="../../../../builtin/index.html#byte">byte</a>) *<a href="index.html#Options">Options</a></pre>
@@ -666,7 +666,7 @@ BuildOptions receives bytes as parameter and convert them to Option object.
 				
 			
 				
-				<h3 id="NewOptions">func <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/options.go?s=970:996#L19">NewOptions</a>
+				<h3 id="NewOptions">func <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/options.go?s=970:996#L19">NewOptions</a>
 					<a class="permalink" href="index.html#NewOptions">&#xb6;</a>
 				</h3>
 				<pre>func NewOptions() *<a href="index.html#Options">Options</a></pre>
@@ -680,7 +680,7 @@ NewOptions create a Option object, initialize the struct properties and returns 
 
 			
 				
-				<h3 id="Options.GetField">func (*Options) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/options.go?s=3260:3319#L107">GetField</a>
+				<h3 id="Options.GetField">func (*Options) <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/options.go?s=3260:3319#L107">GetField</a>
 					<a class="permalink" href="index.html#Options.GetField">&#xb6;</a>
 				</h3>
 				<pre>func (c *<a href="index.html#Options">Options</a>) GetField(group <a href="../../../../builtin/index.html#string">string</a>, key <a href="../../../../builtin/index.html#string">string</a>) <a href="../../../../builtin/index.html#string">string</a></pre>
@@ -693,7 +693,7 @@ GetField return the value of a Field. The return value is a string.
 				
 			
 				
-				<h3 id="Options.GetHeader">func (*Options) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/options.go?s=2283:2329#L70">GetHeader</a>
+				<h3 id="Options.GetHeader">func (*Options) <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/options.go?s=2283:2329#L70">GetHeader</a>
 					<a class="permalink" href="index.html#Options.GetHeader">&#xb6;</a>
 				</h3>
 				<pre>func (c *<a href="index.html#Options">Options</a>) GetHeader(key <a href="../../../../builtin/index.html#string">string</a>) <a href="../../../../builtin/index.html#string">string</a></pre>
@@ -706,7 +706,7 @@ GetHeader get a header parameter
 				
 			
 				
-				<h3 id="Options.GetHeaders">func (*Options) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/options.go?s=2035:2083#L60">GetHeaders</a>
+				<h3 id="Options.GetHeaders">func (*Options) <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/options.go?s=2035:2083#L60">GetHeaders</a>
 					<a class="permalink" href="index.html#Options.GetHeaders">&#xb6;</a>
 				</h3>
 				<pre>func (c *<a href="index.html#Options">Options</a>) GetHeaders() map[<a href="../../../../builtin/index.html#string">string</a>]<a href="../../../../builtin/index.html#string">string</a></pre>
@@ -719,7 +719,7 @@ GetHeaders get the header parameters
 				
 			
 				
-				<h3 id="Options.GetParam">func (*Options) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/options.go?s=1692:1737#L47">GetParam</a>
+				<h3 id="Options.GetParam">func (*Options) <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/options.go?s=1692:1737#L47">GetParam</a>
 					<a class="permalink" href="index.html#Options.GetParam">&#xb6;</a>
 				</h3>
 				<pre>func (c *<a href="index.html#Options">Options</a>) GetParam(key <a href="../../../../builtin/index.html#string">string</a>) <a href="../../../../builtin/index.html#string">string</a></pre>
@@ -732,7 +732,7 @@ GetParam get a parameter
 				
 			
 				
-				<h3 id="Options.GetParams">func (*Options) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/options.go?s=1464:1511#L37">GetParams</a>
+				<h3 id="Options.GetParams">func (*Options) <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/options.go?s=1464:1511#L37">GetParams</a>
 					<a class="permalink" href="index.html#Options.GetParams">&#xb6;</a>
 				</h3>
 				<pre>func (c *<a href="index.html#Options">Options</a>) GetParams() map[<a href="../../../../builtin/index.html#string">string</a>]<a href="../../../../builtin/index.html#string">string</a></pre>
@@ -745,7 +745,7 @@ GetParams get the parameters
 				
 			
 				
-				<h3 id="Options.Marshal">func (*Options) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/options.go?s=2473:2507#L75">Marshal</a>
+				<h3 id="Options.Marshal">func (*Options) <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/options.go?s=2473:2507#L75">Marshal</a>
 					<a class="permalink" href="index.html#Options.Marshal">&#xb6;</a>
 				</h3>
 				<pre>func (c *<a href="index.html#Options">Options</a>) Marshal() []<a href="../../../../builtin/index.html#byte">byte</a></pre>
@@ -758,7 +758,7 @@ Marshal return the object to bytes in order to be able to transfer it over HTTP 
 				
 			
 				
-				<h3 id="Options.SetField">func (*Options) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/options.go?s=2938:3004#L96">SetField</a>
+				<h3 id="Options.SetField">func (*Options) <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/options.go?s=2938:3004#L96">SetField</a>
 					<a class="permalink" href="index.html#Options.SetField">&#xb6;</a>
 				</h3>
 				<pre>func (c *<a href="index.html#Options">Options</a>) SetField(group <a href="../../../../builtin/index.html#string">string</a>, key <a href="../../../../builtin/index.html#string">string</a>, value <a href="../../../../builtin/index.html#string">string</a>)</pre>
@@ -771,7 +771,7 @@ SetField create a Fields map[string]map[string]string. We need this method in or
 				
 			
 				
-				<h3 id="Options.SetHeader">func (*Options) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/options.go?s=2153:2206#L65">SetHeader</a>
+				<h3 id="Options.SetHeader">func (*Options) <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/options.go?s=2153:2206#L65">SetHeader</a>
 					<a class="permalink" href="index.html#Options.SetHeader">&#xb6;</a>
 				</h3>
 				<pre>func (c *<a href="index.html#Options">Options</a>) SetHeader(key <a href="../../../../builtin/index.html#string">string</a>, value <a href="../../../../builtin/index.html#string">string</a>)</pre>
@@ -784,7 +784,7 @@ SetHeader set a header parameter
 				
 			
 				
-				<h3 id="Options.SetHeaders">func (*Options) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/options.go?s=1832:1886#L52">SetHeaders</a>
+				<h3 id="Options.SetHeaders">func (*Options) <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/options.go?s=1832:1886#L52">SetHeaders</a>
 					<a class="permalink" href="index.html#Options.SetHeaders">&#xb6;</a>
 				</h3>
 				<pre>func (c *<a href="index.html#Options">Options</a>) SetHeaders(params map[<a href="../../../../builtin/index.html#string">string</a>]<a href="../../../../builtin/index.html#string">string</a>)</pre>
@@ -797,7 +797,7 @@ SetHeaders re-set the hole header parameters fields
 				
 			
 				
-				<h3 id="Options.SetParam">func (*Options) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/options.go?s=1572:1624#L42">SetParam</a>
+				<h3 id="Options.SetParam">func (*Options) <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/options.go?s=1572:1624#L42">SetParam</a>
 					<a class="permalink" href="index.html#Options.SetParam">&#xb6;</a>
 				</h3>
 				<pre>func (c *<a href="index.html#Options">Options</a>) SetParam(key <a href="../../../../builtin/index.html#string">string</a>, value <a href="../../../../builtin/index.html#string">string</a>)</pre>
@@ -810,7 +810,7 @@ SetParam set a parameter
 				
 			
 				
-				<h3 id="Options.SetParams">func (*Options) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/options.go?s=1271:1324#L29">SetParams</a>
+				<h3 id="Options.SetParams">func (*Options) <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/options.go?s=1271:1324#L29">SetParams</a>
 					<a class="permalink" href="index.html#Options.SetParams">&#xb6;</a>
 				</h3>
 				<pre>func (c *<a href="index.html#Options">Options</a>) SetParams(params map[<a href="../../../../builtin/index.html#string">string</a>]<a href="../../../../builtin/index.html#string">string</a>)</pre>
@@ -823,7 +823,7 @@ SetParams re-set the hole parameters fields
 				
 			
 				
-				<h3 id="Options.Unmarshal">func (*Options) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/options.go?s=2655:2704#L84">Unmarshal</a>
+				<h3 id="Options.Unmarshal">func (*Options) <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/options.go?s=2655:2704#L84">Unmarshal</a>
 					<a class="permalink" href="index.html#Options.Unmarshal">&#xb6;</a>
 				</h3>
 				<pre>func (c *<a href="index.html#Options">Options</a>) Unmarshal(data []<a href="../../../../builtin/index.html#byte">byte</a>) *<a href="index.html#Options">Options</a></pre>
@@ -838,7 +838,7 @@ Unmarshal convert an Option object from bytes to an actually object.
 		
 			
 			
-			<h2 id="Payload">type <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/payload.go?s=751:806#L8">Payload</a>
+			<h2 id="Payload">type <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/payload.go?s=751:806#L8">Payload</a>
 				<a class="permalink" href="index.html#Payload">&#xb6;</a>
 			</h2>
 			<p>
@@ -877,7 +877,7 @@ The payload also used as channel type through network.Channel.
 
 			
 				
-				<h3 id="BuildPayload">func <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/payload.go?s=993:1047#L19">BuildPayload</a>
+				<h3 id="BuildPayload">func <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/payload.go?s=993:1047#L19">BuildPayload</a>
 					<a class="permalink" href="index.html#BuildPayload">&#xb6;</a>
 				</h3>
 				<pre>func BuildPayload(body []<a href="../../../../builtin/index.html#byte">byte</a>, options []<a href="../../../../builtin/index.html#byte">byte</a>) <a href="index.html#Payload">Payload</a></pre>
@@ -889,7 +889,7 @@ BuildPayload return a new payload
 				
 			
 				
-				<h3 id="NewPayload">func <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/payload.go?s=850:903#L14">NewPayload</a>
+				<h3 id="NewPayload">func <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/payload.go?s=850:903#L14">NewPayload</a>
 					<a class="permalink" href="index.html#NewPayload">&#xb6;</a>
 				</h3>
 				<pre>func NewPayload(body []<a href="../../../../builtin/index.html#byte">byte</a>, options []<a href="../../../../builtin/index.html#byte">byte</a>) *<a href="index.html#Payload">Payload</a></pre>
@@ -905,7 +905,7 @@ NewPayload return a new payload object
 		
 			
 			
-			<h2 id="Server">type <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/server.go?s=3149:3260#L68">Server</a>
+			<h2 id="Server">type <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/server.go?s=3149:3260#L68">Server</a>
 				<a class="permalink" href="index.html#Server">&#xb6;</a>
 			</h2>
 			<p>

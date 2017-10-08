@@ -3,7 +3,7 @@ package netamqp_test
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"bitbucket.org/code_horse/pegasus/network/netamqp"
+	"github.com/cpapidas/pegasus/network/netamqp"
 
 	"testing"
 )

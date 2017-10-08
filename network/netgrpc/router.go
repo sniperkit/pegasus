@@ -1,6 +1,6 @@
 package netgrpc
 
-import "bitbucket.org/code_horse/pegasus/network"
+import "github.com/cpapidas/pegasus/network"
 
 // Router struct describes the paths, handlers and the middleware. This is a mapper in order
 // server to know when to call each handler.

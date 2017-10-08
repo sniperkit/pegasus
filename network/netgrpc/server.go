@@ -1,9 +1,9 @@
 package netgrpc
 
 import (
-	"bitbucket.org/code_horse/pegasus/helpers"
-	"bitbucket.org/code_horse/pegasus/network"
-	pb "bitbucket.org/code_horse/pegasus/network/netgrpc/proto"
+	"github.com/cpapidas/pegasus/helpers"
+	"github.com/cpapidas/pegasus/network"
+	pb "github.com/cpapidas/pegasus/network/netgrpc/proto"
 	"errors"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"

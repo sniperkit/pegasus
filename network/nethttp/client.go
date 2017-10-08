@@ -1,12 +1,12 @@
 package nethttp
 
 import (
-	"bitbucket.org/code_horse/pegasus/network"
+	"github.com/cpapidas/pegasus/network"
 	"bytes"
 	"io/ioutil"
 	"net/http"
 	"strings"
-	"bitbucket.org/code_horse/pegasus/helpers"
+	"github.com/cpapidas/pegasus/helpers"
 )
 
 // Client interface describes the protocols client model. Client keeps the connections open for each protocol.

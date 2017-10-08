@@ -77,7 +77,7 @@
 		
 		<div id="short-nav">
 			<dl>
-			<dd><code>import "bitbucket.org/code_horse/pegasus/network/netamqp"</code></dd>
+			<dd><code>import "github.com/cpapidas/pegasus/network/netamqp"</code></dd>
 			</dl>
 			<dl>
 			<dd><a href="index.html#pkg-overview" class="overviewLink">Overview</a></dd>
@@ -150,11 +150,11 @@
 			<p>
 			<span style="font-size:90%">
 			
-				<a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/netamqp/client.go">client.go</a>
+				<a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/netamqp/client.go">client.go</a>
 			
-				<a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/netamqp/publishing.go">publishing.go</a>
+				<a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/netamqp/publishing.go">publishing.go</a>
 			
-				<a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/netamqp/server.go">server.go</a>
+				<a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/netamqp/server.go">server.go</a>
 			
 			</span>
 			</p>
@@ -253,7 +253,7 @@ Sleep delay between calls
 		
 			
 			
-			<h2 id="SetPath">func <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/netamqp/server.go?s=580:614#L17">SetPath</a>
+			<h2 id="SetPath">func <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/netamqp/server.go?s=580:614#L17">SetPath</a>
 				<a class="permalink" href="index.html#SetPath">&#xb6;</a>
 			</h2>
 			<pre>func SetPath(path <a href="../../../../../builtin/index.html#string">string</a>) []<a href="../../../../../builtin/index.html#string">string</a></pre>
@@ -268,7 +268,7 @@ SetPath get a path as parameter and return an array. It use for Server.Listen.
 		
 			
 			
-			<h2 id="Client">type <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/netamqp/client.go?s=258:309#L1">Client</a>
+			<h2 id="Client">type <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/netamqp/client.go?s=258:309#L1">Client</a>
 				<a class="permalink" href="index.html#Client">&#xb6;</a>
 			</h2>
 			<p>
@@ -291,7 +291,7 @@ Client implements the network.Client interface. Client handles the remote calls 
 
 			
 				
-				<h3 id="Client.Close">func (Client) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/netamqp/client.go?s=2105:2128#L89">Close</a>
+				<h3 id="Client.Close">func (Client) <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/netamqp/client.go?s=2105:2128#L89">Close</a>
 					<a class="permalink" href="index.html#Client.Close">&#xb6;</a>
 				</h3>
 				<pre>func (c <a href="index.html#Client">Client</a>) Close()</pre>
@@ -304,7 +304,7 @@ Close close the current connection
 				
 			
 				
-				<h3 id="Client.Send">func (Client) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/netamqp/client.go?s=926:1012#L27">Send</a>
+				<h3 id="Client.Send">func (Client) <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/netamqp/client.go?s=926:1012#L27">Send</a>
 					<a class="permalink" href="index.html#Client.Send">&#xb6;</a>
 				</h3>
 				<pre>func (c <a href="index.html#Client">Client</a>) Send(conf []<a href="../../../../../builtin/index.html#string">string</a>, payload <a href="../index.html">network</a>.<a href="../index.html#Payload">Payload</a>) (*<a href="../index.html">network</a>.<a href="../index.html#Payload">Payload</a>, <a href="../../../../../builtin/index.html#error">error</a>)</pre>
@@ -319,7 +319,7 @@ Send is responsible to send data in RabbitMQ server
 		
 			
 			
-			<h2 id="Server">type <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/netamqp/server.go?s=339:390#L6">Server</a>
+			<h2 id="Server">type <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/netamqp/server.go?s=339:390#L6">Server</a>
 				<a class="permalink" href="index.html#Server">&#xb6;</a>
 			</h2>
 			<p>
@@ -342,7 +342,7 @@ Server struct implements the network.Server interface for RabbitMQ services.
 
 			
 				
-				<h3 id="Server.Listen">func (Server) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/netamqp/server.go?s=1308:1401#L45">Listen</a>
+				<h3 id="Server.Listen">func (Server) <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/netamqp/server.go?s=1308:1401#L45">Listen</a>
 					<a class="permalink" href="index.html#Server.Listen">&#xb6;</a>
 				</h3>
 				<pre>func (s <a href="index.html#Server">Server</a>) Listen(conf []<a href="../../../../../builtin/index.html#string">string</a>, handler <a href="../index.html">network</a>.<a href="../index.html#Handler">Handler</a>, middleware <a href="../index.html">network</a>.<a href="../index.html#Middleware">Middleware</a>)</pre>
@@ -355,7 +355,7 @@ Listen method start a new worker which is listing to a specif queue.
 				
 			
 				
-				<h3 id="Server.Serve">func (*Server) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/netamqp/server.go?s=786:824#L23">Serve</a>
+				<h3 id="Server.Serve">func (*Server) <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/netamqp/server.go?s=786:824#L23">Serve</a>
 					<a class="permalink" href="index.html#Server.Serve">&#xb6;</a>
 				</h3>
 				<pre>func (s *<a href="index.html#Server">Server</a>) Serve(address <a href="../../../../../builtin/index.html#string">string</a>)</pre>

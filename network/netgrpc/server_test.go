@@ -1,10 +1,10 @@
 package netgrpc_test
 
 import (
-	"bitbucket.org/code_horse/pegasus/network/netgrpc"
+	"github.com/cpapidas/pegasus/network/netgrpc"
 
-	"bitbucket.org/code_horse/pegasus/network"
-	pb "bitbucket.org/code_horse/pegasus/network/netgrpc/proto"
+	"github.com/cpapidas/pegasus/network"
+	pb "github.com/cpapidas/pegasus/network/netgrpc/proto"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"reflect"

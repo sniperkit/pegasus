@@ -1,11 +1,11 @@
 package netgrpc_test
 
 import (
-	"bitbucket.org/code_horse/pegasus/network/netgrpc"
+	"github.com/cpapidas/pegasus/network/netgrpc"
 
-	"bitbucket.org/code_horse/pegasus/network"
-	pb "bitbucket.org/code_horse/pegasus/network/netgrpc/proto"
-	"bitbucket.org/code_horse/pegasus/tests/mocks/mock_netgrpc"
+	"github.com/cpapidas/pegasus/network"
+	pb "github.com/cpapidas/pegasus/network/netgrpc/proto"
+	"github.com/cpapidas/pegasus/tests/mocks/mock_netgrpc"
 	"context"
 	"errors"
 	. "github.com/onsi/ginkgo"

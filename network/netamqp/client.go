@@ -1,8 +1,8 @@
 package netamqp
 
 import (
-	"bitbucket.org/code_horse/pegasus/helpers"
-	"bitbucket.org/code_horse/pegasus/network"
+	"github.com/cpapidas/pegasus/helpers"
+	"github.com/cpapidas/pegasus/network"
 	"github.com/streadway/amqp"
 )
 

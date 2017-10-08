@@ -1,14 +1,14 @@
 package nethttp
 
 import (
-	"bitbucket.org/code_horse/pegasus/network"
+	"github.com/cpapidas/pegasus/network"
 	"github.com/gorilla/mux"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
-	"bitbucket.org/code_horse/pegasus/helpers"
+	"github.com/cpapidas/pegasus/helpers"
 )
 
 // Router interface for mux.Router

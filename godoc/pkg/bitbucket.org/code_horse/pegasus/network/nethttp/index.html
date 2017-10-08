@@ -77,7 +77,7 @@
 		
 		<div id="short-nav">
 			<dl>
-			<dd><code>import "bitbucket.org/code_horse/pegasus/network/nethttp"</code></dd>
+			<dd><code>import "github.com/cpapidas/pegasus/network/nethttp"</code></dd>
 			</dl>
 			<dl>
 			<dd><a href="index.html#pkg-overview" class="overviewLink">Overview</a></dd>
@@ -158,11 +158,11 @@
 			<p>
 			<span style="font-size:90%">
 			
-				<a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/nethttp/client.go">client.go</a>
+				<a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/nethttp/client.go">client.go</a>
 			
-				<a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/nethttp/method.go">method.go</a>
+				<a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/nethttp/method.go">method.go</a>
 			
-				<a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/nethttp/server.go">server.go</a>
+				<a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/nethttp/server.go">server.go</a>
 			
 			</span>
 			</p>
@@ -238,7 +238,7 @@ parameter, if the router parameter is nil it will generate a new router and assi
 		
 			
 			
-			<h2 id="SetPath">func <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/nethttp/server.go?s=896:945#L23">SetPath</a>
+			<h2 id="SetPath">func <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/nethttp/server.go?s=896:945#L23">SetPath</a>
 				<a class="permalink" href="index.html#SetPath">&#xb6;</a>
 			</h2>
 			<pre>func SetPath(path <a href="../../../../../builtin/index.html#string">string</a>, method <a href="index.html#Method">Method</a>) []<a href="../../../../../builtin/index.html#string">string</a></pre>
@@ -253,7 +253,7 @@ SetPath get a path as parameter and return an array. It use for Server.Listen.
 		
 			
 			
-			<h2 id="Client">type <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/nethttp/client.go?s=341:388#L3">Client</a>
+			<h2 id="Client">type <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/nethttp/client.go?s=341:388#L3">Client</a>
 				<a class="permalink" href="index.html#Client">&#xb6;</a>
 			</h2>
 			<p>
@@ -277,7 +277,7 @@ close the connection should use the Close function. Send function used to send d
 
 			
 				
-				<h3 id="Client.Close">func (*Client) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/nethttp/client.go?s=2070:2094#L74">Close</a>
+				<h3 id="Client.Close">func (*Client) <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/nethttp/client.go?s=2070:2094#L74">Close</a>
 					<a class="permalink" href="index.html#Client.Close">&#xb6;</a>
 				</h3>
 				<pre>func (c *<a href="index.html#Client">Client</a>) Close()</pre>
@@ -290,7 +290,7 @@ Close terminal the current connection.
 				
 			
 				
-				<h3 id="Client.Send">func (*Client) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/nethttp/client.go?s=753:840#L15">Send</a>
+				<h3 id="Client.Send">func (*Client) <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/nethttp/client.go?s=753:840#L15">Send</a>
 					<a class="permalink" href="index.html#Client.Send">&#xb6;</a>
 				</h3>
 				<pre>func (c *<a href="index.html#Client">Client</a>) Send(conf []<a href="../../../../../builtin/index.html#string">string</a>, payload <a href="../index.html">network</a>.<a href="../index.html#Payload">Payload</a>) (*<a href="../index.html">network</a>.<a href="../index.html#Payload">Payload</a>, <a href="../../../../../builtin/index.html#error">error</a>)</pre>
@@ -306,7 +306,7 @@ object. The path may use other function ir order to generate the format for each
 		
 			
 			
-			<h2 id="Method">type <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/nethttp/method.go?s=77:95#L1">Method</a>
+			<h2 id="Method">type <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/nethttp/method.go?s=77:95#L1">Method</a>
 				<a class="permalink" href="index.html#Method">&#xb6;</a>
 			</h2>
 			<p>
@@ -349,7 +349,7 @@ Method describe the HTTP methods
 
 			
 				
-				<h3 id="Method.String">func (Method) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/nethttp/method.go?s=669:700#L22">String</a>
+				<h3 id="Method.String">func (Method) <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/nethttp/method.go?s=669:700#L22">String</a>
 					<a class="permalink" href="index.html#Method.String">&#xb6;</a>
 				</h3>
 				<pre>func (m <a href="index.html#Method">Method</a>) String() <a href="../../../../../builtin/index.html#string">string</a></pre>
@@ -364,7 +364,7 @@ String return the string that is related with the specific method
 		
 			
 			
-			<h2 id="Server">type <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/nethttp/server.go?s=356:451#L6">Server</a>
+			<h2 id="Server">type <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/nethttp/server.go?s=356:451#L6">Server</a>
 				<a class="permalink" href="index.html#Server">&#xb6;</a>
 			</h2>
 			<p>
@@ -390,7 +390,7 @@ that the http server works properly
 
 			
 				
-				<h3 id="Server.Listen">func (*Server) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/nethttp/server.go?s=1373:1468#L39">Listen</a>
+				<h3 id="Server.Listen">func (*Server) <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/nethttp/server.go?s=1373:1468#L39">Listen</a>
 					<a class="permalink" href="index.html#Server.Listen">&#xb6;</a>
 				</h3>
 				<pre>func (s *<a href="index.html#Server">Server</a>) Listen(paths []<a href="../../../../../builtin/index.html#string">string</a>, handler <a href="../index.html">network</a>.<a href="../index.html#Handler">Handler</a>, middleware <a href="../index.html">network</a>.<a href="../index.html#Middleware">Middleware</a>)</pre>
@@ -404,7 +404,7 @@ which is a function and the middleware which also is a function.
 				
 			
 				
-				<h3 id="Server.Serve">func (*Server) <a href="http://localhost:6060/src/bitbucket.org/code_horse/pegasus/network/nethttp/server.go?s=1055:1090#L28">Serve</a>
+				<h3 id="Server.Serve">func (*Server) <a href="http://localhost:6060/src/github.com/cpapidas/pegasus/network/nethttp/server.go?s=1055:1090#L28">Serve</a>
 					<a class="permalink" href="index.html#Server.Serve">&#xb6;</a>
 				</h3>
 				<pre>func (s *<a href="index.html#Server">Server</a>) Serve(path <a href="../../../../../builtin/index.html#string">string</a>)</pre>
