@@ -1,7 +1,6 @@
 package helpers
 
 import (
-	"github.com/cpapidas/pegasus/blunder"
 	"errors"
 	"net/url"
 	"os/exec"
@@ -34,7 +33,6 @@ func commandRunner(command string, errMsg string) (string, error) {
 	cmdArgs := []string{command}
 
 	if cmdOut, err = exec.Command(cmdName, cmdArgs...).Output(); err != nil {
-		blunder.Set("Error on helpers/commands.go function commandRunner", err).Handle()
 		return "", errors.New(errMsg)
 	}
 
