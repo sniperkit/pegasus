@@ -16,9 +16,9 @@ var _ = Describe("Netgrpc", func() {
 
 		// Set the listeners
 
-		server.Listen(netgrpc.SetPath("/grpc/end-to-end"), handler, nil)
+		server.Listen(netgrpc.SetConf("/grpc/end-to-end"), handler, nil)
 
-		server.Listen(netgrpc.SetPath("/grpc/end-to-end/middleware"), handler, middleware)
+		server.Listen(netgrpc.SetConf("/grpc/end-to-end/middleware"), handler, middleware)
 
 		// Start the server
 		server.Serve("localhost:50052")

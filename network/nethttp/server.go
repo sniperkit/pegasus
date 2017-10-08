@@ -11,17 +11,22 @@ import (
 	"bitbucket.org/code_horse/pegasus/helpers"
 )
 
+// Router interface for mux.Router
+type Router interface {
+	HandleFunc(path string, f func(http.ResponseWriter, *http.Request)) *mux.Route
+}
+
 // Server implements the network.Server
 // Server struct is responsible for http server. It manages connections and configuration might be needed in order to
 // ensure that the http server works properly
 type Server struct {
 	// Router is responsible for handler and middleware
-	Router *mux.Router
+	Router Router
 }
 
 // NewServer is a constructor of Server struct. It initializes and returns a Server object. It gets a *mux.Router as
 // parameter, if the router parameter is nil it will generate a new router and assign it to the object.
-var NewServer = func(router *mux.Router) network.Server {
+var NewServer = func(router Router) network.Server {
 
 	if router == nil {
 		router = mux.NewRouter()
@@ -30,15 +35,15 @@ var NewServer = func(router *mux.Router) network.Server {
 	return &Server{Router: router}
 }
 
-// SetPath gets a path as parameter and returns an array. It is used for Server.Listen.
-func SetPath(path string, method Method) []string {
+// SetConf gets a path as parameter and returns an array. It is used for Server.Listen.
+func SetConf(path string, method Method) []string {
 	return []string{path, method.String()}
 }
 
 // Serve function starts the server for a specific part and port.
 func (s Server) Serve(path string) {
 	go func() {
-		err := http.ListenAndServe(path, s.Router)
+		err := http.ListenAndServe(path, s.Router.(*mux.Router))
 		if err != nil {
 			panic(err)
 		}

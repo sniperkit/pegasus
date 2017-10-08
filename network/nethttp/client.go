@@ -13,13 +13,28 @@ import (
 // In order to close the connection the Close function should be used. Send function is used to send data
 // to other servers.
 type Client struct {
-	httpClient *http.Client
+	httpClient IHTTPClient
 }
 
+// IHTTPClient interface describe the http.Client struct
+type IHTTPClient interface {
+	Do(req *http.Request) (*http.Response, error)
+}
+
+// NewRequest http.NewRequest
+var NewRequest = http.NewRequest
+
+// ReadAll ioutil.ReadAll
+var ReadAll = ioutil.ReadAll
+
 // NewClient generates and returns a Client object.
-var NewClient = func() network.Client {
-	client := &http.Client{}
-	return &Client{httpClient: client}
+var NewClient = func(httpClient IHTTPClient) network.Client {
+
+	if httpClient == nil {
+		httpClient = &http.Client{}
+	}
+
+	return &Client{httpClient: httpClient}
 }
 
 // Send function sends a payload to other servers. It gets the string path which is the unique id and the payload
@@ -35,7 +50,7 @@ func (c Client) Send(conf []string, payload network.Payload) (*network.Payload, 
 	}
 
 	// Create a request
-	request, err := http.NewRequest(method, path, bytes.NewReader(body))
+	request, err := NewRequest(method, path, bytes.NewReader(body))
 
 	if err != nil {
 		return nil, err
@@ -75,7 +90,7 @@ func (c Client) Send(conf []string, payload network.Payload) (*network.Payload, 
 	defer response.Body.Close()
 
 	// Get get body content
-	content, err := ioutil.ReadAll(response.Body)
+	content, err := ReadAll(response.Body)
 
 	if err != nil {
 		return nil, err
@@ -85,5 +100,6 @@ func (c Client) Send(conf []string, payload network.Payload) (*network.Payload, 
 }
 
 // Close terminal the current connection.
-func (Client) Close() {
+func (Client) Close() error{
+	return nil
 }

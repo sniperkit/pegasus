@@ -70,8 +70,8 @@ var _ = Describe("General", func() {
 
 		serverAMQP.Serve("amqp://guest:guest@localhost:5672/")
 
-		serverHTTP.Listen(nethttp.SetPath("/hello/{id}", nethttp.Put), handler, nil)
-		serverGRPC.Listen(netgrpc.SetPath("/hello/{id}"), handler, nil)
+		serverHTTP.Listen(nethttp.SetConf("/hello/{id}", nethttp.Put), handler, nil)
+		serverGRPC.Listen(netgrpc.SetConf("/hello/{id}"), handler, nil)
 		serverAMQP.Listen(netamqp.SetConf("/hello/{id}"), handler, nil)
 
 		serverHTTP.Serve("localhost:7001")
@@ -86,8 +86,8 @@ var _ = Describe("General", func() {
 			payload := network.BuildPayload([]byte("foo"), options.Marshal())
 
 			// Send the payload
-			response, err := nethttp.NewClient().
-				Send(nethttp.SetPath("http://localhost:7001/hello/44?name=christos", nethttp.Put), payload)
+			response, err := nethttp.NewClient(nil).
+				Send(nethttp.SetConf("http://localhost:7001/hello/44?name=christos", nethttp.Put), payload)
 
 			replyOptions := network.NewOptions().Unmarshal(response.Options)
 
@@ -136,7 +136,7 @@ var _ = Describe("General", func() {
 
 			// Send the payload
 			response, err := netgrpc.NewClient("localhost:50051").
-				Send(netgrpc.SetPath("/hello/{id}"), payload)
+				Send(netgrpc.SetConf("/hello/{id}"), payload)
 
 			replyOptions := network.NewOptions().Unmarshal(response.Options)
 

@@ -38,8 +38,8 @@ var NewServer = func(router *Router) network.Server {
 	return &Server{Router: router}
 }
 
-// SetPath gets a path as parameter and returns an array. It is used for Server.Listen.
-func SetPath(path string) []string {
+// SetConf gets a path as parameter and returns an array. It is used for Server.Listen.
+func SetConf(path string) []string {
 	return []string{path}
 }
 
@@ -56,7 +56,7 @@ func (s Server) Listen(path []string, handler network.Handler, middleware networ
 	s.Router.Add(path[0], handler, middleware)
 }
 
-// HandlerSync is the method which sends and receives the messages between the GRPC server. This is the brain of GRPC
+// HandlerSync is the method which sends and receives the messages between the GRPC servers. This is the brain of GRPC
 // transportation. The first parameter is the context from GRPC and  the second is the HandlerRequest which contains all
 // the new messages. The function returns a HandlerReply or an error if something happens.
 func (s Server) HandlerSync(ctx context.Context, in *pb.HandlerRequest) (*pb.HandlerReply, error) {
@@ -68,7 +68,7 @@ func (s Server) HandlerSync(ctx context.Context, in *pb.HandlerRequest) (*pb.Han
 	// Get the handler method for this request
 	pathWrapper := s.Router.PathsWrapper[in.Path]
 
-	for k, _ := range options.GetHeaders() {
+	for k := range options.GetHeaders() {
 		if !helpers.IsGRPCValidHeader(k) {
 			delete(options.Fields["HEADERS"], k)
 		}
@@ -91,8 +91,17 @@ func (s Server) HandlerSync(ctx context.Context, in *pb.HandlerRequest) (*pb.Han
 	// Read from chanel
 	payload := channel.Receive()
 
+	replyOptions := network.NewOptions().Unmarshal(payload.Options)
+
+	// Set the headers
+	for rh := range replyOptions.GetHeaders() {
+		if !helpers.IsGRPCValidHeader(rh) {
+			delete(replyOptions.Fields["HEADERS"], rh)
+		}
+	}
+
 	// Return the content and the options to the client
-	return &pb.HandlerReply{Content: payload.Body, Options: payload.Options}, nil
+	return &pb.HandlerReply{Content: payload.Body, Options: replyOptions.Marshal()}, nil
 }
 
 // Handler soon you will me deleted

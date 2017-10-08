@@ -35,5 +35,5 @@ package network
 // Close function will close the connection if it is open and exists.
 type Client interface {
 	Send(conf []string, payload Payload) (*Payload, error)
-	Close()
+	Close() error
 }

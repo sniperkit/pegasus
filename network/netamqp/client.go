@@ -99,6 +99,6 @@ func (c Client) Send(conf []string, payload network.Payload) (*network.Payload, 
 }
 
 // Close close the current connection
-func (c Client) Close() {
-	c.connection.Close()
+func (c Client) Close() error {
+	return c.connection.Close()
 }

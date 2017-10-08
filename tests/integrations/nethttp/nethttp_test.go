@@ -115,12 +115,12 @@ var _ = Describe("Nethttp", func() {
 
 	server := nethttp.NewServer(nil)
 
-	server.Listen(nethttp.SetPath("/http", nethttp.Get), handlerGet, nil)
-	server.Listen(nethttp.SetPath("/http", nethttp.Post), handlerPost, nil)
-	server.Listen(nethttp.SetPath("/http/{id}", nethttp.Put), handlerPut, nil)
-	server.Listen(nethttp.SetPath("/http/{id}", nethttp.Delete), handlerDelete, nil)
+	server.Listen(nethttp.SetConf("/http", nethttp.Get), handlerGet, nil)
+	server.Listen(nethttp.SetConf("/http", nethttp.Post), handlerPost, nil)
+	server.Listen(nethttp.SetConf("/http/{id}", nethttp.Put), handlerPut, nil)
+	server.Listen(nethttp.SetConf("/http/{id}", nethttp.Delete), handlerDelete, nil)
 
-	server.Listen(nethttp.SetPath("/http/middleware", nethttp.Get), handlerGet, middleware)
+	server.Listen(nethttp.SetConf("/http/middleware", nethttp.Get), handlerGet, middleware)
 
 	server.Serve("localhost:7000")
 
@@ -145,8 +145,8 @@ var _ = Describe("Nethttp", func() {
 			payload := network.BuildPayload(nil, options.Marshal())
 
 			// Send the payload
-			response, err := nethttp.NewClient().
-				Send(nethttp.SetPath("http://localhost:7000/http?foo=bar", nethttp.Get), payload)
+			response, err := nethttp.NewClient(nil).
+				Send(nethttp.SetConf("http://localhost:7000/http?foo=bar", nethttp.Get), payload)
 
 			replyOptions := network.NewOptions().Unmarshal(response.Options)
 
@@ -178,8 +178,8 @@ var _ = Describe("Nethttp", func() {
 			payload := network.BuildPayload([]byte("foo"), options.Marshal())
 
 			// Send the payload
-			response, err := nethttp.NewClient().
-				Send(nethttp.SetPath("http://localhost:7000/http?name=christos", nethttp.Post), payload)
+			response, err := nethttp.NewClient(nil).
+				Send(nethttp.SetConf("http://localhost:7000/http?name=christos", nethttp.Post), payload)
 
 			replyOptions := network.NewOptions().Unmarshal(response.Options)
 
@@ -209,8 +209,8 @@ var _ = Describe("Nethttp", func() {
 			payload := network.BuildPayload([]byte("foo"), options.Marshal())
 
 			// Send the payload
-			response, err := nethttp.NewClient().
-				Send(nethttp.SetPath("http://localhost:7000/http/44?name=christos", nethttp.Put), payload)
+			response, err := nethttp.NewClient(nil).
+				Send(nethttp.SetConf("http://localhost:7000/http/44?name=christos", nethttp.Put), payload)
 
 			replyOptions := network.NewOptions().Unmarshal(response.Options)
 
@@ -244,8 +244,8 @@ var _ = Describe("Nethttp", func() {
 			payload := network.BuildPayload([]byte("foo"), options.Marshal())
 
 			// Send the payload
-			response, err := nethttp.NewClient().
-				Send(nethttp.SetPath("http://localhost:7000/http/44?name=christos", nethttp.Delete), payload)
+			response, err := nethttp.NewClient(nil).
+				Send(nethttp.SetConf("http://localhost:7000/http/44?name=christos", nethttp.Delete), payload)
 
 			replyOptions := network.NewOptions().Unmarshal(response.Options)
 
@@ -280,8 +280,8 @@ var _ = Describe("Nethttp", func() {
 			payload := network.BuildPayload(nil, options.Marshal())
 
 			// Send the payload
-			response, err := nethttp.NewClient().
-				Send(nethttp.SetPath("http://localhost:7000/http/middleware?foo=bar", nethttp.Get), payload)
+			response, err := nethttp.NewClient(nil).
+				Send(nethttp.SetConf("http://localhost:7000/http/middleware?foo=bar", nethttp.Get), payload)
 
 			It("Should not throw an error", func() {
 				Expect(err).To(BeNil())

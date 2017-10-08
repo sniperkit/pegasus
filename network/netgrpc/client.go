@@ -9,6 +9,18 @@ import (
 	"google.golang.org/grpc"
 )
 
+// RetriesTimes for reconnect with the server
+var RetriesTimes = 10
+
+// Sleep delay between calls
+var Sleep = 5
+
+// NewServerClient is a type of proto.NewServeClient function
+var NewServerClient = pb.NewServeClient
+
+// Dial creates and return a grpc.ClientConnection object
+var Dial = grpc.Dial
+
 // Client implements the network.Client. Client struct describe the GRPC client. It contains all the functionality in
 // order to talk to another server.
 type Client struct {
@@ -28,7 +40,7 @@ var NewClient = func(address string) network.Client {
 // object.
 func (c Client) Send(path []string, payload network.Payload) (*network.Payload, error) {
 
-	connection := pb.NewServeClient(c.Connection)
+	connection := NewServerClient(c.Connection)
 
 	if connection == nil {
 		// todo: [fix] [A002] Finish the Blunder package and throw an error
@@ -53,8 +65,8 @@ func (c Client) Send(path []string, payload network.Payload) (*network.Payload, 
 }
 
 // Close terminates the connection immediately.
-func (c Client) Close() {
-	c.Connection.Close()
+func (c Client) Close() error {
+	return c.Connection.Close()
 }
 
 // connect is used to connect with other GRPC services. The first parameter is the address and returns the connection
@@ -64,8 +76,8 @@ func (Client) connect(address string) *grpc.ClientConn {
 	var conn *grpc.ClientConn
 	var err error
 
-	helpers.Retries(10, 5, func(...interface{}) bool {
-		conn, err = grpc.Dial(address, grpc.WithInsecure())
+	helpers.Retries(RetriesTimes, Sleep, func(...interface{}) bool {
+		conn, err = Dial(address, grpc.WithInsecure())
 		if err != nil {
 			return true
 		}
@@ -73,8 +85,7 @@ func (Client) connect(address string) *grpc.ClientConn {
 	})
 
 	if err != nil {
-		// todo: [fix] [A002] Finish the Blunder package and throw an error
-		panic(err)
+		return nil
 	}
 	return conn
 }

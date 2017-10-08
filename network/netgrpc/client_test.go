@@ -4,8 +4,13 @@ import (
 	"bitbucket.org/code_horse/pegasus/network/netgrpc"
 
 	"bitbucket.org/code_horse/pegasus/network"
+	pb "bitbucket.org/code_horse/pegasus/network/netgrpc/proto"
+	"bitbucket.org/code_horse/pegasus/tests/mocks/mock_netgrpc"
+	"context"
+	"errors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"google.golang.org/grpc"
 	"reflect"
 )
 
@@ -13,7 +18,18 @@ var _ = Describe("Client", func() {
 
 	Describe("Client struct", func() {
 
+		BeforeEach(func() {
+			netgrpc.Dial = grpc.Dial
+			netgrpc.RetriesTimes = 1
+			netgrpc.Sleep = 0
+		})
+
 		Context("Constructor", func() {
+
+			netgrpc.Dial = func(target string, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
+				return &grpc.ClientConn{}, nil
+			}
+
 			client := netgrpc.NewClient("")
 
 			It("Should not be nil", func() {
@@ -26,16 +42,67 @@ var _ = Describe("Client", func() {
 		})
 
 		Context("Send function", func() {
-			client := netgrpc.NewClient("")
 
-			It("Should not panic", func() {
-				Expect(func() { client.Send([]string{"path"}, network.BuildPayload(nil, nil)) }).ToNot(Panic())
+			clientConnection := &mock_netgrpc.MockClientConnection{}
+
+			clientConnection.HandlerSyncMock = func(
+				ctx context.Context,
+				in *pb.HandlerRequest,
+				opts ...grpc.CallOption,
+			) (*pb.HandlerReply, error) {
+				return &pb.HandlerReply{
+					Content: []byte("content"),
+					Options: []byte("options"),
+				}, nil
+			}
+
+			netgrpc.NewServerClient = func(cc *grpc.ClientConn) pb.ServeClient {
+				return clientConnection
+			}
+
+			netgrpc.Dial = func(target string, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
+				return &grpc.ClientConn{}, nil
+			}
+
+			client := netgrpc.NewClient("/wherever/whenever/We're/meant/to/be/together/Shakira")
+
+			payload, err := client.Send(netgrpc.SetConf("/Lucky/you/were/born"), network.Payload{})
+
+			It("Should return a nil error", func() {
+				Expect(err).To(BeNil())
 			})
 
-			It("Should return a type of payload and a error", func() {
-				payload, err := client.Send([]string{"path"}, network.BuildPayload(nil, nil))
-				Expect(reflect.ValueOf(payload).String()).To(Equal("<*network.Payload Value>"))
-				Expect(reflect.ValueOf(err).String()).To(Equal("<*status.statusError Value>"))
+			It("Should return a payload.Content equals to content", func() {
+				Expect(string(payload.Body)).To(Equal("content"))
+			})
+
+			It("Should return a payload.Options equals to options", func() {
+				Expect(string(payload.Options)).To(Equal("options"))
+			})
+		})
+
+		Context("Send function on failure", func() {
+
+			clientConnection := &mock_netgrpc.MockClientConnection{}
+
+			clientConnection.HandlerSyncMock = func(
+				ctx context.Context,
+				in *pb.HandlerRequest,
+				opts ...grpc.CallOption,
+			) (*pb.HandlerReply, error) {
+				return nil, errors.New("error")
+			}
+
+			netgrpc.NewServerClient = func(cc *grpc.ClientConn) pb.ServeClient {
+				return clientConnection
+			}
+
+			client := netgrpc.NewClient("/wherever/whenever/We're/meant/to/be/together/Shakira")
+
+			_, err := client.Send(netgrpc.SetConf("/Lucky/you/were/born"), network.Payload{})
+
+			It("Should return a nil error", func() {
+				Expect(err).ToNot(BeNil())
 			})
 		})
 
