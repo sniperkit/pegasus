@@ -49,14 +49,23 @@ func (c Client) Send(conf []string, payload network.Payload) (*network.Payload, 
 		body = payload.Body
 	}
 
+	httpOptions := network.BuildOptions(payload.Options)
+
 	// Create a request
 	request, err := NewRequest(method, path, bytes.NewReader(body))
+
+	q := request.URL.Query()
+
+	for k, v := range httpOptions.GetParams() {
+		q.Add(k, v)
+	}
+
+	request.URL.RawQuery = q.Encode()
 
 	if err != nil {
 		return nil, err
 	}
 
-	httpOptions := network.BuildOptions(payload.Options)
 	headers := httpOptions.GetHeaders()
 
 	request.Header.Set("Content-Type", "application/json")
