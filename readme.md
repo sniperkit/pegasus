@@ -19,8 +19,8 @@ as a message broker. Pegasus helps us to do all the above.
 # Get started
 
 If you don't already set up a golang directory or GOPATH please follow the instructions bellow
-[install go]:https://golang.org/doc/install
-[set gopath]:https://github.com/golang/go/wiki/Setting-GOPATH
+[install go](https://golang.org/doc/install)
+[set gopath](https://github.com/golang/go/wiki/Setting-GOPATH)
 
 Get the project
 
@@ -47,7 +47,7 @@ $ ./samples sample_grpc_http client
 ```
 
 *In case that you want to use RabbitMQ you have to set up and run locally a server
-first.* [RabbitMQ Docker sample]:https://github.com/dockerfile/rabbitmq
+first.* [RabbitMQ Docker sample](https://github.com/dockerfile/rabbitmq)
 
 Next you have to edit the *samples/sample_grpc_http_amqp/server.go* and *samples/sample_grpc_http_amqp/client.go* files
 and change the rabbitMQAddress variables at top. Add your port and username/password. Usually are the same.

@@ -1,12 +1,12 @@
 package nethttp
 
 import (
-	"github.com/cpapidas/pegasus/network"
 	"bytes"
+	"github.com/cpapidas/pegasus/helpers"
+	"github.com/cpapidas/pegasus/network"
 	"io/ioutil"
 	"net/http"
 	"strings"
-	"github.com/cpapidas/pegasus/helpers"
 )
 
 // Client interface describes the protocols client model. Client keeps the connections open for each protocol.
@@ -54,6 +54,10 @@ func (c Client) Send(conf []string, payload network.Payload) (*network.Payload, 
 	// Create a request
 	request, err := NewRequest(method, path, bytes.NewReader(body))
 
+	if err != nil {
+		return nil, err
+	}
+
 	q := request.URL.Query()
 
 	for k, v := range httpOptions.GetParams() {
@@ -61,10 +65,6 @@ func (c Client) Send(conf []string, payload network.Payload) (*network.Payload, 
 	}
 
 	request.URL.RawQuery = q.Encode()
-
-	if err != nil {
-		return nil, err
-	}
 
 	headers := httpOptions.GetHeaders()
 
@@ -109,6 +109,6 @@ func (c Client) Send(conf []string, payload network.Payload) (*network.Payload, 
 }
 
 // Close terminal the current connection.
-func (Client) Close() error{
+func (Client) Close() error {
 	return nil
 }
