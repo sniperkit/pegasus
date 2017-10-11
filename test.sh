@@ -8,6 +8,5 @@ for d in $(go list ./... | grep -v vendor); do
     if [ -f profile.out ]; then
         cat profile.out >> coverage.txt
         rm profile.out
-        echo "REMOVED"
     fi
 done
