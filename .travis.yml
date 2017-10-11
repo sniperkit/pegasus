@@ -1,4 +1,7 @@
 language: go
 go:
   - 1.9
-script: go test ./...
+script:
+  - ./test.sh
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
