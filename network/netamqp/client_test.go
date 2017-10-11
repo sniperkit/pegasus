@@ -106,6 +106,9 @@ var _ = Describe("Client", func() {
 						Expect(msg.Headers["Sample"]).To(Equal("sample-content"))
 						Expect(msg.Headers["HP-Sample"]).To(BeNil())
 						Expect(msg.Headers["GR-Sample"]).To(BeNil())
+
+						Expect(msg.Headers["MP-Foo"]).To(Equal("Bar"))
+
 					})
 
 					return nil
@@ -129,6 +132,8 @@ var _ = Describe("Client", func() {
 			options.SetHeader("Sample", "sample-content")
 			options.SetHeader("HP-Sample", "sample-content")
 			options.SetHeader("GR-Sample", "sample-content")
+
+			options.SetParam("Foo", "Bar")
 
 			payload := network.BuildPayload([]byte("body"), options.Marshal())
 

@@ -80,7 +80,13 @@ func (c Client) Send(conf []string, payload network.Payload) (*network.Payload, 
 		}
 	}
 
+	// Ad the headers
+	for k, v := range options.GetParams() {
+		pub.Headers["MP-"+k] = v
+	}
+
 	pub.Body = body
+
 
 	err = channel.Publish(
 		"",

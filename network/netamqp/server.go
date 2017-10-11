@@ -116,10 +116,17 @@ func (s Server) Listen(conf []string, handler network.Handler, middleware networ
 
 				options := network.NewOptions()
 
-				// Set the headers
+				// Set headers
 				for k, v := range d.Headers {
 					if helpers.IsAMQPValidHeader(k) {
 						options.SetHeader(k, v.(string))
+					}
+				}
+
+				// Set params
+				for k, v := range d.Headers {
+					if paramKey := helpers.AMQPParam(k); paramKey != "" {
+						options.SetParam(paramKey, v.(string))
 					}
 				}
 

@@ -9,6 +9,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/streadway/amqp"
+	"fmt"
 )
 
 var _ = Describe("Server", func() {
@@ -160,6 +161,8 @@ var _ = Describe("Server", func() {
 					Expect(options.GetHeader("Sample")).To(Equal("sample"))
 					Expect(options.GetHeader("HP-Sample")).To(Equal(""))
 					Expect(options.GetHeader("GR-Sample")).To(Equal(""))
+					fmt.Println("->>", options.GetParams())
+					Expect(options.GetParam("Sample")).To(Equal("sample"))
 				})
 
 			}
@@ -170,6 +173,7 @@ var _ = Describe("Server", func() {
 			headers["Sample"] = "sample"
 			headers["HP-Sample"] = "sample"
 			headers["GR-Sample"] = "sample"
+			headers["MP-Sample"] = "sample"
 
 			deliveries <- amqp.Delivery{
 				Body:    []byte("body content"),
