@@ -1,6 +1,8 @@
 # Pegasus
 
 [![Build Status](https://travis-ci.org/cpapidas/pegasus.svg?branch=master)](https://travis-ci.org/cpapidas/pegasus)
+[![Go Report Card](https://goreportcard.com/badge/github.com/cpapidas/pegasus)](https://goreportcard.com/report/github.com/cpapidas/pegasus)
+[![codebeat badge](https://codebeat.co/badges/4fb5d1ae-7479-40fc-aa0d-bdf10a7bc548)](https://codebeat.co/projects/github-com-cpapidas-pegasus-master)
 
 Pegasus is an abstract layer for GRPC, AMQP (RabbitMQ) and HTTP protocols, therefore the library gives you the ability
 to use all the above protocols easily. In micro-services world there are times that we need to use GRPC protocol
