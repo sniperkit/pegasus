@@ -1,0 +1,7 @@
+languages:
+  - go
+exclude:
+  - /samples/.*
+  - /tests/fixtures/.*
+  - /tests/mocks/.*
+  - /vendor/.*
