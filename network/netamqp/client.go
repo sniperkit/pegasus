@@ -26,7 +26,6 @@ var NewClient = func(address string) network.Client {
 	})
 
 	if connection == nil {
-		// todo: [fix] [A002] Finish the Blunder package and throw an error
 		panic("Cannot connect to RabbitMQ server")
 	}
 
@@ -45,7 +44,6 @@ func (c Client) Send(conf []string, payload network.Payload) (*network.Payload, 
 
 	defer channel.Close()
 
-	// todo: [fix] [A002] Finish the Blunder package and throw an error
 	if err != nil {
 		panic(err)
 	}
@@ -59,7 +57,6 @@ func (c Client) Send(conf []string, payload network.Payload) (*network.Payload, 
 		nil,
 	)
 
-	// todo: [fix] [A002] Finish the Blunder package and throw an error
 	if err != nil {
 		panic(err)
 	}
@@ -96,7 +93,6 @@ func (c Client) Send(conf []string, payload network.Payload) (*network.Payload, 
 		pub.Publishing,
 	)
 
-	// todo: [fix] [A002] Finish the Blunder package and throw an error
 	if err != nil {
 		panic(err)
 	}

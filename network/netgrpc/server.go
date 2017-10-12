@@ -105,7 +105,6 @@ func (s Server) HandlerSync(ctx context.Context, in *pb.HandlerRequest) (*pb.Han
 }
 
 // Handler soon you will me deleted
-// todo: [fix] [A005] Regenerate the protoc, and delete this method
 func (Server) Handler(stream pb.Serve_HandlerServer) error {
 	return errors.New("Not yet implement")
 }
@@ -125,7 +124,6 @@ func (s *Server) startServer() {
 	reflection.Register(s.server)
 
 	if err := s.server.Serve(lis); err != nil {
-		// todo: [fix] [A002] Finish the Blunder package and throw an error
 		log.Fatalf("failed to serve: %v", err)
 	}
 }

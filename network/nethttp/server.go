@@ -75,11 +75,9 @@ func (s Server) Listen(paths []string, handler network.Handler, middleware netwo
 		// Parse and set the body
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			// todo: [fix] [A006] Return the error at handler
 			panic(err.Error())
 		}
 
-		//todo: [fix] [A007] Make channel infinity
 		channel := network.NewChannel(1)
 
 		// Get the payload

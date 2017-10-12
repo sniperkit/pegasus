@@ -43,7 +43,6 @@ func (c Client) Send(path []string, payload network.Payload) (*network.Payload, 
 	connection := NewServerClient(c.Connection)
 
 	if connection == nil {
-		// todo: [fix] [A002] Finish the Blunder package and throw an error
 		return nil, errors.New("CONNECTION NOT FOUND")
 	}
 

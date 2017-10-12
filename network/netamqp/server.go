@@ -42,7 +42,6 @@ func (s *Server) Serve(address string) {
 	})
 
 	if connection == nil || err != nil {
-		// todo: [fix] [A002] Finish the Blunder package and throw an error
 		panic("Cannot connect to RabbitMQ server")
 	}
 
@@ -57,14 +56,12 @@ func (s Server) Listen(conf []string, handler network.Handler, middleware networ
 	go func() {
 
 		if s.connection == nil {
-			// todo: [fix] [A002] Finish the Blunder package and throw an error
 			panic("RabbitMQ connection is nil, please start the server first and then set listeners")
 		}
 
 		// Create a channel
 		channel, err := s.connection.Channel()
 
-		// todo: [fix] [A002] Finish the Blunder package and throw an error
 		if err != nil {
 			return
 		}
@@ -79,14 +76,12 @@ func (s Server) Listen(conf []string, handler network.Handler, middleware networ
 			nil,
 		)
 
-		// todo: [fix] [A002] Finish the Blunder package and throw an error
 		if err != nil {
 			return
 		}
 
 		err = channel.Qos(1, 0, false)
 
-		// todo: [fix] [A002] Finish the Blunder package and throw an error
 		if err != nil {
 			return
 		}
@@ -101,7 +96,6 @@ func (s Server) Listen(conf []string, handler network.Handler, middleware networ
 			nil,
 		)
 
-		// todo: [fix] [A002] Finish the Blunder package and throw an error
 		if err != nil {
 			return
 		}
