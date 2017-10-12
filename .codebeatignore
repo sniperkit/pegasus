@@ -1,0 +1,5 @@
+tests/mocks/*
+tests/fixtures/*
+samples/*
+scripts/*
+vendor/*
