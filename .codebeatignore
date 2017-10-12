@@ -1,5 +1,4 @@
-tests/mocks/*
-tests/fixtures/*
-samples/*
-scripts/*
-vendor/*
+tests/**
+samples/**
+scripts/**
+vendor/**
