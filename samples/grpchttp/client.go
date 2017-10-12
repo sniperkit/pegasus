@@ -7,6 +7,7 @@ import (
 	"github.com/cpapidas/pegasus/network/nethttp"
 )
 
+// Client for GRPC HTTP
 func Client() {
 
 	options := network.NewOptions()
