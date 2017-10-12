@@ -3,11 +3,11 @@ package netgrpc_test
 import (
 	"github.com/cpapidas/pegasus/network/netgrpc"
 
+	"context"
+	"errors"
 	"github.com/cpapidas/pegasus/network"
 	pb "github.com/cpapidas/pegasus/network/netgrpc/proto"
 	"github.com/cpapidas/pegasus/tests/mocks/mock_netgrpc"
-	"context"
-	"errors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"google.golang.org/grpc"

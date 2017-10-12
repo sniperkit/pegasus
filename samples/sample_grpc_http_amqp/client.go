@@ -3,9 +3,9 @@ package sample_grpc_http_amqp
 import (
 	"fmt"
 	"github.com/cpapidas/pegasus/network"
+	"github.com/cpapidas/pegasus/network/netamqp"
 	"github.com/cpapidas/pegasus/network/netgrpc"
 	"github.com/cpapidas/pegasus/network/nethttp"
-	"github.com/cpapidas/pegasus/network/netamqp"
 )
 
 func Client() {

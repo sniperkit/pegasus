@@ -20,7 +20,6 @@ var _ = Describe("Client", func() {
 			netamqp.NewConnection = NewConnection
 		})
 
-
 		Context("Test constructor", func() {
 
 			It("Should throw a panic when connection not found", func() {
@@ -143,15 +142,15 @@ var _ = Describe("Client", func() {
 				Expect(callChannel).To(BeTrue())
 			})
 
-			It("Should call the close channel function", func(){
+			It("Should call the close channel function", func() {
 				Expect(callClose).To(BeTrue())
 			})
 
-			It("Should call the queue declare function", func(){
+			It("Should call the queue declare function", func() {
 				Expect(callQueueDeclare).To(BeTrue())
 			})
 
-			It("Should call the publish function", func(){
+			It("Should call the publish function", func() {
 				Expect(callPublish).To(BeTrue())
 			})
 

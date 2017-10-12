@@ -9,7 +9,7 @@ type MockResponseWriter struct {
 	WriteHeaderMock func(int)
 	Headers         map[string][]string
 	Body            []byte
-	Status    		int
+	Status          int
 }
 
 // Header mock for Header

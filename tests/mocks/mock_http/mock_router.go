@@ -1,8 +1,8 @@
 package mock_http
 
 import (
-	"net/http"
 	"github.com/gorilla/mux"
+	"net/http"
 )
 
 // MockRouter mock mux.Router

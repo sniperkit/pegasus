@@ -3,13 +3,13 @@ package netamqp_test
 import (
 	"github.com/cpapidas/pegasus/network/netamqp"
 
+	"errors"
+	"fmt"
 	"github.com/cpapidas/pegasus/network"
 	"github.com/cpapidas/pegasus/tests/mocks/mock_netamqp"
-	"errors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/streadway/amqp"
-	"fmt"
 )
 
 var _ = Describe("Server", func() {

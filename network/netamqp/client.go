@@ -84,7 +84,6 @@ func (c Client) Send(conf []string, payload network.Payload) (*network.Payload, 
 
 	pub.Body = body
 
-
 	err = channel.Publish(
 		"",
 		queue.Name,

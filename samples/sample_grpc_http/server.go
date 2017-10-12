@@ -1,10 +1,10 @@
 package sample_grpc_http
 
 import (
+	"fmt"
 	"github.com/cpapidas/pegasus/network"
 	"github.com/cpapidas/pegasus/network/netgrpc"
 	"github.com/cpapidas/pegasus/network/nethttp"
-	"fmt"
 )
 
 func handler(channel *network.Channel) {

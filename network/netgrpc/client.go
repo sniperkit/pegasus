@@ -1,11 +1,11 @@
 package netgrpc
 
 import (
+	"context"
+	"errors"
 	"github.com/cpapidas/pegasus/helpers"
 	"github.com/cpapidas/pegasus/network"
 	pb "github.com/cpapidas/pegasus/network/netgrpc/proto"
-	"context"
-	"errors"
 	"google.golang.org/grpc"
 )
 

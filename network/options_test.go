@@ -98,7 +98,7 @@ var _ = Describe("Options", func() {
 
 			It("Should set a new param", func() {
 				options.SetParam("baz", "ba")
-				Expect(options.GetParams()).To(Equal(map[string]string{"foo": "fa", "baz":"ba"}))
+				Expect(options.GetParams()).To(Equal(map[string]string{"foo": "fa", "baz": "ba"}))
 			})
 
 			It("Should get a param", func() {
@@ -122,14 +122,13 @@ var _ = Describe("Options", func() {
 
 			It("Should set a new header", func() {
 				options.SetHeader("baz", "ba")
-				Expect(options.GetHeaders()).To(Equal(map[string]string{"foo": "fa", "baz":"ba"}))
+				Expect(options.GetHeaders()).To(Equal(map[string]string{"foo": "fa", "baz": "ba"}))
 			})
 
 			It("Should get a header", func() {
 				Expect(options.GetHeader("foo")).To(Equal("fa"))
 			})
 		})
-
 
 	})
 

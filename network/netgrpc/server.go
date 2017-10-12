@@ -1,10 +1,10 @@
 package netgrpc
 
 import (
+	"errors"
 	"github.com/cpapidas/pegasus/helpers"
 	"github.com/cpapidas/pegasus/network"
 	pb "github.com/cpapidas/pegasus/network/netgrpc/proto"
-	"errors"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"

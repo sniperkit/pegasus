@@ -3,15 +3,15 @@ package nethttp_test
 import (
 	"github.com/cpapidas/pegasus/network/nethttp"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-	"reflect"
-	"github.com/cpapidas/pegasus/tests/mocks/mock_http"
-	"net/http"
-	"github.com/gorilla/mux"
-	"io/ioutil"
 	"bytes"
 	"github.com/cpapidas/pegasus/network"
+	"github.com/cpapidas/pegasus/tests/mocks/mock_http"
+	"github.com/gorilla/mux"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	"io/ioutil"
+	"net/http"
+	"reflect"
 )
 
 var _ = Describe("Server", func() {
@@ -62,7 +62,7 @@ var _ = Describe("Server", func() {
 
 				r.Body = ioutil.NopCloser(bytes.NewReader([]byte("content")))
 
-				f(w,r)
+				f(w, r)
 
 				It("Should contain the right headers", func() {
 					Expect(w.Headers["Custom-Sample"]).To(Equal([]string{"sample"}))
@@ -133,7 +133,7 @@ var _ = Describe("Server", func() {
 
 				r.Body = ioutil.NopCloser(bytes.NewReader([]byte("content")))
 
-				f(w,r)
+				f(w, r)
 
 				It("Should contain the right headers", func() {
 					Expect(w.Headers["Custom-Sample"]).To(Equal([]string{"sample"}))

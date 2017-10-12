@@ -1,6 +1,7 @@
 package nethttp
 
 import (
+	"github.com/cpapidas/pegasus/helpers"
 	"github.com/cpapidas/pegasus/network"
 	"github.com/gorilla/mux"
 	"io/ioutil"
@@ -8,7 +9,6 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
-	"github.com/cpapidas/pegasus/helpers"
 )
 
 // Router interface for mux.Router

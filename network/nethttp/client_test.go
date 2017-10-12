@@ -3,16 +3,16 @@ package nethttp_test
 import (
 	"github.com/cpapidas/pegasus/network/nethttp"
 
+	"bytes"
+	"errors"
+	"github.com/cpapidas/pegasus/network"
+	"github.com/cpapidas/pegasus/tests/mocks/mock_http"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"reflect"
-	"github.com/cpapidas/pegasus/tests/mocks/mock_http"
-	"net/http"
-	"github.com/cpapidas/pegasus/network"
-	"bytes"
-	"io/ioutil"
 	"io"
-	"errors"
+	"io/ioutil"
+	"net/http"
+	"reflect"
 )
 
 var _ = Describe("Client", func() {

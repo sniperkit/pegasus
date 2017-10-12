@@ -10,7 +10,7 @@ type MockChannel struct {
 	QueueDeclareMock func(name string, durable, autoDelete, exclusive, noWait bool, args amqp.Table) (amqp.Queue, error)
 	PublishMock      func(exchange, key string, mandatory, immediate bool, msg amqp.Publishing) error
 	QosMock          func(prefetchCount, prefetchSize int, global bool) error
-	ConsumeMock func(
+	ConsumeMock      func(
 		queue,
 		consumer string,
 		autoAck,

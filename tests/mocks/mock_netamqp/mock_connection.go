@@ -1,13 +1,13 @@
 package mock_netamqp
 
 import (
-	"github.com/streadway/amqp"
 	"github.com/cpapidas/pegasus/network/netamqp"
+	"github.com/streadway/amqp"
 )
 
 // MockConnection mock for amqp.Connection
 type MockConnection struct {
-	CloseMock func() error
+	CloseMock   func() error
 	ChannelMock func() (netamqp.IChannel, error)
 }
 
