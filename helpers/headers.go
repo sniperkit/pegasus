@@ -41,7 +41,7 @@ func IsAMQPValidHeader(key string) bool {
 	return false
 }
 
-// IsAMQPValidHeader returns true if the key is less than 3 characters or is not equal to GRPCHeaderKey & HTTPHeaderKey
+// AMQPParam returns true if the key is less than 3 characters or is not equal to GRPCHeaderKey & HTTPHeaderKey
 func AMQPParam(key string) string {
 	if len(key) > 3 && key[0:3] == AMQPPramKey {
 		return key[3:]

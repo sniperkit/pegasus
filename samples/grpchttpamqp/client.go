@@ -1,13 +1,17 @@
-package sample_grpc_http
+package grpchttpamqp
 
 import (
 	"fmt"
 	"github.com/cpapidas/pegasus/network"
+	"github.com/cpapidas/pegasus/network/netamqp"
 	"github.com/cpapidas/pegasus/network/netgrpc"
 	"github.com/cpapidas/pegasus/network/nethttp"
 )
 
+// Client of grpc http amqp
 func Client() {
+
+	rabbitMQAddress := "amqp://guest:guest@localhost:5672/"
 
 	options := network.NewOptions()
 	options.SetHeader("Token", "<th3S4cjgetTok42n>")
@@ -30,6 +34,14 @@ func Client() {
 		panic(err)
 	}
 
+	// Send the grpc call and print the result
+	_, err = netamqp.NewClient(rabbitMQAddress).
+		Send(netamqp.SetConf("/sample/{id}"), send)
+
+	if err != nil {
+		panic(err)
+	}
+
 	// print the http response
 	fmt.Println("--------------------- HTTP RESPONSE ---------------------")
 	fmt.Println("body:", string(httpResponse.Body))
@@ -40,5 +52,10 @@ func Client() {
 	fmt.Println("--------------------- GRPC RESPONSE ---------------------")
 	fmt.Println("body:", string(grpcResponse.Body))
 	fmt.Println("options:", network.NewOptions().Unmarshal(grpcResponse.Options))
+	fmt.Println("----------------------------------------------------------")
+
+	// print the grpc response
+	fmt.Println("--------------------- GRPC RESPONSE ---------------------")
+	fmt.Println("Go back to server terminal and check the logs")
 	fmt.Println("----------------------------------------------------------")
 }

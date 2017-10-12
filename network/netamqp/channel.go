@@ -4,7 +4,7 @@ import (
 	"github.com/streadway/amqp"
 )
 
-// Channel describes the amqp.Channel. We use it in order to return a abstract object from connection.Channel().
+// IChannel describes the amqp.Channel. We use it in order to return a abstract object from connection.Channel().
 type IChannel interface {
 	Close() error
 	QueueDeclare(name string, durable, autoDelete, exclusive, noWait bool, args amqp.Table) (amqp.Queue, error)

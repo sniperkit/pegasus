@@ -2,28 +2,28 @@ package main
 
 import (
 	"fmt"
-	"github.com/cpapidas/pegasus/samples/sample_grpc_http"
-	"github.com/cpapidas/pegasus/samples/sample_grpc_http_amqp"
+	"github.com/cpapidas/pegasus/samples/grpchttp"
+	"github.com/cpapidas/pegasus/samples/grpchttpamqp"
 	"os"
 )
 
 func main() {
 
-	if os.Args[1] == "sample_grpc_http" {
+	if os.Args[1] == "grpchttp" {
 		switch os.Args[2] {
 		case "client":
-			sample_grpc_http.Client()
+			grpchttp.Client()
 		case "server":
-			sample_grpc_http.Server()
+			grpchttp.Server()
 		default:
 			fmt.Println("Command not found.")
 		}
-	} else if os.Args[1] == "sample_grpc_http_amqp" {
+	} else if os.Args[1] == "grpchttpamqp" {
 		switch os.Args[2] {
 		case "client":
-			sample_grpc_http_amqp.Client()
+			grpchttpamqp.Client()
 		case "server":
-			sample_grpc_http_amqp.Server()
+			grpchttpamqp.Server()
 		default:
 			fmt.Println("Command not found.")
 		}

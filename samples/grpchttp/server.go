@@ -1,4 +1,4 @@
-package sample_grpc_http
+package grpchttp
 
 import (
 	"fmt"
@@ -53,7 +53,7 @@ func Server() {
 
 	// Print a cool message
 	fmt.Println("\nThe servers GRPC-HTTP is up and running,\n" +
-		"now run [$ ./samples sample_grpc_http client] command :) \n")
+		"now run [$ ./samples grpchttp client] command :) \n")
 
 	// wait here forever
 	<-stop

@@ -7,7 +7,7 @@ import (
 	"errors"
 	"github.com/cpapidas/pegasus/network"
 	pb "github.com/cpapidas/pegasus/network/netgrpc/proto"
-	"github.com/cpapidas/pegasus/tests/mocks/mock_netgrpc"
+	"github.com/cpapidas/pegasus/tests/mocks/mnetgrpc"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"google.golang.org/grpc"
@@ -43,7 +43,7 @@ var _ = Describe("Client", func() {
 
 		Context("Send function", func() {
 
-			clientConnection := &mock_netgrpc.MockClientConnection{}
+			clientConnection := &mnetgrpc.MockClientConnection{}
 
 			clientConnection.HandlerSyncMock = func(
 				ctx context.Context,
@@ -83,7 +83,7 @@ var _ = Describe("Client", func() {
 
 		Context("Send function on failure", func() {
 
-			clientConnection := &mock_netgrpc.MockClientConnection{}
+			clientConnection := &mnetgrpc.MockClientConnection{}
 
 			clientConnection.HandlerSyncMock = func(
 				ctx context.Context,

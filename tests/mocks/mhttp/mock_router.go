@@ -1,4 +1,4 @@
-package mock_http
+package mhttp
 
 import (
 	"github.com/gorilla/mux"
@@ -10,7 +10,7 @@ type MockRouter struct {
 	HandleFuncMock func(path string, f func(http.ResponseWriter, *http.Request)) *mux.Route
 }
 
-// HandlerFunc mock for mux.Router HandleFunc
+// HandleFunc mock for mux.Router HandleFunc
 func (m MockRouter) HandleFunc(path string, f func(http.ResponseWriter, *http.Request)) *mux.Route {
 	if m.HandleFuncMock != nil {
 		return m.HandleFuncMock(path, f)

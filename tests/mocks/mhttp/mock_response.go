@@ -1,4 +1,4 @@
-package mock_http
+package mhttp
 
 import "net/http"
 

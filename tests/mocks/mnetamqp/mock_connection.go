@@ -1,4 +1,4 @@
-package mock_netamqp
+package mnetamqp
 
 import (
 	"github.com/cpapidas/pegasus/network/netamqp"

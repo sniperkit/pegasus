@@ -5,7 +5,7 @@ import (
 
 	"bytes"
 	"github.com/cpapidas/pegasus/network"
-	"github.com/cpapidas/pegasus/tests/mocks/mock_http"
+	"github.com/cpapidas/pegasus/tests/mocks/mhttp"
 	"github.com/gorilla/mux"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -44,11 +44,11 @@ var _ = Describe("Server", func() {
 
 			callHandler := false
 
-			router := &mock_http.MockRouter{}
+			router := &mhttp.MockRouter{}
 
 			router.HandleFuncMock = func(path string, f func(http.ResponseWriter, *http.Request)) *mux.Route {
 
-				w := &mock_http.MockResponseWriter{
+				w := &mhttp.MockResponseWriter{
 					Headers: make(map[string][]string),
 				}
 
@@ -115,11 +115,11 @@ var _ = Describe("Server", func() {
 			callHandler := false
 			callMiddleware := false
 
-			router := &mock_http.MockRouter{}
+			router := &mhttp.MockRouter{}
 
 			router.HandleFuncMock = func(path string, f func(http.ResponseWriter, *http.Request)) *mux.Route {
 
-				w := &mock_http.MockResponseWriter{
+				w := &mhttp.MockResponseWriter{
 					Headers: make(map[string][]string),
 				}
 

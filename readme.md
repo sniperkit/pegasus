@@ -44,9 +44,9 @@ Run the HTTP-GRPC
 
 ```bash
 // run the server
-$ ./samples sample_grpc_http server
+$ ./samples grpchttp server
 // open a new terminal and run the client
-$ ./samples sample_grpc_http client
+$ ./samples grpchttp client
 ```
 
 *In case that you want to use RabbitMQ you have to set up and run locally a server
@@ -57,9 +57,9 @@ and change the rabbitMQAddress variables at top. Add your port and username/pass
 
 ```bash
 // run the server
-$ ./samples sample_grpc_http_amqp server
+$ ./samples grpchttpamqp server
 // open a new terminal and run the client
-$ ./samples sample_grpc_http_amqp client
+$ ./samples grpchttpamqp client
 ```
 
 

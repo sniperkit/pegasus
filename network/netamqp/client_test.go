@@ -3,7 +3,7 @@ package netamqp_test
 import (
 	"github.com/cpapidas/pegasus/network"
 	"github.com/cpapidas/pegasus/network/netamqp"
-	"github.com/cpapidas/pegasus/tests/mocks/mock_netamqp"
+	"github.com/cpapidas/pegasus/tests/mocks/mnetamqp"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/streadway/amqp"
@@ -51,10 +51,10 @@ var _ = Describe("Client", func() {
 			callQueueDeclare := false
 			callPublish := false
 
-			mockConnection := &mock_netamqp.MockConnection{}
+			mockConnection := &mnetamqp.MockConnection{}
 
 			mockConnection.ChannelMock = func() (netamqp.IChannel, error) {
-				mockChannel := &mock_netamqp.MockChannel{}
+				mockChannel := &mnetamqp.MockChannel{}
 
 				callChannel = true
 
@@ -164,10 +164,10 @@ var _ = Describe("Client", func() {
 			callChannel := false
 			callPublish := false
 
-			mockConnection := &mock_netamqp.MockConnection{}
+			mockConnection := &mnetamqp.MockConnection{}
 
 			mockConnection.ChannelMock = func() (netamqp.IChannel, error) {
-				mockChannel := &mock_netamqp.MockChannel{}
+				mockChannel := &mnetamqp.MockChannel{}
 
 				callChannel = true
 
@@ -231,7 +231,7 @@ var _ = Describe("Client", func() {
 				Expect(callChannel).To(BeTrue())
 			})
 
-			It("Shoudl call the channel.Publish funciton", func() {
+			It("Should call the channel.Publish function", func() {
 				Expect(callPublish).To(BeTrue())
 			})
 
@@ -244,7 +244,7 @@ var _ = Describe("Client", func() {
 
 			callClose := false
 
-			mockConnection := &mock_netamqp.MockConnection{}
+			mockConnection := &mnetamqp.MockConnection{}
 
 			mockConnection.CloseMock = func() error {
 				callClose = true

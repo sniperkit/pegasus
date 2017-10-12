@@ -6,7 +6,7 @@ import (
 	"bytes"
 	"errors"
 	"github.com/cpapidas/pegasus/network"
-	"github.com/cpapidas/pegasus/tests/mocks/mock_http"
+	"github.com/cpapidas/pegasus/tests/mocks/mhttp"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"io"
@@ -37,7 +37,7 @@ var _ = Describe("Client", func() {
 
 			called := false
 
-			mockHTTPClient := &mock_http.MockHTTPClient{}
+			mockHTTPClient := &mhttp.MockHTTPClient{}
 
 			mockHTTPClient.DoMock = func(req *http.Request) (*http.Response, error) {
 
@@ -126,7 +126,7 @@ var _ = Describe("Client", func() {
 
 		called := false
 
-		mockHTTPClient := &mock_http.MockHTTPClient{}
+		mockHTTPClient := &mhttp.MockHTTPClient{}
 
 		mockHTTPClient.DoMock = func(req *http.Request) (*http.Response, error) {
 			called = true
@@ -159,7 +159,7 @@ var _ = Describe("Client", func() {
 			return nil, errors.New("error")
 		}
 
-		mockHTTPClient := &mock_http.MockHTTPClient{}
+		mockHTTPClient := &mhttp.MockHTTPClient{}
 
 		mockHTTPClient.DoMock = func(req *http.Request) (*http.Response, error) {
 			called = true

@@ -1,4 +1,4 @@
-package mock_netgrpc
+package mnetgrpc
 
 import (
 	"context"

@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/cpapidas/pegasus/network"
-	"github.com/cpapidas/pegasus/tests/mocks/mock_netamqp"
+	"github.com/cpapidas/pegasus/tests/mocks/mnetamqp"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/streadway/amqp"
@@ -65,11 +65,11 @@ var _ = Describe("Server", func() {
 
 			deliveries := make(chan amqp.Delivery)
 
-			mockConnection := &mock_netamqp.MockConnection{}
+			mockConnection := &mnetamqp.MockConnection{}
 
 			mockConnection.ChannelMock = func() (netamqp.IChannel, error) {
 
-				mockChannel := &mock_netamqp.MockChannel{}
+				mockChannel := &mnetamqp.MockChannel{}
 
 				callChannel = true
 
@@ -209,11 +209,11 @@ var _ = Describe("Server", func() {
 			callChannel := false
 			callQueueDeclare := false
 
-			mockConnection := &mock_netamqp.MockConnection{}
+			mockConnection := &mnetamqp.MockConnection{}
 
 			mockConnection.ChannelMock = func() (netamqp.IChannel, error) {
 
-				mockChannel := &mock_netamqp.MockChannel{}
+				mockChannel := &mnetamqp.MockChannel{}
 
 				callChannel = true
 
@@ -262,11 +262,11 @@ var _ = Describe("Server", func() {
 			callQueueDeclare := false
 			callQos := false
 
-			mockConnection := &mock_netamqp.MockConnection{}
+			mockConnection := &mnetamqp.MockConnection{}
 
 			mockConnection.ChannelMock = func() (netamqp.IChannel, error) {
 
-				mockChannel := &mock_netamqp.MockChannel{}
+				mockChannel := &mnetamqp.MockChannel{}
 
 				callChannel = true
 
@@ -325,11 +325,11 @@ var _ = Describe("Server", func() {
 			callQos := false
 			callConsume := false
 
-			mockConnection := &mock_netamqp.MockConnection{}
+			mockConnection := &mnetamqp.MockConnection{}
 
 			mockConnection.ChannelMock = func() (netamqp.IChannel, error) {
 
-				mockChannel := &mock_netamqp.MockChannel{}
+				mockChannel := &mnetamqp.MockChannel{}
 
 				callChannel = true
 
@@ -387,6 +387,10 @@ var _ = Describe("Server", func() {
 
 			It("Should call the function Qos", func() {
 				Expect(callQos).To(BeTrue())
+			})
+
+			It("Should call the function Consume", func() {
+				Expect(callConsume).To(BeTrue())
 			})
 
 		})
