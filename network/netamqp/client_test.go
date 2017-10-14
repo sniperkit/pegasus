@@ -8,6 +8,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/streadway/amqp"
 	"time"
+	"errors"
 )
 
 var _ = Describe("Client", func() {
@@ -261,6 +262,174 @@ var _ = Describe("Client", func() {
 
 			It("Should call the Close function", func() {
 				Expect(callClose).To(BeTrue())
+			})
+
+		})
+
+		Context("Test on nil connection", func() {
+
+			netamqp.RetriesTimes = 1
+			netamqp.Sleep = 1
+
+			netamqp.NewConnection = func(address string) (netamqp.IConnection, error) {
+				return nil, errors.New("error")
+			}
+
+			It("Should throw a panic on connection error", func() {
+				Expect(func() {
+					netamqp.NewClient("whatever")
+				}).To(Panic())
+			})
+
+		})
+
+		Context("Test Send function on channel failure", func() {
+
+			netamqp.RetriesTimes = 1
+			netamqp.Sleep = 1
+
+			mockConnection := &mnetamqp.MockConnection{}
+
+			mockConnection.ChannelMock = func() (netamqp.IChannel, error) {
+				return nil, errors.New("error")
+			}
+
+			netamqp.NewConnection = func(address string) (netamqp.IConnection, error) {
+				return mockConnection, nil
+			}
+
+			client := netamqp.NewClient("whatever")
+
+			payload := network.BuildPayload([]byte("body"), nil)
+
+			_, err := client.Send(netamqp.SetConf("whatever/path"), payload)
+
+			It("Should return an error", func() {
+				Expect(err).ToNot(BeNil())
+			})
+
+		})
+
+		Context("Test Send function on queue declaration failure", func() {
+
+			netamqp.RetriesTimes = 1
+			netamqp.Sleep = 1
+
+			callChannel := false
+			callQueueDeclare := false
+
+			mockConnection := &mnetamqp.MockConnection{}
+
+			mockConnection.ChannelMock = func() (netamqp.IChannel, error) {
+				mockChannel := &mnetamqp.MockChannel{}
+
+				callChannel = true
+
+				mockChannel.QueueDeclareMock = func(
+					name string,
+					durable,
+					autoDelete,
+					exclusive,
+					noWait bool,
+					args amqp.Table,
+				) (amqp.Queue, error) {
+					callQueueDeclare = true
+					return amqp.Queue{}, errors.New("error")
+				}
+
+				return mockChannel, nil
+			}
+
+			netamqp.NewConnection = func(address string) (netamqp.IConnection, error) {
+				return mockConnection, nil
+			}
+
+			client := netamqp.NewClient("whatever")
+
+			payload := network.BuildPayload([]byte("body"), nil)
+
+			_, err := client.Send(netamqp.SetConf("whatever/path"), payload)
+
+			It("Should call the channel function", func() {
+				Expect(callChannel).ToNot(BeNil())
+			})
+
+			It("Should call the queue declaration function", func() {
+				Expect(callQueueDeclare).ToNot(BeNil())
+			})
+
+			It("Should return an error", func() {
+				Expect(err).ToNot(BeNil())
+			})
+
+		})
+
+		Context("Test Send function on publish failure", func() {
+
+			netamqp.RetriesTimes = 1
+			netamqp.Sleep = 1
+
+			callChannel := false
+			callQueueDeclare := false
+			callPublish := false
+
+			mockConnection := &mnetamqp.MockConnection{}
+
+			mockConnection.ChannelMock = func() (netamqp.IChannel, error) {
+				mockChannel := &mnetamqp.MockChannel{}
+
+				callChannel = true
+
+				mockChannel.QueueDeclareMock = func(
+					name string,
+					durable,
+					autoDelete,
+					exclusive,
+					noWait bool,
+					args amqp.Table,
+				) (amqp.Queue, error) {
+					callQueueDeclare = true
+					return amqp.Queue{}, nil
+				}
+
+				mockChannel.PublishMock = func(
+					exchange,
+					key string,
+					mandatory,
+					immediate bool,
+					msg amqp.Publishing,
+				) error {
+					callPublish = true
+					return errors.New("error")
+				}
+
+				return mockChannel, nil
+			}
+
+			netamqp.NewConnection = func(address string) (netamqp.IConnection, error) {
+				return mockConnection, nil
+			}
+
+			client := netamqp.NewClient("whatever")
+
+			payload := network.BuildPayload([]byte("body"), nil)
+
+			_, err := client.Send(netamqp.SetConf("whatever/path"), payload)
+
+			It("Should call the channel function", func() {
+				Expect(callChannel).ToNot(BeNil())
+			})
+
+			It("Should call the queue declaration function", func() {
+				Expect(callQueueDeclare).ToNot(BeNil())
+			})
+
+			It("Should call the publish function", func() {
+				Expect(callPublish).ToNot(BeNil())
+			})
+
+			It("Should return an error", func() {
+				Expect(err).ToNot(BeNil())
 			})
 
 		})

@@ -30,11 +30,10 @@ func SetConf(path string) []string {
 // Serve method (network.Server) starts the RabbitMQ server for a specif address. It should have the right format
 // <address>:<port>
 func (s *Server) Serve(address string) {
-	var connection IConnection
 	var err error
 
 	helpers.Retries(RetriesTimes, Sleep, func(...interface{}) bool {
-		connection, err = NewConnection(address)
+		s.connection, err = NewConnection(address)
 		if err != nil {
 			return true
 		}
@@ -42,18 +41,13 @@ func (s *Server) Serve(address string) {
 		return false
 	})
 
-	if connection == nil || err != nil {
+	if s.connection == nil || err != nil {
 		panic("Cannot connect to RabbitMQ server")
 	}
-
-	s.connection = connection
 }
 
 // Listen method starts a new worker which is listening to a specific queue.
 func (s Server) Listen(conf []string, h network.Handler, m network.Middleware) {
-	if s.connection == nil {
-		panic("RabbitMQ connection is nil, please start the server first and then set listeners")
-	}
 	go s.addListener(conf[0], h, m)
 }
 

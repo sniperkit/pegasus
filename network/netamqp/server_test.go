@@ -4,7 +4,6 @@ import (
 	"github.com/cpapidas/pegasus/network/netamqp"
 
 	"errors"
-	"fmt"
 	"github.com/cpapidas/pegasus/network"
 	"github.com/cpapidas/pegasus/tests/mocks/mnetamqp"
 	. "github.com/onsi/ginkgo"
@@ -161,7 +160,6 @@ var _ = Describe("Server", func() {
 					Expect(options.GetHeader("Sample")).To(Equal("sample"))
 					Expect(options.GetHeader("HP-Sample")).To(Equal(""))
 					Expect(options.GetHeader("GR-Sample")).To(Equal(""))
-					fmt.Println("->>", options.GetParams())
 					Expect(options.GetParam("Sample")).To(Equal("sample"))
 				})
 
@@ -198,6 +196,177 @@ var _ = Describe("Server", func() {
 
 			It("Should call the handler", func() {
 				Expect(callHandler).To(BeTrue())
+			})
+		})
+
+		Context("Test Middleware method", func() {
+
+			netamqp.RetriesTimes = 1
+			netamqp.Sleep = 0
+
+			callChannel := false
+			callQueueDeclare := false
+			callQos := false
+			callConsume := false
+			callHandler := false
+			callMiddleware := false
+
+			deliveries := make(chan amqp.Delivery)
+
+			mockConnection := &mnetamqp.MockConnection{}
+
+			mockConnection.ChannelMock = func() (netamqp.IChannel, error) {
+
+				mockChannel := &mnetamqp.MockChannel{}
+
+				callChannel = true
+
+				mockChannel.QueueDeclareMock = func(
+					name string,
+					durable,
+					autoDelete,
+					exclusive,
+					noWait bool,
+					args amqp.Table,
+				) (amqp.Queue, error) {
+
+					callQueueDeclare = true
+
+					It("Should call connection.Channel() with valid parameters", func() {
+						Expect(name).To(Equal("/random/path"))
+						Expect(durable).To(BeTrue())
+						Expect(autoDelete).To(BeFalse())
+						Expect(exclusive).To(BeFalse())
+						Expect(noWait).To(BeFalse())
+						Expect(args).To(BeNil())
+					})
+
+					return amqp.Queue{Name: "QueueName"}, nil
+				}
+
+				mockChannel.QosMock = func(prefetchCount, prefetchSize int, global bool) error {
+
+					callQos = true
+
+					It("Should call the Qos function with right parameters", func() {
+						Expect(prefetchCount).To(Equal(1))
+						Expect(prefetchSize).To(Equal(0))
+						Expect(global).To(Equal(false))
+					})
+
+					return nil
+				}
+
+				mockChannel.ConsumeMock = func(
+					queue,
+					consumer string,
+					autoAck,
+					exclusive,
+					noLocal,
+					noWait bool,
+					args amqp.Table,
+				) (<-chan amqp.Delivery, error) {
+
+					callConsume = true
+
+					It("Should call the consume function with valid parameters", func() {
+						Expect(queue).To(Equal("QueueName"))
+						Expect(consumer).To(Equal(""))
+						Expect(autoAck).To(BeFalse())
+						Expect(exclusive).To(BeFalse())
+						Expect(exclusive).To(BeFalse())
+						Expect(noLocal).To(BeFalse())
+						Expect(noWait).To(BeFalse())
+						Expect(args).To(BeNil())
+					})
+
+					return (<-chan amqp.Delivery)(deliveries), nil
+				}
+
+				return mockChannel, nil
+			}
+
+			netamqp.NewConnection = func(address string) (netamqp.IConnection, error) {
+				return mockConnection, nil
+			}
+
+			server := netamqp.NewServer()
+			server.Serve("whatever")
+
+			var handler = func(channel *network.Channel) {
+
+				callHandler = true
+
+				payload := channel.Receive()
+
+				It("Should return a body equals to body content", func() {
+					Expect(string(payload.Body)).To(Equal("body content"))
+				})
+
+				options := network.NewOptions().Unmarshal(payload.Options)
+
+				It("Should have the right headers", func() {
+					Expect(options.GetHeader("Sample")).To(Equal("sample"))
+					Expect(options.GetHeader("HP-Sample")).To(Equal(""))
+					Expect(options.GetHeader("GR-Sample")).To(Equal(""))
+					Expect(options.GetParam("Sample")).To(Equal("sample"))
+				})
+
+				It("Should have the middleware param and header", func() {
+					Expect(options.GetHeader("middleware")).To(Equal("middleware"))
+					Expect(options.GetParam("middleware")).To(Equal("middleware"))
+				})
+
+			}
+
+			var middleware = func(handler network.Handler, channel *network.Channel) {
+				callMiddleware = true
+				receive := channel.Receive()
+
+				options := network.NewOptions().Unmarshal(receive.Options)
+				options.SetParam("middleware", "middleware")
+				options.SetHeader("middleware", "middleware")
+
+				payload := network.BuildPayload(receive.Body, options.Marshal())
+				channel.Send(payload)
+				handler(channel)
+			}
+
+			server.Listen(netamqp.SetConf("/random/path"), handler, middleware)
+
+			headers := make(map[string]interface{})
+			headers["Sample"] = "sample"
+			headers["HP-Sample"] = "sample"
+			headers["GR-Sample"] = "sample"
+			headers["MP-Sample"] = "sample"
+
+			deliveries <- amqp.Delivery{
+				Body:    []byte("body content"),
+				Headers: headers,
+			}
+
+			It("Should call the Channel function", func() {
+				Expect(callChannel).To(BeTrue())
+			})
+
+			It("Should call the QueueDeclare function", func() {
+				Expect(callQueueDeclare).To(BeTrue())
+			})
+
+			It("Should call the Qos function", func() {
+				Expect(callQos).To(BeTrue())
+			})
+
+			It("Should call the Consume function", func() {
+				Expect(callConsume).To(BeTrue())
+			})
+
+			It("Should call the handler", func() {
+				Expect(callHandler).To(BeTrue())
+			})
+
+			It("Should call the handler", func() {
+				Expect(callMiddleware).To(BeTrue())
 			})
 		})
 
@@ -391,6 +560,100 @@ var _ = Describe("Server", func() {
 
 			It("Should call the function Consume", func() {
 				Expect(callConsume).To(BeTrue())
+			})
+
+		})
+
+		Context("Test Listen method error on Qos", func() {
+
+			netamqp.RetriesTimes = 1
+			netamqp.Sleep = 0
+
+			callChannel := false
+			callQueueDeclare := false
+			callQos := false
+			callConsume := false
+
+			mockConnection := &mnetamqp.MockConnection{}
+
+			mockConnection.ChannelMock = func() (netamqp.IChannel, error) {
+
+				mockChannel := &mnetamqp.MockChannel{}
+
+				callChannel = true
+
+				mockChannel.QueueDeclareMock = func(
+					name string,
+					durable,
+					autoDelete,
+					exclusive,
+					noWait bool,
+					args amqp.Table,
+				) (amqp.Queue, error) {
+
+					callQueueDeclare = true
+
+					return amqp.Queue{}, nil
+				}
+
+				mockChannel.QosMock = func(prefetchCount, prefetchSize int, global bool) error {
+					callQos = true
+					return errors.New("error")
+				}
+
+				mockChannel.ConsumeMock = func(
+					queue,
+					consumer string,
+					autoAck,
+					exclusive,
+					noLocal,
+					noWait bool,
+					args amqp.Table,
+				) (<-chan amqp.Delivery, error) {
+					callConsume = true
+					return nil, nil
+				}
+
+				return mockChannel, nil
+			}
+
+			netamqp.NewConnection = func(address string) (netamqp.IConnection, error) {
+				return mockConnection, nil
+			}
+
+			server := netamqp.NewServer()
+			server.Serve("whatever")
+
+			server.Listen(netamqp.SetConf("/what/ever"), nil, nil)
+
+			It("Should call the Channel function", func() {
+				Expect(callChannel).To(BeTrue())
+			})
+
+			It("Should call the QueueDeclare function", func() {
+				Expect(callQueueDeclare).To(BeTrue())
+			})
+
+			It("Should call the function Qos", func() {
+				Expect(callQos).To(BeTrue())
+			})
+
+			It("Should call the function Consume", func() {
+				Expect(callConsume).To(BeFalse())
+			})
+
+		})
+
+		Context("On connection nil", func() {
+			netamqp.NewConnection = func(address string) (netamqp.IConnection, error) {
+				return nil, nil
+			}
+			server := netamqp.NewServer()
+			It("Should throw a panic on nil connection", func() {
+				Expect(func() {
+					server.Serve("whatever")
+					server.Listen(netamqp.SetConf("/what/ever"), nil, nil)
+				}).To(Panic())
 			})
 
 		})

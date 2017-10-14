@@ -41,6 +41,37 @@ var _ = Describe("Connection", func() {
 
 		})
 
+		Context("Test constructor", func() {
+
+			var called bool
+
+			BeforeEach(func() {
+				// Set the mocked variable back to originals
+				netamqp.Dial = amqp.Dial
+				netamqp.NewConnection = NewConnection
+
+				netamqp.RetriesTimes = 1
+				netamqp.Sleep = 1
+
+				called = false
+
+				netamqp.Dial = func(url string) (*amqp.Connection, error) {
+					called = true
+					c := &amqp.Connection{}
+					return c, nil
+				}
+			})
+
+			It("Should returns a channel object", func() {
+				connection, err := netamqp.NewConnection("")
+				Expect(err).To(BeNil())
+				Expect(func() {
+					connection.Channel()
+				}).To(Panic())
+			})
+
+		})
+
 	})
 
 })

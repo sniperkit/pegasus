@@ -38,11 +38,12 @@ func (c Client) Send(conf []string, payload network.Payload) (*network.Payload, 
 	options := network.NewOptions().Unmarshal(payload.Options)
 	channel, err := c.connection.Channel()
 
-	defer channel.Close()
 
 	if err != nil {
 		return nil, err
 	}
+
+	defer channel.Close()
 
 	queue, err := c.queueDeclare(channel, conf[0])
 
