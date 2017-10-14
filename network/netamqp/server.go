@@ -3,6 +3,7 @@ package netamqp
 import (
 	"github.com/cpapidas/pegasus/helpers"
 	"github.com/cpapidas/pegasus/network"
+	"github.com/streadway/amqp"
 )
 
 // RetriesTimes for reconnect with the server
@@ -49,96 +50,86 @@ func (s *Server) Serve(address string) {
 }
 
 // Listen method starts a new worker which is listening to a specific queue.
-func (s Server) Listen(conf []string, handler network.Handler, middleware network.Middleware) {
+func (s Server) Listen(conf []string, h network.Handler, m network.Middleware) {
+	if s.connection == nil {
+		panic("RabbitMQ connection is nil, please start the server first and then set listeners")
+	}
+	go s.addListener(conf[0], h, m)
+}
 
-	path := conf[0]
+// addListener add a new amqp listener
+func (s Server) addListener(path string, handler network.Handler, middleware network.Middleware) {
+	channel, err := s.connection.Channel()
+	defer channel.Close()
+	if err != nil {
+		return
+	}
+	queue, err := s.queueDeclare(channel, path)
+	if err != nil {
+		return
+	}
+	err = channel.Qos(1, 0, false)
+	if err != nil {
+		return
+	}
+	msgs, err := s.createConsume(channel, queue.Name)
+	if err != nil {
+		return
+	}
+	forever := make(chan bool)
+	go s.handlerRequest(msgs, handler, middleware)
+	<-forever
+}
 
-	go func() {
-
-		if s.connection == nil {
-			panic("RabbitMQ connection is nil, please start the server first and then set listeners")
+// setHeader sets the amqp headers
+func (Server) setHeader(options *network.Options, headers amqp.Table) {
+	for k, v := range headers {
+		if helpers.IsAMQPValidHeader(k) {
+			options.SetHeader(k, v.(string))
+		}else if paramKey := helpers.AMQPParam(k); paramKey != "" {
+			options.SetParam(paramKey, v.(string))
 		}
+	}
+}
 
-		// Create a channel
-		channel, err := s.connection.Channel()
-
-		if err != nil {
-			return
+// handlerRequest is responsible to handle a specific request for the listener.
+func (s Server) handlerRequest(msgs <-chan amqp.Delivery, handler network.Handler, middleware network.Middleware) {
+	for d := range msgs {
+		ch := network.NewChannel(1)
+		options := network.NewOptions()
+		s.setHeader(options, d.Headers)
+		pl := network.BuildPayload(d.Body, options.Marshal())
+		ch.Send(pl)
+		if middleware != nil {
+			middleware(handler, ch)
+		} else {
+			handler(ch)
 		}
-		defer channel.Close()
+		d.Ack(false)
+	}
+}
 
-		queue, err := channel.QueueDeclare(
-			path,
-			true,
-			false,
-			false,
-			false,
-			nil,
-		)
+// queueDeclare declare a amqp queue and return the values.
+func (Server) queueDeclare(channel IChannel, path string) (amqp.Queue, error) {
+	return channel.QueueDeclare(
+		path,
+		true,
+		false,
+		false,
+		false,
+		nil,
+	)
+}
 
-		if err != nil {
-			return
-		}
-
-		err = channel.Qos(1, 0, false)
-
-		if err != nil {
-			return
-		}
-
-		msgs, err := channel.Consume(
-			queue.Name,
-			"",
-			false,
-			false,
-			false,
-			false,
-			nil,
-		)
-
-		if err != nil {
-			return
-		}
-
-		forever := make(chan bool)
-
-		go func() {
-
-			for d := range msgs {
-
-				ch := network.NewChannel(1)
-
-				options := network.NewOptions()
-
-				// Set headers
-				for k, v := range d.Headers {
-					if helpers.IsAMQPValidHeader(k) {
-						options.SetHeader(k, v.(string))
-					}
-				}
-
-				// Set params
-				for k, v := range d.Headers {
-					if paramKey := helpers.AMQPParam(k); paramKey != "" {
-						options.SetParam(paramKey, v.(string))
-					}
-				}
-
-				pl := network.BuildPayload(d.Body, options.Marshal())
-				ch.Send(pl)
-
-				if middleware != nil {
-					middleware(handler, ch)
-				} else {
-					handler(ch)
-				}
-
-				d.Ack(false)
-			}
-
-		}()
-
-		<-forever
-
-	}()
+// createConsume create a new consumer and return the values.
+func (Server) createConsume(channel IChannel, queueName string) (<-chan amqp.Delivery, error) {
+	return channel.Consume(
+		queueName,
+		"",
+		false,
+		false,
+		false,
+		false,
+		nil,
+	)
 }

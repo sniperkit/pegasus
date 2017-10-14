@@ -35,65 +35,26 @@ var NewClient = func(address string) network.Client {
 // Send is responsible to send data in RabbitMQ server
 func (c Client) Send(conf []string, payload network.Payload) (*network.Payload, error) {
 
-	path := conf[0]
-	body := payload.Body
 	options := network.NewOptions().Unmarshal(payload.Options)
-
-	// Create a new channel and make sure and channel will close when this function ends (defer)
 	channel, err := c.connection.Channel()
 
 	defer channel.Close()
 
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	queue, err := channel.QueueDeclare(
-		path,
-		true,
-		false,
-		false,
-		false,
-		nil,
-	)
+	queue, err := c.queueDeclare(channel, conf[0])
 
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	pub := publishing{}
-
-	pub.DeliveryMode = amqp.Persistent
-	pub.ContentType = "text/plain"
-
-	pub.configurePublishing(options.GetHeaders())
-
-	pub.Headers = make(map[string]interface{})
-
-	// Set the headers
-	for k, v := range options.GetHeaders() {
-		if helpers.IsAMQPValidHeader(k) {
-			pub.Headers[k] = v
-		}
-	}
-
-	// Ad the headers
-	for k, v := range options.GetParams() {
-		pub.Headers["MP-"+k] = v
-	}
-
-	pub.Body = body
-
-	err = channel.Publish(
-		"",
-		queue.Name,
-		false,
-		false,
-		pub.Publishing,
-	)
+	pub := buildPublishing(options, payload.Body)
+	err = c.setPublish(channel, queue.Name, pub)
 
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	return nil, nil
@@ -102,4 +63,28 @@ func (c Client) Send(conf []string, payload network.Payload) (*network.Payload, 
 // Close close the current connection
 func (c Client) Close() error {
 	return c.connection.Close()
+}
+
+// queueDeclare declares a new amqp Queue and returns it. If something goes wrong the function will return an error
+// object.
+func (Client) queueDeclare(channel IChannel, path string) (amqp.Queue, error) {
+	return channel.QueueDeclare(
+		path,
+		true,
+		false,
+		false,
+		false,
+		nil,
+	)
+}
+
+// setPublish setup the amqp publish function
+func (Client) setPublish(channel IChannel, queueName string, publishing publishing) error {
+	return channel.Publish(
+		"",
+		queueName,
+		false,
+		false,
+		publishing.Publishing,
+	)
 }
