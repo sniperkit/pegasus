@@ -53,26 +53,12 @@ func (s Server) Serve(path string) {
 // Listen function creates a handler for a specific endpoint. It gets the path string unique key, the handler
 // which is a function and the middleware which also is a function.
 func (s Server) Listen(paths []string, handler network.Handler, middleware network.Middleware) {
-
-	path := paths[0]
-	method := paths[1]
-
-	s.Router.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
-
+	s.Router.HandleFunc(paths[0], func(w http.ResponseWriter, r *http.Request) {
 		options := network.NewOptions()
-
-		// Set the headers
 		options.SetHeaders(s.setHeaders(r.Header))
-
-		// Set the query params
 		options.SetParams(s.setQueryParams(r.URL.Query()))
+		s.setPathVariables(r, options)
 
-		// Set path variables
-		for pathKey, pathVar := range mux.Vars(r) {
-			options.SetParam(pathKey, pathVar)
-		}
-
-		// Parse and set the body
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
 			panic(err.Error())
@@ -80,50 +66,17 @@ func (s Server) Listen(paths []string, handler network.Handler, middleware netwo
 
 		channel := network.NewChannel(1)
 
-		// Get the payload
 		requestPayload := network.BuildPayload(body, options.Marshal())
-
-		// Send the payload
 		channel.Send(requestPayload)
-
-		// Start the handler
-		if middleware != nil {
-			middleware(handler, channel)
-		} else {
-			handler(channel)
-		}
-
-		// Receive the data from channel
+		s.callHandler(handler, middleware, channel)
 		responsePayload := channel.Receive()
-
-		// Build the options form bytes to nethttp.Option object
 		responseOptions := network.BuildOptions(responsePayload.Options)
 
-		// Get the headers from options
-		responseHeaders := responseOptions.GetHeaders()
-
-		// Set the default header of response to json
 		w.Header().Set("Content-Type", "application/json")
-
-		// Set the http headers
-		if responseHeaders != nil {
-			for key, value := range responseHeaders {
-				if helpers.IsHTTPValidHeader(key) {
-					w.Header().Set(key, value)
-				}
-			}
-		}
-
-		// If the header with Status is set then pass the header value
-		if status := responseOptions.GetHeader("Status"); status != "" {
-			s, _ := strconv.Atoi(status)
-			w.WriteHeader(s)
-		}
-
+		s.setResponseHeaders(responseOptions, w)
+		s.setResponseStatus(w, responseOptions.GetHeader("Status"))
 		w.Write(responsePayload.Body)
-
-	}).Methods(method)
-
+	}).Methods(paths[1])
 }
 
 // setHeaders sets a map of string keys and string values of given http headers. Receives
@@ -146,4 +99,40 @@ func (Server) setQueryParams(params url.Values) map[string]string {
 		mapper[key] = strings.Join(value, ",")
 	}
 	return mapper
+}
+
+// setResponseStatus sets the response status. If the header with Status is set then pass the header value.
+func (Server) setResponseStatus(w http.ResponseWriter, status string) {
+	if status := status; status != "" {
+		s, _ := strconv.Atoi(status)
+		w.WriteHeader(s)
+	}
+}
+
+// setPathVariables sets the path variables
+func (Server) setPathVariables(r *http.Request, options *network.Options) {
+	for pathKey, pathVar := range mux.Vars(r) {
+		options.SetParam(pathKey, pathVar)
+	}
+}
+
+// callHandler call the http handler. If the middleware para is not nil will call only the middleware.
+func (Server) callHandler(handler network.Handler, middleware network.Middleware, channel *network.Channel) {
+	if middleware != nil {
+		middleware(handler, channel)
+	} else {
+		handler(channel)
+	}
+}
+
+// setResponseHeaders sets the response headers
+func (Server) setResponseHeaders(options *network.Options, w http.ResponseWriter) {
+	responseHeaders := options.GetHeaders()
+	if responseHeaders != nil {
+		for key, value := range responseHeaders {
+			if helpers.IsHTTPValidHeader(key) {
+				w.Header().Set(key, value)
+			}
+		}
+	}
 }

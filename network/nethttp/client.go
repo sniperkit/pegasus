@@ -41,43 +41,16 @@ var NewClient = func(httpClient IHTTPClient) network.Client {
 // object. The path may use other function ir order to generate the format for each provider.
 func (c Client) Send(conf []string, payload network.Payload) (*network.Payload, error) {
 
-	path := conf[0]
-	method := conf[1]
-
-	var body []byte
-	if method != Get.String() {
-		body = payload.Body
-	}
-
 	httpOptions := network.BuildOptions(payload.Options)
 
 	// Create a request
-	request, err := NewRequest(method, path, bytes.NewReader(body))
-
+	request, err := c.createRequest(conf[0], conf[1], payload.Body)
 	if err != nil {
 		return nil, err
 	}
 
-	q := request.URL.Query()
-
-	for k, v := range httpOptions.GetParams() {
-		q.Add(k, v)
-	}
-
-	request.URL.RawQuery = q.Encode()
-
-	headers := httpOptions.GetHeaders()
-
-	request.Header.Set("Content-Type", "application/json")
-
-	if headers != nil {
-		//Set the HTTP request headers
-		for key, value := range headers {
-			if helpers.IsHTTPValidHeader(key) {
-				request.Header.Set(key, value)
-			}
-		}
-	}
+	c.setRequestParams(request, httpOptions)
+	c.setRequestHeaders(request, httpOptions)
 
 	// Send the request
 	response, err := c.httpClient.Do(request)
@@ -85,22 +58,12 @@ func (c Client) Send(conf []string, payload network.Payload) (*network.Payload, 
 		return nil, err
 	}
 
-	// Build the options for the response
 	responseOptions := network.NewOptions()
+	c.setResponseHeaders(response, responseOptions)
 
-	// Set the HTTP request headers
-	for key, value := range response.Header {
-		if helpers.IsHTTPValidHeader(key) {
-			responseOptions.SetHeader(key, strings.Join(value, ","))
-		}
-	}
-
-	// Close the body
 	defer response.Body.Close()
 
-	// Get get body content
 	content, err := ReadAll(response.Body)
-
 	if err != nil {
 		return nil, err
 	}
@@ -111,4 +74,43 @@ func (c Client) Send(conf []string, payload network.Payload) (*network.Payload, 
 // Close terminal the current connection.
 func (Client) Close() error {
 	return nil
+}
+
+// createRequest creates a new http request object
+func (Client) createRequest(path string, method string, body []byte) (*http.Request, error) {
+	if method == Get.String() {
+		body = nil
+	}
+	return NewRequest(method, path, bytes.NewReader(body))
+}
+
+// setRequestParams sets the request parameter
+func (Client) setRequestParams(request *http.Request, options *network.Options) {
+	q := request.URL.Query()
+	for k, v := range options.GetParams() {
+		q.Add(k, v)
+	}
+	request.URL.RawQuery = q.Encode()
+}
+
+// setRequestHeaders sets the request headers
+func (Client) setRequestHeaders(request *http.Request, options *network.Options) {
+	request.Header.Set("Content-Type", "application/json")
+	headers := options.GetHeaders()
+	if headers != nil {
+		for key, value := range headers {
+			if helpers.IsHTTPValidHeader(key) {
+				request.Header.Set(key, value)
+			}
+		}
+	}
+}
+
+// setResponseHeaders set the response headers
+func (Client) setResponseHeaders(response *http.Response, options *network.Options) {
+	for key, value := range response.Header {
+		if helpers.IsHTTPValidHeader(key) {
+			options.SetHeader(key, strings.Join(value, ","))
+		}
+	}
 }
