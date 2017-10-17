@@ -54,11 +54,8 @@ func (s Server) Serve(path string) {
 // which is a function and the middleware which also is a function.
 func (s Server) Listen(paths []string, handler network.Handler, middleware network.Middleware) {
 	s.Router.HandleFunc(paths[0], func(w http.ResponseWriter, r *http.Request) {
-		options := network.NewOptions()
-		options.SetHeaders(s.setHeaders(r.Header))
-		options.SetParams(s.setQueryParams(r.URL.Query()))
-		s.setPathVariables(r, options)
 
+		// Get the body
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
 			panic(err.Error())
@@ -66,22 +63,39 @@ func (s Server) Listen(paths []string, handler network.Handler, middleware netwo
 
 		channel := network.NewChannel(1)
 
-		requestPayload := network.BuildPayload(body, options.Marshal())
+		requestPayload := network.BuildPayload(body, s.setRequestOptions(r).Marshal())
+
+		// Initialize the channel
 		channel.Send(requestPayload)
+
+		// The handler, middleware will send though channel
 		s.callHandler(handler, middleware, channel)
+
+		// Receive the data
 		responsePayload := channel.Receive()
+
 		responseOptions := network.BuildOptions(responsePayload.Options)
 
-		w.Header().Set("Content-Type", "application/json")
 		s.setResponseHeaders(responseOptions, w)
+
 		s.setResponseStatus(w, responseOptions.GetHeader("Status"))
+
 		w.Write(responsePayload.Body)
 	}).Methods(paths[1])
 }
 
-// setHeaders sets a map of string keys and string values of given http headers. Receives
+// setRequestOptions sets and return a network.Option object.
+func (s Server) setRequestOptions(r *http.Request) *network.Options {
+	options := network.NewOptions()
+	options.SetHeaders(s.setRequestHeaders(r.Header))
+	options.SetParams(s.setQueryParams(r.URL.Query()))
+	s.setPathVariables(r, s.setRequestOptions(r))
+	return options
+}
+
+// setRequestHeaders sets a map of string keys and string values of given http headers. Receives
 // an http header object and returns a map object map[string]string.
-func (Server) setHeaders(headers http.Header) map[string]string {
+func (Server) setRequestHeaders(headers http.Header) map[string]string {
 	mapper := make(map[string]string)
 	for key, value := range headers {
 		if helpers.IsHTTPValidHeader(key) {
@@ -127,6 +141,7 @@ func (Server) callHandler(handler network.Handler, middleware network.Middleware
 
 // setResponseHeaders sets the response headers
 func (Server) setResponseHeaders(options *network.Options, w http.ResponseWriter) {
+	w.Header().Set("Content-Type", "application/json")
 	responseHeaders := options.GetHeaders()
 	if responseHeaders != nil {
 		for key, value := range responseHeaders {
