@@ -4,7 +4,6 @@ import (
 	"github.com/cpapidas/pegasus/helpers"
 	"github.com/cpapidas/pegasus/network"
 	"github.com/gorilla/mux"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -15,6 +14,9 @@ import (
 type Router interface {
 	HandleFunc(path string, f func(http.ResponseWriter, *http.Request)) *mux.Route
 }
+
+// ListenAndServe start the server
+var ListenAndServe = http.ListenAndServe
 
 // Server implements the network.Server
 // Server struct is responsible for http server. It manages connections and configuration might be needed in order to
@@ -42,12 +44,7 @@ func SetConf(path string, method Method) []string {
 
 // Serve function starts the server for a specific part and port.
 func (s Server) Serve(path string) {
-	go func() {
-		err := http.ListenAndServe(path, s.Router.(*mux.Router))
-		if err != nil {
-			panic(err)
-		}
-	}()
+	go func() { ListenAndServe(path, s.Router.(*mux.Router)) }()
 }
 
 // Listen function creates a handler for a specific endpoint. It gets the path string unique key, the handler
@@ -56,14 +53,13 @@ func (s Server) Listen(paths []string, handler network.Handler, middleware netwo
 	s.Router.HandleFunc(paths[0], func(w http.ResponseWriter, r *http.Request) {
 		options := s.setRequestOptions(r)
 
-		s.setPathVariables(r, options)
-
-		body, err := ioutil.ReadAll(r.Body)
+		body, err := ReadAll(r.Body)
 		if err != nil {
 			panic(err.Error())
 		}
 
 		channel := network.NewChannel(1)
+
 
 		requestPayload := network.BuildPayload(body, options.Marshal())
 		channel.Send(requestPayload)
@@ -78,8 +74,8 @@ func (s Server) Listen(paths []string, handler network.Handler, middleware netwo
 func (s Server) setRequestOptions(r *http.Request) *network.Options {
 	options := network.NewOptions()
 	options.SetHeaders(s.setRequestHeaders(r.Header))
-	options.SetParams(s.setQueryParams(r.URL.Query()))
 
+	options.SetParams(s.setQueryParams(r.URL.Query()))
 	return options
 }
 
@@ -118,13 +114,6 @@ func (Server) setResponseStatus(w http.ResponseWriter, status string) {
 	if status := status; status != "" {
 		s, _ := strconv.Atoi(status)
 		w.WriteHeader(s)
-	}
-}
-
-// setPathVariables sets the path variables
-func (Server) setPathVariables(r *http.Request, options *network.Options) {
-	for pathKey, pathVar := range mux.Vars(r) {
-		options.SetParam(pathKey, pathVar)
 	}
 }
 

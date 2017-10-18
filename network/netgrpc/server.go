@@ -104,7 +104,7 @@ func (s Server) HandlerSync(ctx context.Context, in *pb.HandlerRequest) (*pb.Han
 	return &pb.HandlerReply{Content: payload.Body, Options: replyOptions.Marshal()}, nil
 }
 
-// Handler soon you will me deleted
+// Handler have to delete this function
 func (Server) Handler(stream pb.Serve_HandlerServer) error {
 	return errors.New("Not yet implement")
 }

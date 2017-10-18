@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"github.com/cpapidas/pegasus/helpers"
 	"github.com/cpapidas/pegasus/network"
-	"io/ioutil"
 	"net/http"
 	"strings"
+	"errors"
 )
 
 // Client interface describes the protocols client model. Client keeps the connections open for each protocol.
@@ -20,12 +20,6 @@ type Client struct {
 type IHTTPClient interface {
 	Do(req *http.Request) (*http.Response, error)
 }
-
-// NewRequest http.NewRequest
-var NewRequest = http.NewRequest
-
-// ReadAll ioutil.ReadAll
-var ReadAll = ioutil.ReadAll
 
 // NewClient generates and returns a Client object.
 var NewClient = func(httpClient IHTTPClient) network.Client {
@@ -73,7 +67,7 @@ func (c Client) Send(conf []string, payload network.Payload) (*network.Payload, 
 
 // Close terminal the current connection.
 func (Client) Close() error {
-	return nil
+	return errors.New("Not implemented function")
 }
 
 // createRequest creates a new http request object

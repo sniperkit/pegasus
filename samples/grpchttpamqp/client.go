@@ -21,14 +21,14 @@ func Client() {
 
 	// Send the http call and print the result
 	httpResponse, err := nethttp.NewClient(nil).
-		Send(nethttp.SetConf("http://localhost:9092/sample/14", nethttp.Put), send)
+		Send(nethttp.SetConf("http://localhost:9092/sample", nethttp.Put), send)
 	if err != nil {
 		panic(err)
 	}
 
 	// Send the grpc call and print the result
 	grpcResponse, err := netgrpc.NewClient("localhost:9091").
-		Send(netgrpc.SetConf("/sample/{id}"), send)
+		Send(netgrpc.SetConf("/sample"), send)
 
 	if err != nil {
 		panic(err)
@@ -36,7 +36,7 @@ func Client() {
 
 	// Send the grpc call and print the result
 	_, err = netamqp.NewClient(rabbitMQAddress).
-		Send(netamqp.SetConf("/sample/{id}"), send)
+		Send(netamqp.SetConf("/sample"), send)
 
 	if err != nil {
 		panic(err)

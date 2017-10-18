@@ -33,7 +33,7 @@ var _ = Describe("Client", func() {
 
 		})
 
-		Context("Send function", func() {
+		Context("Send function - POST request", func() {
 
 			called := false
 
@@ -78,6 +78,77 @@ var _ = Describe("Client", func() {
 			payload := network.BuildPayload([]byte("content"), requestOptions.Marshal())
 
 			reply, err := client.Send(nethttp.SetConf("/whatever", "POST"), payload)
+
+			replyOptions := network.NewOptions().Unmarshal(reply.Options)
+
+			It("Should return a nil error", func() {
+				Expect(err).To(BeNil())
+			})
+
+			It("Should call the Do function", func() {
+				Expect(called).To(BeTrue())
+			})
+
+			It("Should return valid parameters", func() {
+				Expect(replyOptions.GetHeader("Custom-Sample-Reply")).To(Equal("sample reply"))
+				Expect(replyOptions.GetHeader("HP-Sample-Reply")).To(Equal("sample reply"))
+				Expect(replyOptions.GetHeader("MQ-Sample-Reply")).To(BeEmpty())
+				Expect(replyOptions.GetHeader("GR-Sample-Reply")).To(BeEmpty())
+				Expect(string(reply.Body)).To(Equal("content reply"))
+			})
+
+		})
+
+		Context("Send function - GET request", func() {
+
+			called := false
+
+			mockHTTPClient := &mhttp.MockHTTPClient{}
+
+			mockHTTPClient.DoMock = func(req *http.Request) (*http.Response, error) {
+
+				called = true
+
+				It("Should have the right parameters", func() {
+					Expect(req.Header["Custom-Sample"]).To(Equal([]string{"sample"}))
+					Expect(req.Header["Hp-Sample"]).To(Equal([]string{"sample"}))
+					Expect(req.Header["Mq-Sample"]).To(BeNil())
+					Expect(req.Header["Gr-Sample"]).To(BeNil())
+
+					b, err := ioutil.ReadAll(req.Body)
+
+					Expect(err).To(BeNil())
+					Expect(string(b)).To(BeEmpty())
+
+					Expect(req.URL.Query().Get("foo")).To(Equal("bar"))
+				})
+
+				response := &http.Response{}
+				response.Header = make(map[string][]string)
+				response.Header["Custom-Sample-Reply"] = []string{"sample reply"}
+				response.Header["HP-Sample-Reply"] = []string{"sample reply"}
+				response.Header["MQ-Sample-Reply"] = []string{"sample reply"}
+				response.Header["GR-Sample-Reply"] = []string{"sample reply"}
+
+
+				response.Body = ioutil.NopCloser(bytes.NewReader([]byte("content reply")))
+
+				return response, nil
+			}
+
+			requestOptions := network.NewOptions()
+			requestOptions.SetHeader("Custom-Sample", "sample")
+			requestOptions.SetHeader("HP-Sample", "sample")
+			requestOptions.SetHeader("MQ-Sample", "sample")
+			requestOptions.SetHeader("GR-Sample", "sample")
+
+			requestOptions.SetParam("foo", "bar")
+
+			client := nethttp.NewClient(mockHTTPClient)
+
+			payload := network.BuildPayload([]byte("content"), requestOptions.Marshal())
+
+			reply, err := client.Send(nethttp.SetConf("/whatever", nethttp.Get), payload)
 
 			replyOptions := network.NewOptions().Unmarshal(reply.Options)
 
@@ -186,6 +257,13 @@ var _ = Describe("Client", func() {
 
 		nethttp.ReadAll = ioutil.ReadAll
 
+	})
+
+	Context("Test close function", func() {
+		client := nethttp.NewClient(nil)
+		It("Should an error, because this function is not implemented for nethttp provider", func() {
+			Expect(client.Close()).ToNot(BeNil())
+		})
 	})
 
 })

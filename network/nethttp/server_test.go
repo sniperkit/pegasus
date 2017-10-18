@@ -12,6 +12,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"reflect"
+	"io"
+	"errors"
 )
 
 var _ = Describe("Server", func() {
@@ -123,7 +125,7 @@ var _ = Describe("Server", func() {
 					Headers: make(map[string][]string),
 				}
 
-				r, _ := http.NewRequest("POST", "anything", bytes.NewReader([]byte("content")))
+				r, _ := http.NewRequest("PUT", "/url/path", bytes.NewReader([]byte("content")))
 
 				r.Header = make(map[string][]string)
 				r.Header["Custom-Sample"] = []string{"Sample"}
@@ -132,6 +134,10 @@ var _ = Describe("Server", func() {
 				r.Header["MQ-Sample"] = []string{"Sample"}
 
 				r.Body = ioutil.NopCloser(bytes.NewReader([]byte("content")))
+
+				q := r.URL.Query()
+				q.Add("foo", "bar")
+				r.URL.RawQuery = q.Encode()
 
 				f(w, r)
 
@@ -161,6 +167,7 @@ var _ = Describe("Server", func() {
 					Expect(options.GetHeader("Custom-Sample")).To(Equal("sample middleware"))
 					Expect(options.GetHeader("HP-Sample")).To(Equal("sample middleware"))
 				})
+
 				replyOptions := network.NewOptions()
 
 				replyOptions.SetHeader("Custom-Sample", "sample")
@@ -188,6 +195,11 @@ var _ = Describe("Server", func() {
 					Expect(options.GetHeader("MQ-Sample")).To(BeEmpty())
 				})
 
+				It("Should contains the right parameters", func() {
+					Expect(options.GetParam("foo")).To(Equal("bar"))
+				})
+
+
 				replyOptions := network.NewOptions()
 
 				replyOptions.SetHeader("Custom-Sample", "sample middleware")
@@ -198,7 +210,7 @@ var _ = Describe("Server", func() {
 				handler(channel)
 			}
 
-			server.Listen(nethttp.SetConf("foo", "POST"), handler, middleware)
+			server.Listen(nethttp.SetConf("/url/path", "PUT"), handler, middleware)
 
 			It("Should call the handler", func() {
 				Expect(callHandler).To(BeTrue())
@@ -209,6 +221,58 @@ var _ = Describe("Server", func() {
 			})
 		})
 
+		Context("Serve function", func() {
+
+			var server network.Server
+
+			BeforeEach(func() {
+				nethttp.ListenAndServe = func(addr string, handler http.Handler) error {
+					return nil
+				}
+				server = nethttp.NewServer(nil)
+
+			})
+
+			It("Should not panic", func() {
+				Expect(func() { server.Serve("Foo") }).ToNot(Panic())
+
+			})
+
+		})
+
+		Context("Listen ReadAll error", func() {
+
+			var server network.Server
+
+			BeforeEach(func() {
+				router := &mhttp.MockRouter{}
+
+				router.HandleFuncMock = func(path string, f func(http.ResponseWriter, *http.Request)) *mux.Route {
+					w := &mhttp.MockResponseWriter{
+						Headers: make(map[string][]string),
+					}
+					r, _ := http.NewRequest("POST", "anything", bytes.NewReader([]byte("content")))
+					f(w, r)
+
+					return &mux.Route{}
+				}
+
+				server = nethttp.NewServer(router)
+
+				nethttp.ReadAll = func(r io.Reader) ([]byte, error) {
+					return nil, errors.New("error")
+				}
+
+			})
+
+			It("Should not panic", func() {
+				Expect(func() { server.Listen(nethttp.SetConf("", ""), nil, nil) }).
+					To(Panic())
+			})
+
+		})
+
 	})
 
 })
+

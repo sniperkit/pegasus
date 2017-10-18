@@ -117,8 +117,8 @@ var _ = Describe("Nethttp", func() {
 
 	server.Listen(nethttp.SetConf("/http", nethttp.Get), handlerGet, nil)
 	server.Listen(nethttp.SetConf("/http", nethttp.Post), handlerPost, nil)
-	server.Listen(nethttp.SetConf("/http/{id}", nethttp.Put), handlerPut, nil)
-	server.Listen(nethttp.SetConf("/http/{id}", nethttp.Delete), handlerDelete, nil)
+	server.Listen(nethttp.SetConf("/http", nethttp.Put), handlerPut, nil)
+	server.Listen(nethttp.SetConf("/http", nethttp.Delete), handlerDelete, nil)
 
 	server.Listen(nethttp.SetConf("/http/middleware", nethttp.Get), handlerGet, middleware)
 
@@ -210,7 +210,7 @@ var _ = Describe("Nethttp", func() {
 
 			// Send the payload
 			response, err := nethttp.NewClient(nil).
-				Send(nethttp.SetConf("http://localhost:7000/http/44?name=christos", nethttp.Put), payload)
+				Send(nethttp.SetConf("http://localhost:7000/http?name=christos", nethttp.Put), payload)
 
 			replyOptions := network.NewOptions().Unmarshal(response.Options)
 
@@ -228,10 +228,6 @@ var _ = Describe("Nethttp", func() {
 
 			It("Should returns the param name", func() {
 				Expect(replyOptions.GetHeader("Name")).To(Equal("christos response"))
-			})
-
-			It("Should return the path param", func() {
-				Expect(replyOptions.GetHeader("Id")).To(Equal("44 response"))
 			})
 		})
 
@@ -245,7 +241,7 @@ var _ = Describe("Nethttp", func() {
 
 			// Send the payload
 			response, err := nethttp.NewClient(nil).
-				Send(nethttp.SetConf("http://localhost:7000/http/44?name=christos", nethttp.Delete), payload)
+				Send(nethttp.SetConf("http://localhost:7000/http?name=christos", nethttp.Delete), payload)
 
 			replyOptions := network.NewOptions().Unmarshal(response.Options)
 
@@ -263,10 +259,6 @@ var _ = Describe("Nethttp", func() {
 
 			It("Should returns the param name", func() {
 				Expect(replyOptions.GetHeader("Name")).To(Equal("christos response"))
-			})
-
-			It("Should return the path param", func() {
-				Expect(replyOptions.GetHeader("Id")).To(Equal("44 response"))
 			})
 
 		})

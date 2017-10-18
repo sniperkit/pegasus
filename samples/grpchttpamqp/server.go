@@ -22,13 +22,10 @@ func handler(channel *network.Channel) {
 	// Get the header (HTTP-GRPC-AMQP)
 	token := options.GetHeader("Token")
 
-	// Get the path param (HTTP-GRPC-AMQP)
-	id := options.GetParam("id")
-
 	// Get url param (HTTP-GRPC-AMQP)
 	order := options.GetParam("order")
 
-	replyMessage += " token:" + token + " id:" + id + " order:" + order
+	replyMessage += " token:" + token + " order:" + order
 
 	fmt.Println("------------------------ RESPONSE ------------------------")
 	fmt.Println("Reply Message:", replyMessage)
@@ -55,9 +52,9 @@ func Server() {
 	amqpServer.Serve(rabbitMQAddress)
 
 	// Create the listeners
-	grpcServer.Listen(netgrpc.SetConf("/sample/{id}"), handler, nil)
-	httpServer.Listen(nethttp.SetConf("/sample/{id}", nethttp.Put), handler, nil)
-	amqpServer.Listen(netamqp.SetConf("/sample/{id}"), handler, nil)
+	grpcServer.Listen(netgrpc.SetConf("/sample"), handler, nil)
+	httpServer.Listen(nethttp.SetConf("/sample", nethttp.Put), handler, nil)
+	amqpServer.Listen(netamqp.SetConf("/sample"), handler, nil)
 
 	// We have to keep the main goroutine up so we have to create something like while(true) but more elegant
 	stop := make(chan bool)
