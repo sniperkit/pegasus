@@ -21,12 +21,18 @@ var NewServerClient = pb.NewServeClient
 // Dial creates and return a grpc.ClientConnection object
 var Dial = grpc.Dial
 
+// ClientConn interface for grpc.ClientConn struct
+type ClientConn interface {
+	// Close closes the opened connection
+	Close() error
+}
+
 // Client implements the network.Client. Client struct describe the GRPC client. It contains all the functionality in
 // order to talk to another server.
 type Client struct {
 
 	// Connection is the connection of GRPC server
-	Connection *grpc.ClientConn
+	Connection ClientConn
 }
 
 // NewClient connects to a GRPC server, set up the struct and return the new Client object
@@ -40,7 +46,7 @@ var NewClient = func(address string) network.Client {
 // object.
 func (c Client) Send(path []string, payload network.Payload) (*network.Payload, error) {
 
-	connection := NewServerClient(c.Connection)
+	connection := NewServerClient(c.Connection.(*grpc.ClientConn))
 
 	if connection == nil {
 		return nil, errors.New("CONNECTION NOT FOUND")

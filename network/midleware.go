@@ -21,4 +21,4 @@ package network
 //		chanel.send(network.BuildPayload(payload.Body, options.Marshal())) // Add a new payload
 // 		handler(chanel) // Call the handler with new channel
 //	}
-type Middleware func(handler Handler, chanel *Channel)
+type Middleware func(handler Handler, channel *Channel)

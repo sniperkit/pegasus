@@ -8,7 +8,6 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
-	"log"
 	"net"
 )
 
@@ -109,21 +108,38 @@ func (Server) Handler(stream pb.Serve_HandlerServer) error {
 	return errors.New("Not yet implement")
 }
 
+// Listen net.Listen function
+var Listen = net.Listen
+
+// NewGRPCServer grpc.NewServer function
+var NewGRPCServer = grpc.NewServer
+
+// RegisterServeServer pb.RegisterServeServer function
+var RegisterServeServer = pb.RegisterServeServer
+
+// ReflectionRegister reflection.Register function
+var ReflectionRegister = reflection.Register
+
 // startServer function start the server for the configured router and giver path
 func (s *Server) startServer() {
-	lis, err := net.Listen("tcp", s.address)
+	defer func() {
+		if err := recover(); err != nil {
+			network.ErrorTrack <- err
+		}
+	}()
+	lis, err := Listen("tcp", s.address)
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		panic("Failed to listen on address " + s.address)
 	}
 
-	s.server = grpc.NewServer()
+	s.server = NewGRPCServer()
 
-	pb.RegisterServeServer(s.server, &Server{Router: s.Router})
+	RegisterServeServer(s.server, &Server{Router: s.Router})
 
 	// Register reflection service on gRPC server.
-	reflection.Register(s.server)
+	ReflectionRegister(s.server)
 
 	if err := s.server.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
+		panic("Failed to server " + err.Error())
 	}
 }
