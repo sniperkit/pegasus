@@ -60,4 +60,20 @@ var _ = Describe("Headers", func() {
 
 	})
 
+	Describe( "AMQPParam function", func() {
+
+		Context("Valid/Invalid parameters", func() {
+
+			It("Should return param name", func() {
+				Expect(helpers.AMQPParam("MP-param")).To(Equal("param"))
+			})
+
+			It("Should return param name", func() {
+				Expect(helpers.AMQPParam("ffparam")).To(BeEmpty())
+			})
+
+		})
+
+	})
+
 })

@@ -82,10 +82,7 @@ func (c Options) GetHeader(key string) string {
 
 // Marshal returns the object to bytes in order to be able to transfer it over HTTP or GRPC or whatever.
 func (c Options) Marshal() []byte {
-	b, err := json.Marshal(c)
-	if err != nil {
-		panic(err)
-	}
+	b, _ := json.Marshal(c)
 	return b
 }
 
@@ -96,7 +93,7 @@ func (c *Options) Unmarshal(data []byte) *Options {
 	}
 	err := json.Unmarshal(data, c)
 	if err != nil {
-		panic(err)
+		return nil
 	}
 	return c
 }

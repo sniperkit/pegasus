@@ -53,19 +53,23 @@ var _ = Describe("Options", func() {
 				)))
 			})
 
+			It("Should return a nil value for failure", func() {
+				unashamedData := network.NewOptions().Unmarshal([]byte("whatever"))
+				Expect(unashamedData).To(BeNil())
+			})
+
 		})
 
 		Context("Check Marshal and Unmarshal methods with nil params", func() {
 
 			It("Should unmarshal the struct properly", func() {
 				network.NewOptions().Unmarshal(nil)
-				Expect(func() { network.NewOptions().Unmarshal(nil) }).ToNot(Panic())
+				Expect(network.NewOptions().Unmarshal(nil)).ToNot(BeNil())
 			})
 
 			It("Should marshal the struct properly", func() {
-				Expect(func() { network.NewOptions().Marshal() }).ToNot(Panic())
+				Expect(network.NewOptions().Marshal()).ToNot(BeNil())
 			})
-
 		})
 
 		Context("Set/Get Field", func() {
@@ -80,11 +84,23 @@ var _ = Describe("Options", func() {
 				Expect(options.GetField("foo", "faa")).To(Equal("Ga"))
 			})
 
+			It("Should work nicely for nil fields - GetField", func() {
+				opts := network.Options{}
+				Expect(opts.GetField("foo", "foo")).To(BeEmpty())
+			})
+
+			It("Should work nicely for nil fields - SetField", func() {
+				opts := network.Options{}
+				opts.SetField("foo", "bar", "baz")
+				Expect(opts.GetField("foo", "bar")).To(Equal("baz"))
+			})
+
+
 		})
 
 		Context("Set/Get Params", func() {
 
-			options := network.NewOptions()
+			options := network.Options{}
 
 			options.SetParams(map[string]string{"foo": "fa"})
 
@@ -108,7 +124,7 @@ var _ = Describe("Options", func() {
 
 		Context("Set/Get Headers", func() {
 
-			options := network.NewOptions()
+			options := network.Options{}
 
 			options.SetHeaders(map[string]string{"foo": "fa"})
 
@@ -127,6 +143,20 @@ var _ = Describe("Options", func() {
 
 			It("Should get a header", func() {
 				Expect(options.GetHeader("foo")).To(Equal("fa"))
+			})
+
+			It("Should work nicely for nil fields", func() {
+				opts := network.Options{}
+				Expect(opts.GetHeader("foo")).To(BeEmpty())
+			})
+		})
+
+		Context("BuildOptions function", func() {
+			It("Should return the valid field", func() {
+				opts := network.NewOptions()
+				opts.SetField("foo", "bar", "baz")
+				built := network.BuildOptions(opts.Marshal())
+				Expect(built.GetField("foo", "bar")).To(Equal("baz"))
 			})
 		})
 
