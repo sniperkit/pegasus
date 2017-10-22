@@ -18,7 +18,7 @@ import (
 // A Type is a type of DNS request and response.
 type Type uint16
 
-// A Class is a type of network.
+// A Class is a type of peg.
 type Class uint16
 
 // An OpCode is a DNS operation code.

@@ -16,14 +16,14 @@ var _ = math.Inf
 // points. It contains the size of the population of sample points plus
 // additional optional information:
 //
-//   - the arithmetic mean of the samples
-//   - the minimum and maximum of the samples
-//   - the sum-squared-deviation of the samples, used to compute variance
+//   - the arithmetic mean of the examples
+//   - the minimum and maximum of the examples
+//   - the sum-squared-deviation of the examples, used to compute variance
 //   - a histogram of the values of the sample points
 type Distribution struct {
-	// The total number of samples in the distribution. Must be >= 0.
+	// The total number of examples in the distribution. Must be >= 0.
 	Count int64 `protobuf:"varint,1,opt,name=count" json:"count,omitempty"`
-	// The arithmetic mean of the samples in the distribution. If `count` is
+	// The arithmetic mean of the examples in the distribution. If `count` is
 	// zero then this field must be zero.
 	Mean float64 `protobuf:"fixed64,2,opt,name=mean" json:"mean,omitempty"`
 	// The minimum of the population of values. Ignored if `count` is zero.
@@ -35,14 +35,14 @@ type Distribution struct {
 	// where each x_i is a sample values. If `count` is zero then this field
 	// must be zero, otherwise validation of the request fails.
 	SumOfSquaredDeviation float64 `protobuf:"fixed64,5,opt,name=sum_of_squared_deviation,json=sumOfSquaredDeviation" json:"sum_of_squared_deviation,omitempty"`
-	// The number of samples in each histogram bucket. `bucket_counts` are
+	// The number of examples in each histogram bucket. `bucket_counts` are
 	// optional. If present, they must sum to the `count` value.
 	//
 	// The buckets are defined below in `bucket_option`. There are N buckets.
-	// `bucket_counts[0]` is the number of samples in the underflow bucket.
-	// `bucket_counts[1]` to `bucket_counts[N-1]` are the numbers of samples
+	// `bucket_counts[0]` is the number of examples in the underflow bucket.
+	// `bucket_counts[1]` to `bucket_counts[N-1]` are the numbers of examples
 	// in each of the finite buckets. And `bucket_counts[N] is the number
-	// of samples in the overflow bucket. See the comments of `bucket_option`
+	// of examples in the overflow bucket. See the comments of `bucket_option`
 	// below for more details.
 	//
 	// Any suffix of trailing zeros may be omitted.

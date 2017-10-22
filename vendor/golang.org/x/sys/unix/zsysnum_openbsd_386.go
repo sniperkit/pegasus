@@ -48,7 +48,7 @@ const (
 	SYS_DUP            = 41  // { int sys_dup(int fd); }
 	SYS_FSTATAT        = 42  // { int sys_fstatat(int fd, const char *path, \
 	SYS_GETEGID        = 43  // { gid_t sys_getegid(void); }
-	SYS_PROFIL         = 44  // { int sys_profil(caddr_t samples, size_t size, \
+	SYS_PROFIL         = 44  // { int sys_profil(caddr_t examples, size_t size, \
 	SYS_KTRACE         = 45  // { int sys_ktrace(const char *fname, int ops, \
 	SYS_SIGACTION      = 46  // { int sys_sigaction(int signum, \
 	SYS_GETGID         = 47  // { gid_t sys_getgid(void); }

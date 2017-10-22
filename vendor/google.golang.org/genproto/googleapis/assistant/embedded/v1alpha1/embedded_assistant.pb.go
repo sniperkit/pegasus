@@ -48,7 +48,7 @@ type AudioInConfig_Encoding int32
 const (
 	// Not specified. Will return result [google.rpc.Code.INVALID_ARGUMENT][].
 	AudioInConfig_ENCODING_UNSPECIFIED AudioInConfig_Encoding = 0
-	// Uncompressed 16-bit signed little-endian samples (Linear PCM).
+	// Uncompressed 16-bit signed little-endian examples (Linear PCM).
 	// This encoding includes no header, only the raw audio bytes.
 	AudioInConfig_LINEAR16 AudioInConfig_Encoding = 1
 	// [`FLAC`](https://xiph.org/flac/documentation.html) (Free Lossless Audio
@@ -56,7 +56,7 @@ const (
 	// lossless--therefore recognition is not compromised--and
 	// requires only about half the bandwidth of `LINEAR16`. This encoding
 	// includes the `FLAC` stream header followed by audio data. It supports
-	// 16-bit and 24-bit samples, however, not all fields in `STREAMINFO` are
+	// 16-bit and 24-bit examples, however, not all fields in `STREAMINFO` are
 	// supported.
 	AudioInConfig_FLAC AudioInConfig_Encoding = 2
 )
@@ -84,7 +84,7 @@ type AudioOutConfig_Encoding int32
 const (
 	// Not specified. Will return result [google.rpc.Code.INVALID_ARGUMENT][].
 	AudioOutConfig_ENCODING_UNSPECIFIED AudioOutConfig_Encoding = 0
-	// Uncompressed 16-bit signed little-endian samples (Linear PCM).
+	// Uncompressed 16-bit signed little-endian examples (Linear PCM).
 	AudioOutConfig_LINEAR16 AudioOutConfig_Encoding = 1
 	// MP3 audio encoding. The sample rate is encoded in the payload.
 	AudioOutConfig_MP3 AudioOutConfig_Encoding = 2

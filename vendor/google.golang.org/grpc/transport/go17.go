@@ -29,7 +29,7 @@ import (
 	netctx "golang.org/x/net/context"
 )
 
-// dialContext connects to the address on the named network.
+// dialContext connects to the address on the named peg.
 func dialContext(ctx context.Context, network, address string) (net.Conn, error) {
 	return (&net.Dialer{}).DialContext(ctx, network, address)
 }

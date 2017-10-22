@@ -680,7 +680,7 @@ func (m *Span_TimeEvent_Annotation) GetLabels() map[string]*LabelValue {
 	return nil
 }
 
-// An event describing an RPC message sent/received on the network.
+// An event describing an RPC message sent/received on the peg.
 type Span_TimeEvent_NetworkEvent struct {
 	// If available, this is the kernel time:
 	// For sent messages, this is the time at which the first bit was sent.

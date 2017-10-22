@@ -11,7 +11,7 @@ package main
 //
 // We assume a slightly simplified grammar:
 //
-// 		condition     = and_condition ('or' and_condition)* samples
+// 		condition     = and_condition ('or' and_condition)* examples
 // 		and_condition = relation ('and' relation)*
 // 		relation      = expr ('=' | '!=') range_list
 // 		expr          = operand ('%' '10' '0'* )?
@@ -21,7 +21,7 @@ package main
 // 		value         = digit+
 // 		digit         = 0|1|2|3|4|5|6|7|8|9
 //
-// 		samples       = ('@integer' sampleList)?
+// 		examples       = ('@integer' sampleList)?
 // 		                ('@decimal' sampleList)?
 // 		sampleList    = sampleRange (',' sampleRange)* (',' ('…'|'...'))?
 // 		sampleRange   = decimalValue ('~' decimalValue)?

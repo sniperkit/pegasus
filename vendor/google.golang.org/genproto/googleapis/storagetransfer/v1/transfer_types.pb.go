@@ -802,7 +802,7 @@ type ErrorSummary struct {
 	// Count of this type of error.
 	// Required.
 	ErrorCount int64 `protobuf:"varint,2,opt,name=error_count,json=errorCount" json:"error_count,omitempty"`
-	// Error samples.
+	// Error examples.
 	ErrorLogEntries []*ErrorLogEntry `protobuf:"bytes,3,rep,name=error_log_entries,json=errorLogEntries" json:"error_log_entries,omitempty"`
 }
 
