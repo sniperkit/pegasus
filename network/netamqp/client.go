@@ -4,6 +4,7 @@ import (
 	"github.com/cpapidas/pegasus/helpers"
 	"github.com/cpapidas/pegasus/network"
 	"github.com/streadway/amqp"
+	"errors"
 )
 
 // Client implements the network.Client interface. Client handles the remote calls via RabbitMQ (AMQP) protocol
@@ -12,7 +13,7 @@ type Client struct {
 }
 
 // NewClient connects to a RabbitMQ server, initializes a netamqp.Client object and returns a network.Client
-var NewClient = func(address string) network.Client {
+var NewClient = func(address string) (network.Client, error){
 
 	var connection IConnection
 	var err error
@@ -26,10 +27,10 @@ var NewClient = func(address string) network.Client {
 	})
 
 	if connection == nil {
-		panic("Cannot connect to RabbitMQ server")
+		return nil, errors.New("cannot connect")
 	}
 
-	return &Client{connection: connection}
+	return &Client{connection: connection}, nil
 }
 
 // Send is responsible to send data in RabbitMQ server

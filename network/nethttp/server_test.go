@@ -7,272 +7,250 @@ import (
 	"github.com/cpapidas/pegasus/network"
 	"github.com/cpapidas/pegasus/tests/mocks/mhttp"
 	"github.com/gorilla/mux"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"net/http"
 	"reflect"
 	"io"
 	"errors"
+	"github.com/stretchr/testify/assert"
+
+	"testing"
 )
 
-var _ = Describe("Server", func() {
+func TestNewServer(t *testing.T) {
+	// Should not be nil
+	server := nethttp.NewServer(nil)
+	assert.NotNil(t, server, "Should not be nil")
 
-	Describe("Server struct", func() {
+	// Should be type of *Server
+	server = nethttp.NewServer(nil)
+	assert.Equal(t, "<*nethttp.Server Value>", reflect.ValueOf(server).String(),
+		"Should be type of <*nethttp.Server Value>")
+}
 
-		Context("Construct NewServer", func() {
+func TestSetConf(t *testing.T) {
+	// Should return an array of given strings
+	assert.Equal(t, []string{"foo", "bar"}, nethttp.SetConf("foo", "bar"),
+		`Should be equals to []string{"foo", "bar"}`)
+}
 
-			It("Should not be nil", func() {
-				server := nethttp.NewServer(nil)
-				Expect(server).ToNot(BeNil())
-			})
+func TestServer_Serve(t *testing.T) {
+	var server network.Server
+	nethttp.ListenAndServe = func(addr string, handler http.Handler) error {
+		return nil
+	}
+	server = nethttp.NewServer(nil)
+	assert.NotPanics(t, func() { server.Serve("Foo") }, "Should not panics")
+}
 
-			It("Should be type of *Server", func() {
-				server := nethttp.NewServer(nil)
-				Expect(reflect.ValueOf(server).String()).To(Equal("<*nethttp.Server Value>"))
-			})
+func TestServer_Listen(t *testing.T) {
+	callHandler := false
 
-		})
+	// Create a mock router
+	router := &mhttp.MockRouter{}
 
-		Context("SetConf function", func() {
+	// Initialize the handler function
+	router.HandleFuncMock = func(path string, f func(http.ResponseWriter, *http.Request)) *mux.Route {
 
-			It("Should return an array of given strings", func() {
-				Expect(nethttp.SetConf("foo", "bar")).To(Equal([]string{"foo", "bar"}))
-			})
+		w := &mhttp.MockResponseWriter{
+			Headers: make(map[string][]string),
+		}
 
-		})
+		r, _ := http.NewRequest("POST", "anything", bytes.NewReader([]byte("content")))
 
-		Context("Listen function", func() {
+		r.Header = make(map[string][]string)
+		r.Header["Custom-Sample"] = []string{"Sample"}
+		r.Header["HP-Sample"] = []string{"Sample"}
+		r.Header["GR-Sample"] = []string{"Sample"}
+		r.Header["MQ-Sample"] = []string{"Sample"}
+
+		r.Body = ioutil.NopCloser(bytes.NewReader([]byte("content")))
 
-			callHandler := false
+		f(w, r)
 
-			router := &mhttp.MockRouter{}
+		// Should contain the right headers
+		assert.Equal(t, []string{"sample"}, w.Headers["Custom-Sample"],
+			`Should be equals to []string{"sample"}`)
+		assert.Equal(t, []string{"sample"}, w.Headers["Hp-Sample"],
+			`Should be equals to []string{"sample"}`)
+		assert.Empty(t, w.Headers["Gr-Sample"],
+			"Should be empty")
+		assert.Empty(t, w.Headers["Mq-Sample"],
+			"Should be empty")
+		assert.Equal(t, "content reply", string(w.Body),
+			"Should be content reply")
 
-			router.HandleFuncMock = func(path string, f func(http.ResponseWriter, *http.Request)) *mux.Route {
+		return &mux.Route{}
+	}
 
-				w := &mhttp.MockResponseWriter{
-					Headers: make(map[string][]string),
-				}
+	server := nethttp.NewServer(router)
 
-				r, _ := http.NewRequest("POST", "anything", bytes.NewReader([]byte("content")))
+	// Initialize the request handler
+	var handler = func(channel *network.Channel) {
 
-				r.Header = make(map[string][]string)
-				r.Header["Custom-Sample"] = []string{"Sample"}
-				r.Header["HP-Sample"] = []string{"Sample"}
-				r.Header["GR-Sample"] = []string{"Sample"}
-				r.Header["MQ-Sample"] = []string{"Sample"}
+		callHandler = true
 
-				r.Body = ioutil.NopCloser(bytes.NewReader([]byte("content")))
+		payload := channel.Receive()
 
-				f(w, r)
+		options := network.NewOptions().Unmarshal(payload.Options)
 
-				It("Should contain the right headers", func() {
-					Expect(w.Headers["Custom-Sample"]).To(Equal([]string{"sample"}))
-					Expect(w.Headers["Hp-Sample"]).To(Equal([]string{"sample"}))
-					Expect(w.Headers["Gr-Sample"]).To(BeEmpty())
-					Expect(w.Headers["Mq-Sample"]).To(BeEmpty())
-					Expect(string(w.Body)).To(Equal("content reply"))
-				})
+		// Should return the valid headers
+		assert.Equal(t, "Sample", options.GetHeader("Custom-Sample"),
+			"Should be equals to Sample")
+		assert.Equal(t, "Sample", options.GetHeader("HP-Sample"),
+			"Should be equals to Sample")
+		assert.Empty(t, options.GetHeader("GR-Sample"), "Should be empty")
+		assert.Empty(t, options.GetHeader("MQ-Sample"), "Should be empty")
 
-				return &mux.Route{}
-			}
+		replyOptions := network.NewOptions()
 
-			server := nethttp.NewServer(router)
+		replyOptions.SetHeader("Custom-Sample", "sample")
+		replyOptions.SetHeader("HP-Sample", "sample")
+		replyOptions.SetHeader("GR-Sample", "sample")
+		replyOptions.SetHeader("MQ-Sample", "sample")
 
-			var handler = func(channel *network.Channel) {
+		channel.Send(network.BuildPayload([]byte("content reply"), replyOptions.Marshal()))
 
-				callHandler = true
+	}
 
-				payload := channel.Receive()
+	server.Listen(nethttp.SetConf("foo", "POST"), handler, nil)
 
-				options := network.NewOptions().Unmarshal(payload.Options)
+	// Should call the handler
+	assert.True(t, callHandler, "Should call the handler")
+}
 
-				It("Should return the valid headers", func() {
-					Expect(options.GetHeader("Custom-Sample")).To(Equal("Sample"))
-					Expect(options.GetHeader("HP-Sample")).To(Equal("Sample"))
-					Expect(options.GetHeader("GR-Sample")).To(BeEmpty())
-					Expect(options.GetHeader("MQ-Sample")).To(BeEmpty())
-				})
+func TestServer_Listen_middleware(t *testing.T) {
+	callHandler := false
+	callMiddleware := false
 
-				replyOptions := network.NewOptions()
+	router := &mhttp.MockRouter{}
 
-				replyOptions.SetHeader("Custom-Sample", "sample")
-				replyOptions.SetHeader("HP-Sample", "sample")
-				replyOptions.SetHeader("GR-Sample", "sample")
-				replyOptions.SetHeader("MQ-Sample", "sample")
+	// Initialize the handler function
+	router.HandleFuncMock = func(path string, f func(http.ResponseWriter, *http.Request)) *mux.Route {
 
-				channel.Send(network.BuildPayload([]byte("content reply"), replyOptions.Marshal()))
+		w := &mhttp.MockResponseWriter{
+			Headers: make(map[string][]string),
+		}
 
-			}
+		r, _ := http.NewRequest("PUT", "/url/path", bytes.NewReader([]byte("content")))
 
-			server.Listen(nethttp.SetConf("foo", "POST"), handler, nil)
+		r.Header = make(map[string][]string)
+		r.Header["Custom-Sample"] = []string{"Sample"}
+		r.Header["HP-Sample"] = []string{"Sample"}
+		r.Header["GR-Sample"] = []string{"Sample"}
+		r.Header["MQ-Sample"] = []string{"Sample"}
 
-			It("Should call the handler", func() {
-				Expect(callHandler).To(BeTrue())
-			})
-		})
+		r.Body = ioutil.NopCloser(bytes.NewReader([]byte("content")))
 
-		Context("Listen function", func() {
+		q := r.URL.Query()
+		q.Add("foo", "bar")
+		r.URL.RawQuery = q.Encode()
 
-			callHandler := false
-			callMiddleware := false
+		f(w, r)
 
-			router := &mhttp.MockRouter{}
+		// Should contain the right headers
+		assert.Equal(t, []string{"sample"}, w.Headers["Custom-Sample"],
+			`Should be equals to []string{"sample"}`)
+		assert.Equal(t, []string{"sample"}, w.Headers["Hp-Sample"],
+			`Should be equals to []string{"sample"}`)
+		assert.Empty(t, w.Headers["Gr-Sample"],
+			"Should be empty")
+		assert.Empty(t, w.Headers["Mq-Sample"],
+			"Should be empty")
+		assert.Equal(t, "content reply", string(w.Body),
+			"Should be content reply")
+		assert.Equal(t, 201, w.Status, "Should be equals to 201")
 
-			router.HandleFuncMock = func(path string, f func(http.ResponseWriter, *http.Request)) *mux.Route {
+		return &mux.Route{}
+	}
 
-				w := &mhttp.MockResponseWriter{
-					Headers: make(map[string][]string),
-				}
+	// Create a server object with mocked date
+	server := nethttp.NewServer(router)
 
-				r, _ := http.NewRequest("PUT", "/url/path", bytes.NewReader([]byte("content")))
+	// Initialize the handler
+	var handler = func(channel *network.Channel) {
 
-				r.Header = make(map[string][]string)
-				r.Header["Custom-Sample"] = []string{"Sample"}
-				r.Header["HP-Sample"] = []string{"Sample"}
-				r.Header["GR-Sample"] = []string{"Sample"}
-				r.Header["MQ-Sample"] = []string{"Sample"}
+		callHandler = true
 
-				r.Body = ioutil.NopCloser(bytes.NewReader([]byte("content")))
+		payload := channel.Receive()
 
-				q := r.URL.Query()
-				q.Add("foo", "bar")
-				r.URL.RawQuery = q.Encode()
+		options := network.NewOptions().Unmarshal(payload.Options)
 
-				f(w, r)
+		// Should return the valid headers
+		assert.Equal(t, "sample middleware", options.GetHeader("Custom-Sample"),
+			"Should be equals to sample middleware")
+		assert.Equal(t, "sample middleware", options.GetHeader("HP-Sample"),
+			"Should be equals to sample middleware")
 
-				It("Should contain the right headers", func() {
-					Expect(w.Headers["Custom-Sample"]).To(Equal([]string{"sample"}))
-					Expect(w.Headers["Hp-Sample"]).To(Equal([]string{"sample"}))
-					Expect(w.Headers["Gr-Sample"]).To(BeEmpty())
-					Expect(w.Headers["Mq-Sample"]).To(BeEmpty())
-					Expect(string(w.Body)).To(Equal("content reply"))
-					Expect(w.Status).To(Equal(201))
-				})
+		replyOptions := network.NewOptions()
 
-				return &mux.Route{}
-			}
+		replyOptions.SetHeader("Custom-Sample", "sample")
+		replyOptions.SetHeader("HP-Sample", "sample")
+		replyOptions.SetHeader("GR-Sample", "sample")
+		replyOptions.SetHeader("MQ-Sample", "sample")
+		replyOptions.SetHeader("Status", "201")
 
-			server := nethttp.NewServer(router)
+		channel.Send(network.BuildPayload([]byte("content reply"), replyOptions.Marshal()))
 
-			var handler = func(channel *network.Channel) {
+	}
 
-				callHandler = true
+	// Middleware router
+	var middleware = func(handler network.Handler, channel *network.Channel) {
 
-				payload := channel.Receive()
+		callMiddleware = true
 
-				options := network.NewOptions().Unmarshal(payload.Options)
+		payload := channel.Receive()
 
-				It("Should return the valid headers", func() {
-					Expect(options.GetHeader("Custom-Sample")).To(Equal("sample middleware"))
-					Expect(options.GetHeader("HP-Sample")).To(Equal("sample middleware"))
-				})
+		options := network.NewOptions().Unmarshal(payload.Options)
 
-				replyOptions := network.NewOptions()
+		// Should contains the valid header
+		assert.Equal(t, "Sample", options.GetHeader("Custom-Sample"),
+			"Should be equals to Sample")
+		assert.Equal(t, "Sample", options.GetHeader("HP-Sample"),
+			"Should be equals to Sample")
+		assert.Empty(t, options.GetHeader("GR-Sample"), "Should be empty")
+		assert.Empty(t, options.GetHeader("MQ-Sample"), "Should be empty")
 
-				replyOptions.SetHeader("Custom-Sample", "sample")
-				replyOptions.SetHeader("HP-Sample", "sample")
-				replyOptions.SetHeader("GR-Sample", "sample")
-				replyOptions.SetHeader("MQ-Sample", "sample")
-				replyOptions.SetHeader("Status", "201")
+		// Should contains the right parameters
+		assert.Equal(t, "bar", options.GetParam("foo"),
+			"Should be equals to bar")
 
-				channel.Send(network.BuildPayload([]byte("content reply"), replyOptions.Marshal()))
+		replyOptions := network.NewOptions()
 
-			}
+		replyOptions.SetHeader("Custom-Sample", "sample middleware")
+		replyOptions.SetHeader("HP-Sample", "sample middleware")
 
-			var middleware = func(handler network.Handler, channel *network.Channel) {
+		channel.Send(network.BuildPayload([]byte("content reply middleware"), replyOptions.Marshal()))
 
-				callMiddleware = true
+		handler(channel)
+	}
 
-				payload := channel.Receive()
+	server.Listen(nethttp.SetConf("/url/path", "PUT"), handler, middleware)
 
-				options := network.NewOptions().Unmarshal(payload.Options)
+	// Should call the handler
+	assert.True(t, callHandler, "Should call the handler")
 
-				It("Should return the valid headers", func() {
-					Expect(options.GetHeader("Custom-Sample")).To(Equal("Sample"))
-					Expect(options.GetHeader("HP-Sample")).To(Equal("Sample"))
-					Expect(options.GetHeader("GR-Sample")).To(BeEmpty())
-					Expect(options.GetHeader("MQ-Sample")).To(BeEmpty())
-				})
+	// Should call the middleware
+	assert.True(t, callMiddleware, "Should call the middleware")
+}
 
-				It("Should contains the right parameters", func() {
-					Expect(options.GetParam("foo")).To(Equal("bar"))
-				})
+func TestServer_Listen_readAllFailure(t *testing.T) {
+	var server network.Server
+	router := &mhttp.MockRouter{}
+	router.HandleFuncMock = func(path string, f func(http.ResponseWriter, *http.Request)) *mux.Route {
+		w := &mhttp.MockResponseWriter{
+			Headers: make(map[string][]string),
+		}
+		r, _ := http.NewRequest("POST", "anything", bytes.NewReader([]byte("content")))
+		f(w, r)
 
-
-				replyOptions := network.NewOptions()
-
-				replyOptions.SetHeader("Custom-Sample", "sample middleware")
-				replyOptions.SetHeader("HP-Sample", "sample middleware")
-
-				channel.Send(network.BuildPayload([]byte("content reply middleware"), replyOptions.Marshal()))
-
-				handler(channel)
-			}
-
-			server.Listen(nethttp.SetConf("/url/path", "PUT"), handler, middleware)
-
-			It("Should call the handler", func() {
-				Expect(callHandler).To(BeTrue())
-			})
-
-			It("Should call the handler", func() {
-				Expect(callMiddleware).To(BeTrue())
-			})
-		})
-
-		Context("Serve function", func() {
-
-			var server network.Server
-
-			BeforeEach(func() {
-				nethttp.ListenAndServe = func(addr string, handler http.Handler) error {
-					return nil
-				}
-				server = nethttp.NewServer(nil)
-
-			})
-
-			It("Should not panic", func() {
-				Expect(func() { server.Serve("Foo") }).ToNot(Panic())
-
-			})
-
-		})
-
-		Context("Listen ReadAll error", func() {
-
-			var server network.Server
-
-			BeforeEach(func() {
-				router := &mhttp.MockRouter{}
-
-				router.HandleFuncMock = func(path string, f func(http.ResponseWriter, *http.Request)) *mux.Route {
-					w := &mhttp.MockResponseWriter{
-						Headers: make(map[string][]string),
-					}
-					r, _ := http.NewRequest("POST", "anything", bytes.NewReader([]byte("content")))
-					f(w, r)
-
-					return &mux.Route{}
-				}
-
-				server = nethttp.NewServer(router)
-
-				nethttp.ReadAll = func(r io.Reader) ([]byte, error) {
-					return nil, errors.New("error")
-				}
-
-			})
-
-			It("Should not panic", func() {
-				Expect(func() { server.Listen(nethttp.SetConf("", ""), nil, nil) }).
-					To(Panic())
-			})
-
-		})
-
-	})
-
-})
-
+		return &mux.Route{}
+	}
+	server = nethttp.NewServer(router)
+	nethttp.ReadAll = func(r io.Reader) ([]byte, error) {
+		return nil, errors.New("error")
+	}
+	// Should not panic
+	assert.Panics(t, func() { server.Listen(nethttp.SetConf("", ""), nil, nil) },
+		"Should panics")
+}

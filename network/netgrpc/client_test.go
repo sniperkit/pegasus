@@ -8,165 +8,185 @@ import (
 	"github.com/cpapidas/pegasus/network"
 	pb "github.com/cpapidas/pegasus/network/netgrpc/proto"
 	"github.com/cpapidas/pegasus/tests/mocks/mnetgrpc"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"google.golang.org/grpc"
+	"testing"
+	"github.com/stretchr/testify/assert"
+
 	"reflect"
 )
 
-var _ = Describe("Client", func() {
+var client = netgrpc.NewClient
 
-	Describe("Client struct", func() {
+func setClientDefaults() {
+	netgrpc.NewServerClient = pb.NewServeClient
+	netgrpc.Dial = grpc.Dial
+	netgrpc.NewClient = client
+	netgrpc.RetriesTimes = 1
+	netgrpc.Sleep = 0
+}
 
-		BeforeEach(func() {
-			netgrpc.Dial = grpc.Dial
-			netgrpc.RetriesTimes = 1
-			netgrpc.Sleep = 0
-		})
+func TestNewClient(t *testing.T) {
+	setClientDefaults()
 
-		Context("Constructor", func() {
+	 //Should return a nil client object
+	netgrpc.Dial = func(target string, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
+		return &grpc.ClientConn{}, nil
+	}
+	client := netgrpc.NewClient("")
+	assert.NotNil(t, client, "Should not be nil")
 
-			It("Should not be nil", func() {
-				netgrpc.Dial = func(target string, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
-					return &grpc.ClientConn{}, nil
-				}
-				client := netgrpc.NewClient("")
-				Expect(client).ToNot(BeNil())
-			})
+	// Should be type of *netgrpc.Client
+	netgrpc.Dial = func(target string, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
+		return &grpc.ClientConn{}, nil
+	}
+	client = netgrpc.NewClient("")
+	assert.Equal(t, "<*netgrpc.Client Value>", reflect.ValueOf(client).String(),
+		"Should be type of <*netgrpc.Client Value>")
 
-			It("Should be type of *netgrpc.Client", func() {
-				netgrpc.Dial = func(target string, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
-					return &grpc.ClientConn{}, nil
-				}
-				client := netgrpc.NewClient("")
-				Expect(reflect.ValueOf(client).String()).To(Equal("<*netgrpc.Client Value>"))
-			})
+	// Should return an error on Dial failure
+	netgrpc.Dial = func(target string, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
+		return nil, errors.New("error")
+	}
+	netgrpc.NewServerClient = func(cc *grpc.ClientConn) pb.ServeClient {
+		return nil
+	}
+	client = netgrpc.NewClient("")
+	_, err := client.Send(netgrpc.SetConf("path"), network.BuildPayload(nil, nil))
+	assert.NotNil(t, err, "Should return an error")
+}
 
-			It("Should return an error on Dial failure", func() {
-				netgrpc.Dial = func(target string, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
-					return nil, errors.New("error")
-				}
-				client := netgrpc.NewClient("")
-				_, err := client.Send(netgrpc.SetConf("path"), network.BuildPayload(nil, nil))
-				Expect(err).ToNot(BeNil())
-			})
-		})
+func TestClient_Send(t *testing.T) {
+	setClientDefaults()
 
-		Context("Send function", func() {
+	// Mock the connection
+	clientConnection := &mnetgrpc.MockServeClient{}
 
-			clientConnection := &mnetgrpc.MockServeClient{}
+	// Mock the handler
+	clientConnection.HandlerSyncMock = func(
+		ctx context.Context,
+		in *pb.HandlerRequest,
+		opts ...grpc.CallOption,
+	) (*pb.HandlerReply, error) {
+		return &pb.HandlerReply{
+			Content: []byte("content"),
+			Options: []byte("options"),
+		}, nil
+	}
 
-			clientConnection.HandlerSyncMock = func(
-				ctx context.Context,
-				in *pb.HandlerRequest,
-				opts ...grpc.CallOption,
-			) (*pb.HandlerReply, error) {
-				return &pb.HandlerReply{
-					Content: []byte("content"),
-					Options: []byte("options"),
-				}, nil
-			}
+	// Replace the NewServerClient in order to return the mocked object
+	netgrpc.NewServerClient = func(cc *grpc.ClientConn) pb.ServeClient {
+		return clientConnection
+	}
 
-			netgrpc.NewServerClient = func(cc *grpc.ClientConn) pb.ServeClient {
-				return clientConnection
-			}
+	// Replace the Dial in order to return the connection
+	netgrpc.Dial = func(target string, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
+		return &grpc.ClientConn{}, nil
+	}
 
-			netgrpc.Dial = func(target string, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
-				return &grpc.ClientConn{}, nil
-			}
+	client := netgrpc.NewClient("/wherever/whenever/We're/meant/to/be/together/Shakira")
 
-			client := netgrpc.NewClient("/wherever/whenever/We're/meant/to/be/together/Shakira")
+	payload, err := client.Send(netgrpc.SetConf("/Lucky/you/were/born"), network.Payload{})
 
-			payload, err := client.Send(netgrpc.SetConf("/Lucky/you/were/born"), network.Payload{})
+	// Should return a nil error
+	assert.Nil(t,  err, "Should not return an error")
 
-			It("Should return a nil error", func() {
-				Expect(err).To(BeNil())
-			})
 
-			It("Should return a payload.Content equals to content", func() {
-				Expect(string(payload.Body)).To(Equal("content"))
-			})
+	// Should return a payload.Content equals to content
+	assert.Equal(t, "content", string(payload.Body), "Should be equals to content")
 
-			It("Should return a payload.Options equals to options", func() {
-				Expect(string(payload.Options)).To(Equal("options"))
-			})
-		})
 
-		Context("Send function on failure", func() {
+	// Should return a payload.Options equals to options
+	assert.Equal(t, "options", string(payload.Options), "Should be equals to options")
+}
 
-			clientConnection := &mnetgrpc.MockServeClient{}
+func TestClient_Send_failure(t *testing.T) {
+	setClientDefaults()
 
-			clientConnection.HandlerSyncMock = func(
-				ctx context.Context,
-				in *pb.HandlerRequest,
-				opts ...grpc.CallOption,
-			) (*pb.HandlerReply, error) {
-				return nil, errors.New("error")
-			}
+	// Mock the connection
+	clientConnection := &mnetgrpc.MockServeClient{}
 
-			netgrpc.NewServerClient = func(cc *grpc.ClientConn) pb.ServeClient {
-				return clientConnection
-			}
+	// Mock the handler
+	clientConnection.HandlerSyncMock = func(
+		ctx context.Context,
+		in *pb.HandlerRequest,
+		opts ...grpc.CallOption,
+	) (*pb.HandlerReply, error) {
+		return nil, errors.New("error")
+	}
 
-			client := netgrpc.NewClient("/wherever/whenever/We're/meant/to/be/together/Shakira")
+	// Replace the NewServerClient in order to return the mocked object
+	netgrpc.NewServerClient = func(cc *grpc.ClientConn) pb.ServeClient {
+		return clientConnection
+	}
 
-			_, err := client.Send(netgrpc.SetConf("/Lucky/you/were/born"), network.Payload{})
+	// Replace the Dial in order to return the connection
+	netgrpc.Dial = func(target string, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
+		return &grpc.ClientConn{}, nil
+	}
 
-			It("Should return a nil error", func() {
-				Expect(err).ToNot(BeNil())
-			})
-		})
+	client := netgrpc.NewClient("/wherever/whenever/We're/meant/to/be/together/Shakira")
 
-		Context("Send function on nil connection", func() {
+	_, err := client.Send(netgrpc.SetConf("/Lucky/you/were/born"), network.Payload{})
 
-			netgrpc.NewServerClient = func(cc *grpc.ClientConn) pb.ServeClient {
-				return nil
-			}
+	// Should not return a nil error
+	assert.NotNil(t,  err, "Should return an error")
+}
 
-			client := netgrpc.NewClient("/wherever/whenever/We're/meant/to/be/together/Shakira")
+func TestClient_Send_nilConnection(t *testing.T) {
+	setClientDefaults()
 
-			_, err := client.Send(netgrpc.SetConf("/Lucky/you/were/born"), network.Payload{})
+	// Replace the NewServerClient in order to return the mocked object
+	netgrpc.NewServerClient = func(cc *grpc.ClientConn) pb.ServeClient {
+		return nil
+	}
 
-			It("Should return an error", func() {
-				Expect(err).ToNot(BeNil())
-			})
-		})
+	// Replace the Dial in order to return the connection
+	netgrpc.Dial = func(target string, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
+		return &grpc.ClientConn{}, nil
+	}
 
-		Context("Close function", func() {
+	client := netgrpc.NewClient("/wherever/whenever/We're/meant/to/be/together/Shakira")
 
-			It("Should return an error", func() {
+	_, err := client.Send(netgrpc.SetConf("/Lucky/you/were/born"), network.Payload{})
 
-				mockClientConnection := &mnetgrpc.MockClientConnection{}
-				mockClientConnection.CloseMock = func() error {
-					return errors.New("string")
-				}
+	// Should not return a nil error
+	assert.NotNil(t, err, "Should return an error")
+}
 
-				client := &netgrpc.Client {
-					Connection: mockClientConnection,
-				}
+func TestClient_Close(t *testing.T) {
+	setClientDefaults()
 
-				err := client.Close()
+	// Mock the client connection
+	mockClientConnection := &mnetgrpc.MockClientConnection{}
 
-				Expect(err).ToNot(BeNil())
-			})
+	// Mock the Close function
+	mockClientConnection.CloseMock = func() error {
+		return errors.New("string")
+	}
 
-			It("Should return nil error", func() {
+	client := &netgrpc.Client {
+		Connection: mockClientConnection,
+	}
 
-				mockClientConnection := &mnetgrpc.MockClientConnection{}
-				mockClientConnection.CloseMock = func() error {
-					return nil
-				}
+	err := client.Close()
 
-				client := &netgrpc.Client {
-					Connection: mockClientConnection,
-				}
+	// Should not return a nil error
+	assert.NotNil(t,  err, "Should return an error")
 
-				err := client.Close()
+	// Mock the client connection
+	mockClientConnection = &mnetgrpc.MockClientConnection{}
 
-				Expect(err).To(BeNil())
-			})
-		})
+	// Mock the Close function
+	mockClientConnection.CloseMock = func() error {
+		return nil
+	}
 
-	})
+	client = &netgrpc.Client {
+		Connection: mockClientConnection,
+	}
 
-})
+	err = client.Close()
+
+	// Should not return an error
+	assert.Nil(t,  err, "Should not return an error")
+}

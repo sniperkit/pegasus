@@ -2,76 +2,57 @@ package netamqp_test
 
 import (
 	"github.com/cpapidas/pegasus/network/netamqp"
-
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"github.com/streadway/amqp"
+	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
-var _ = Describe("Connection", func() {
+var NewConnection = netamqp.NewConnection
 
-	Describe("Test Connection struct", func() {
+func TestNewConnection(t *testing.T) {
+	var called bool
 
-		Context("Test constructor", func() {
+	// Set the mocked variable back to originals
+	netamqp.Dial = amqp.Dial
+	netamqp.NewConnection = NewConnection
 
-			var called bool
+	netamqp.RetriesTimes = 1
+	netamqp.Sleep = 1
 
-			BeforeEach(func() {
-				// Set the mocked variable back to originals
-				netamqp.Dial = amqp.Dial
-				netamqp.NewConnection = NewConnection
+	called = false
 
-				netamqp.RetriesTimes = 1
-				netamqp.Sleep = 1
+	netamqp.Dial = func(url string) (*amqp.Connection, error) {
+		called = true
+		return &amqp.Connection{}, nil
+	}
 
-				called = false
+	connection, err := netamqp.NewConnection("")
+	assert.NotNil(t, connection, "Connection should not be nil")
+	assert.Nil(t, err, "error should be nil")
+	assert.True(t, called, "Should call the Dial function")
+}
 
-				netamqp.Dial = func(url string) (*amqp.Connection, error) {
-					called = true
-					return &amqp.Connection{}, nil
-				}
-			})
+func TestConnection_Channel(t *testing.T) {
+	var called bool
 
-			It("Should return a object", func() {
-				connection, err := netamqp.NewConnection("")
-				Expect(connection).ToNot(BeNil())
-				Expect(err).To(BeNil())
-				Expect(called).To(BeTrue())
-			})
+	// Set the mocked variable back to originals
+	netamqp.Dial = amqp.Dial
+	netamqp.NewConnection = NewConnection
 
-		})
+	netamqp.RetriesTimes = 1
+	netamqp.Sleep = 1
 
-		Context("Test constructor", func() {
+	called = false
 
-			var called bool
+	netamqp.Dial = func(url string) (*amqp.Connection, error) {
+		called = true
+		c := &amqp.Connection{}
+		return c, nil
+	}
 
-			BeforeEach(func() {
-				// Set the mocked variable back to originals
-				netamqp.Dial = amqp.Dial
-				netamqp.NewConnection = NewConnection
-
-				netamqp.RetriesTimes = 1
-				netamqp.Sleep = 1
-
-				called = false
-
-				netamqp.Dial = func(url string) (*amqp.Connection, error) {
-					called = true
-					c := &amqp.Connection{}
-					return c, nil
-				}
-			})
-
-			It("Should returns a channel object", func() {
-				connection, err := netamqp.NewConnection("")
-				Expect(err).To(BeNil())
-				Expect(func() {
-					connection.Channel()
-				}).To(Panic())
-			})
-
-		})
-
-	})
-
-})
+	connection, err := netamqp.NewConnection("")
+	assert.Nil(t, err, "Error should be nil")
+	assert.Panics(t, func() {
+		connection.Channel()
+	}, "Should panics for invalid connection")
+}

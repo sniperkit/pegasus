@@ -2,78 +2,37 @@ package helpers_test
 
 import (
 	"github.com/cpapidas/pegasus/helpers"
-
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
-var _ = Describe("Headers", func() {
+func TestIsHTTPValidHeader(t *testing.T) {
+	// Should return true for valid header
+	assert.True(t, helpers.IsHTTPValidHeader("whatever"), "Should return true for valid header")
+	//Should return false for invalid header
+	assert.False(t, helpers.IsHTTPValidHeader("MQ-FF"), "Should return false for invalid header")
+	assert.False(t, helpers.IsHTTPValidHeader("GR-FF"), "Should return false for invalid header")
+}
 
-	Describe("HTTP headers", func() {
+func TestIsGRPCValidHeader(t *testing.T) {
+	// Should return a true for valid header
+	assert.True(t, helpers.IsGRPCValidHeader("whatever"), "Should return true for valid header")
+	// Should return false for invalid header
+	assert.False(t, helpers.IsGRPCValidHeader("HP-FF"), "Should return false for invalid header")
+	assert.False(t, helpers.IsGRPCValidHeader("MQ-FF"), "Should return false for invalid header")
+}
 
-		Context("Valida/Invalid Headers", func() {
+func TestIsAMQPValidHeader(t *testing.T) {
+	// Should return a true for valid header
+	assert.True(t, helpers.IsAMQPValidHeader("whatever"), "Should return true for valid header")
+	// Should return false for invalid header
+	assert.False(t, helpers.IsAMQPValidHeader("HP-FF"), "Should return false for invalid header")
+	assert.False(t, helpers.IsAMQPValidHeader("GR-FF"), "Should return false for invalid header")
+}
 
-			It("Should return a true for valid header", func() {
-				Expect(helpers.IsHTTPValidHeader("whatever")).To(BeTrue())
-			})
-
-			It("Should return false for invalid header", func() {
-				Expect(helpers.IsHTTPValidHeader("MQ-FF")).To(BeFalse())
-				Expect(helpers.IsHTTPValidHeader("GR-FF")).To(BeFalse())
-			})
-
-		})
-
-	})
-
-	Describe("GRPC headers", func() {
-
-		Context("Valida/Invalid Headers", func() {
-
-			It("Should return a true for valid header", func() {
-				Expect(helpers.IsGRPCValidHeader("whatever")).To(BeTrue())
-			})
-
-			It("Should return false for invalid header", func() {
-				Expect(helpers.IsGRPCValidHeader("HP-FF")).To(BeFalse())
-				Expect(helpers.IsGRPCValidHeader("MQ-FF")).To(BeFalse())
-			})
-
-		})
-
-	})
-
-	Describe("AMQP headers", func() {
-
-		Context("Valida/Invalid Headers", func() {
-
-			It("Should return a true for valid header", func() {
-				Expect(helpers.IsAMQPValidHeader("whatever")).To(BeTrue())
-			})
-
-			It("Should return false for invalid header", func() {
-				Expect(helpers.IsAMQPValidHeader("HP-FF")).To(BeFalse())
-				Expect(helpers.IsAMQPValidHeader("GR-FF")).To(BeFalse())
-			})
-
-		})
-
-	})
-
-	Describe( "AMQPParam function", func() {
-
-		Context("Valid/Invalid parameters", func() {
-
-			It("Should return param name", func() {
-				Expect(helpers.AMQPParam("MP-param")).To(Equal("param"))
-			})
-
-			It("Should return param name", func() {
-				Expect(helpers.AMQPParam("ffparam")).To(BeEmpty())
-			})
-
-		})
-
-	})
-
-})
+func TestAMQPParam(t *testing.T) {
+	// Should return the param key name for a valid param
+	assert.Equal(t, helpers.AMQPParam("MP-param"), "param", "Should return the param key name ")
+	// Should return the an empty string for invalid param
+	assert.Empty(t, helpers.AMQPParam("ffparam"), "Should return the an empty string invalid param")
+}

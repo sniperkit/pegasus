@@ -4,43 +4,34 @@ import (
 	"github.com/cpapidas/pegasus/network/netgrpc"
 
 	"github.com/cpapidas/pegasus/network"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"reflect"
+	"testing"
+	"github.com/stretchr/testify/assert"
+
 )
 
-var _ = Describe("Router", func() {
+func TestNewRouter(t *testing.T) {
 
-	Describe("Router struct", func() {
+	router := netgrpc.NewRouter()
 
-		Context("Router constructor", func() {
+	// Should not be nil
+	assert.NotNil(t, router, "Should not be nil")
 
-			router := netgrpc.NewRouter()
+	// Should be type of *netgrpc.Router
+	assert.Equal(t, "<*netgrpc.Router Value>", reflect.ValueOf(router).String(),
+		"Should be type of <*netgrpc.Router Value>")
 
-			It("Should not be nil", func() {
-				Expect(router).ToNot(BeNil())
-			})
+}
 
-			It("Should be type of *netgrpc.Router", func() {
-				Expect(reflect.ValueOf(router).String()).To(Equal("<*netgrpc.Router Value>"))
-			})
+func TestRouter_Add(t *testing.T) {
 
-		})
+	router := netgrpc.NewRouter()
 
-		Context("Router Add function", func() {
+	handler := func(channel *network.Channel) {}
 
-			router := netgrpc.NewRouter()
+	middleware := func(handler network.Handler, channel *network.Channel) {}
 
-			handler := func(channel *network.Channel) {}
-
-			middleware := func(handler network.Handler, channel *network.Channel) {}
-
-			It("Should add a new PathsWrapper", func() {
-				router.Add("/goo/gaa", handler, middleware)
-			})
-
-		})
-
-	})
-
-})
+	router.Add("/goo/gaa", handler, middleware)
+	// Should add a new PathsWrapper
+	assert.NotNil(t, router.PathsWrapper["/goo/gaa"], "Should not be nil")
+}

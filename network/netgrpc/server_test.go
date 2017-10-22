@@ -7,301 +7,289 @@ import (
 	"fmt"
 	"github.com/cpapidas/pegasus/network"
 	pb "github.com/cpapidas/pegasus/network/netgrpc/proto"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"google.golang.org/grpc"
 	"net"
 	"reflect"
+	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
-var _ = Describe("Server", func() {
+func TestNewServer(t *testing.T) {
+	server := netgrpc.NewServer(nil)
+	// Should return a new server instance of *netgrpc.Server
+	assert.NotNil(t, server, "Should return a new server instance of *netgrpc.Server")
+	assert.Equal(t, "<*netgrpc.Server Value>", reflect.ValueOf(server).String(),
+		"Should be equals to <*netgrpc.Server Value>")
+}
+
+func TestSetConf(t *testing.T) {
+	path := netgrpc.SetConf("path")
+	// Should return the path as array
+	assert.Equal(t, []string{"path"}, path, "Should be equals to ['path']")
+}
+
+func TestServer_Listen(t *testing.T) {
+
+	var handler = func(channel *network.Channel) {}
+	var middleware = func(handler network.Handler, channel *network.Channel) {}
+
+	router := netgrpc.NewRouter()
+
+	server := netgrpc.NewServer(router)
+	server.Listen(netgrpc.SetConf("whatever"), handler, middleware)
+
+	// Should add a new route
+	assert.NotNil(t, router.PathsWrapper["whatever"], "Should not be nil")
+}
+
+func TestServer_HandlerSync(t *testing.T) {
+
+	// Define the call* variable in order to make sure that methods have been called
+	callHandler := false
+
+	options := network.NewOptions()
+	options.SetHeader("GR-Sample", "sample")
+	options.SetHeader("HP-Sample", "sample")
+	options.SetHeader("MQ-Sample", "sample")
+	options.SetHeader("Custom-Sample", "sample")
+
+	// Create an HandlerRequest object
+	handlerRequest := &pb.HandlerRequest{
+		Content: []byte("content"),
+		Options: options.Marshal(),
+		Path:    "the/path",
+	}
+
+	// The main handler
+	var handler = func(channel *network.Channel) {
+
+		callHandler = true
+
+		payload := channel.Receive()
+		options := network.NewOptions().Unmarshal(payload.Options)
+
+		// Should receive valid params
+		assert.Equal(t, "sample", options.GetHeader("Custom-Sample"),
+			"Should be equals to sample")
+		assert.Equal(t, "sample", options.GetHeader("GR-Sample"),
+			"Should be equals to sample")
+		assert.Empty(t, options.GetHeader("HP-Sample"),
+			"Should be empty (invalid header)")
+		assert.Empty(t, options.GetHeader("MQ-Sample"),
+			"Should be empty (invalid header)")
+		assert.Equal(t, "content", string(payload.Body),
+			"Should be equals to content")
+
+		replyOptions := network.NewOptions()
+		replyOptions.SetHeader("Custom-Sample-Reply", "sample reply")
+		replyOptions.SetHeader("GR-Sample-Reply", "sample reply")
+		replyOptions.SetHeader("HP-Sample-Reply", "sample reply")
+		replyOptions.SetHeader("MQ-Sample-Reply", "sample reply")
+
+		channel.Send(network.BuildPayload([]byte("content-reply"), replyOptions.Marshal()))
+	}
+
+	router := netgrpc.NewRouter()
+
+	server := &netgrpc.Server{Router: router}
+	server.Listen(netgrpc.SetConf("the/path"), handler, nil)
+
+	// Should add a new route
+	assert.NotNil(t, router.PathsWrapper["the/path"], "Should not be nil")
+
+	handlerReply, err := server.HandlerSync(nil, handlerRequest)
+
+	// Should call the handler function
+	assert.True(t, callHandler, "Should be true")
+
+	// Should return nil error object
+	assert.Nil(t, err, "Should be nil")
+
+	// Should return the right values
 
-	Describe("Should configure the server properly", func() {
+	optionsUn := network.NewOptions().Unmarshal(handlerReply.Options)
 
-		Context("NewServer function", func() {
+	assert.Equal(t, "sample reply", optionsUn.GetHeader("Custom-Sample-Reply"),
+		"Should be equals to sample reply")
+	assert.Equal(t, "sample reply", optionsUn.GetHeader("GR-Sample-Reply"),
+		"Should be equals to sample reply")
+	assert.Empty(t, optionsUn.GetHeader("HP-Sample-Reply"),
+		"Should be empty")
+	assert.Empty(t, optionsUn.GetHeader("MQ-Sample-Reply"),
+		"Should be empty")
+	assert.Equal(t, "content-reply", string(handlerReply.Content),
+		"Should be equal to content-reply")
+}
+
+func TestServer_HandlerSync_middleware(t *testing.T) {
+
+	// Define the call* variable in order to make sure that methods have been called
+	callHandler := false
+
+	options := network.NewOptions()
+	options.SetHeader("GR-Sample", "sample")
+	options.SetHeader("HP-Sample", "sample")
+	options.SetHeader("MQ-Sample", "sample")
+	options.SetHeader("Custom-Sample", "sample")
+
+	// Create an HandlerRequest object
+	handlerRequest := &pb.HandlerRequest{
+		Content: []byte("content"),
+		Options: options.Marshal(),
+		Path:    "the/path",
+	}
+
+	// The main handler
+	var handler = func(channel *network.Channel) {
+
+		callHandler = true
+
+		payload := channel.Receive()
+		options := network.NewOptions().Unmarshal(payload.Options)
 
-			server := netgrpc.NewServer(nil)
+		// Should receive valid params
+		assert.Equal(t, "sample reply middleware", options.GetHeader("Custom-Sample"),
+			"Should be equals to sample")
+		assert.Equal(t, "sample reply middleware", options.GetHeader("GR-Sample"),
+			"Should be equals to sample")
+
+		replyOptions := network.NewOptions()
+		replyOptions.SetHeader("Custom-Sample-Reply", "sample reply")
+		replyOptions.SetHeader("GR-Sample-Reply", "sample reply")
+		replyOptions.SetHeader("HP-Sample-Reply", "sample reply")
+		replyOptions.SetHeader("MQ-Sample-Reply", "sample reply")
+
+		channel.Send(network.BuildPayload([]byte("content-reply"), replyOptions.Marshal()))
+	}
+
+	var middleware = func(handler network.Handler, channel *network.Channel) {
+
+		callHandler = true
 
-			It("Should return a new server instance which implement the Server interface", func() {
-				Expect(server).ToNot(BeNil())
-				Expect(reflect.ValueOf(server).String()).To(Equal("<*netgrpc.Server Value>"))
-			})
+		payload := channel.Receive()
+		options := network.NewOptions().Unmarshal(payload.Options)
+
+		// Should receive valid params
+		assert.Equal(t, "sample", options.GetHeader("Custom-Sample"),
+			"Should be equals to sample")
+		assert.Equal(t, "sample", options.GetHeader("GR-Sample"),
+			"Should be equals to sample")
+		assert.Empty(t, options.GetHeader("HP-Sample"),
+			"Should be empty (invalid header)")
+		assert.Empty(t, options.GetHeader("MQ-Sample"),
+			"Should be empty (invalid header)")
+		assert.Equal(t, "content", string(payload.Body),
+			"Should be equals to content")
+
+		replyOptions := network.NewOptions()
+		replyOptions.SetHeader("Custom-Sample", "sample reply middleware")
+		replyOptions.SetHeader("GR-Sample", "sample reply middleware")
 
-		})
+		channel.Send(network.BuildPayload([]byte("content"), replyOptions.Marshal()))
+		handler(channel)
+	}
 
-		Context("SetConf function", func() {
-			path := netgrpc.SetConf("path")
+	router := netgrpc.NewRouter()
 
-			It("Should return the path as array", func() {
-				Expect(path).To(Equal([]string{"path"}))
-			})
-		})
+	server := &netgrpc.Server{Router: router}
+	server.Listen(netgrpc.SetConf("the/path"), handler, middleware)
 
-		Context("Listen function", func() {
+	// Should add a new route
+	assert.NotNil(t, router.PathsWrapper["the/path"], "Should not be nil")
 
-			var handler = func(channel *network.Channel) {}
-			var middleware = func(handler network.Handler, channel *network.Channel) {}
+	handlerReply, err := server.HandlerSync(nil, handlerRequest)
 
-			router := netgrpc.NewRouter()
+	// Should call the handler function
+	assert.True(t, callHandler, "Should be true")
 
-			server := netgrpc.NewServer(router)
-			server.Listen(netgrpc.SetConf("whatever"), handler, middleware)
+	// Should return nil error object
+	assert.Nil(t, err, "Should be nil")
 
-			It("Should add a new route", func() {
-				Expect(router.PathsWrapper["whatever"]).ToNot(BeNil())
-			})
+	// Should return the right values
 
-		})
+	optionsUn := network.NewOptions().Unmarshal(handlerReply.Options)
 
-		Context("HandleSync function", func() {
+	assert.Equal(t, "sample reply", optionsUn.GetHeader("Custom-Sample-Reply"),
+		"Should be equals to sample reply")
+	assert.Equal(t, "sample reply", optionsUn.GetHeader("GR-Sample-Reply"),
+		"Should be equals to sample reply")
+	assert.Empty(t, optionsUn.GetHeader("HP-Sample-Reply"),
+		"Should be empty")
+	assert.Empty(t, optionsUn.GetHeader("MQ-Sample-Reply"),
+		"Should be empty")
+	assert.Equal(t, "content-reply", string(handlerReply.Content),
+		"Should be equal to content-reply")
+}
 
-			callHandler := false
+func TestServer_Handler(t *testing.T) {
+	// Should return an error
+	server := &netgrpc.Server{}
+	err := server.Handler(nil)
+	assert.NotNil(t, err, "Should returns an error")
+}
 
-			options := network.NewOptions()
+func TestServer_Serve(t *testing.T) {
 
-			options.SetHeader("GR-Sample", "sample")
-			options.SetHeader("HP-Sample", "sample")
-			options.SetHeader("MQ-Sample", "sample")
-			options.SetHeader("Custom-Sample", "sample")
+	// Should not panic
+	netgrpc.Listen = func(network, address string) (net.Listener, error) {
+		return nil, nil
+	}
 
-			handlerRequest := &pb.HandlerRequest{
-				Content: []byte("content"),
-				Options: options.Marshal(),
-				Path:    "the/path",
-			}
+	netgrpc.NewGRPCServer = func(opt ...grpc.ServerOption) *grpc.Server {
+		return nil
+	}
 
-			var handler = func(channel *network.Channel) {
+	netgrpc.RegisterServeServer = func(s *grpc.Server, srv pb.ServeServer) {
+	}
 
-				callHandler = true
+	netgrpc.ReflectionRegister = func(s *grpc.Server) {
 
-				payload := channel.Receive()
-				options := network.NewOptions().Unmarshal(payload.Options)
+	}
 
-				It("Should receive valid params", func() {
-					Expect(options.GetHeader("Custom-Sample")).To(Equal("sample"))
-					Expect(options.GetHeader("GR-Sample")).To(Equal("sample"))
-					Expect(options.GetHeader("HP-Sample")).To(BeEmpty())
-					Expect(options.GetHeader("MQ-Sample")).To(BeEmpty())
-					Expect(string(payload.Body)).To(Equal("content"))
-				})
+	server := netgrpc.NewServer(nil)
+	assert.NotPanics(t, func() { server.Serve("address") },
+		"Should not panics")
 
-				replyOptions := network.NewOptions()
-				replyOptions.SetHeader("Custom-Sample-Reply", "sample reply")
-				replyOptions.SetHeader("GR-Sample-Reply", "sample reply")
-				replyOptions.SetHeader("HP-Sample-Reply", "sample reply")
-				replyOptions.SetHeader("MQ-Sample-Reply", "sample reply")
+	// Should panic on Listen function failure
+	netgrpc.Listen = func(network, address string) (net.Listener, error) {
+		return nil, errors.New("error")
+	}
 
-				channel.Send(network.BuildPayload([]byte("content-reply"), replyOptions.Marshal()))
-			}
+	netgrpc.NewGRPCServer = func(opt ...grpc.ServerOption) *grpc.Server {
+		return nil
+	}
 
-			router := netgrpc.NewRouter()
+	netgrpc.RegisterServeServer = func(s *grpc.Server, srv pb.ServeServer) {
+	}
 
-			server := &netgrpc.Server{Router: router}
-			server.Listen(netgrpc.SetConf("the/path"), handler, nil)
+	netgrpc.ReflectionRegister = func(s *grpc.Server) {
+	}
 
-			It("Should add a new route", func() {
-				Expect(router.PathsWrapper["the/path"]).ToNot(BeNil())
-			})
+	server = netgrpc.NewServer(nil)
+	server.Serve("address")
+	errorTracking := <-network.ErrorTrack
+	assert.NotNil(t, errorTracking, "Should not be nil")
+	fmt.Print(errorTracking)
 
-			handlerReply, err := server.HandlerSync(nil, handlerRequest)
+	// Should panic on Serve function failure
 
-			It("Should call the handler function", func() {
-				Expect(callHandler).To(BeTrue())
-			})
+	netgrpc.Listen = func(network, address string) (net.Listener, error) {
+		return nil, nil
+	}
 
-			It("Should return nil error object", func() {
-				Expect(err).To(BeNil())
-			})
+	netgrpc.NewGRPCServer = func(opt ...grpc.ServerOption) *grpc.Server {
+		return nil
+	}
 
-			It("Should return the right values", func() {
+	netgrpc.RegisterServeServer = func(s *grpc.Server, srv pb.ServeServer) {
+	}
 
-				options := network.NewOptions().Unmarshal(handlerReply.Options)
+	netgrpc.ReflectionRegister = func(s *grpc.Server) {
+	}
 
-				Expect(options.GetHeader("Custom-Sample-Reply")).To(Equal("sample reply"))
-				Expect(options.GetHeader("GR-Sample-Reply")).To(Equal("sample reply"))
-				Expect(options.GetHeader("HP-Sample-Reply")).To(BeEmpty())
-				Expect(options.GetHeader("MQ-Sample-Reply")).To(BeEmpty())
-				Expect(string(handlerReply.Content)).To(Equal("content-reply"))
-			})
+	server = netgrpc.NewServer(nil)
+	server.Serve("address")
+	errorTracking = <-network.ErrorTrack
+	assert.NotNil(t, errorTracking, "Should not returns nil")
 
-		})
-
-		Context("HandleSync function midleware", func() {
-
-			callHandler := false
-
-			options := network.NewOptions()
-
-			options.SetHeader("GR-Sample", "sample")
-			options.SetHeader("HP-Sample", "sample")
-			options.SetHeader("MQ-Sample", "sample")
-			options.SetHeader("Custom-Sample", "sample")
-
-			handlerRequest := &pb.HandlerRequest{
-				Content: []byte("content"),
-				Options: options.Marshal(),
-				Path:    "the/path",
-			}
-
-			var handler = func(channel *network.Channel) {
-
-				callHandler = true
-
-				payload := channel.Receive()
-				options := network.NewOptions().Unmarshal(payload.Options)
-
-				It("Should receive valid params", func() {
-					Expect(options.GetHeader("Custom-Sample")).To(Equal("sample reply middleware"))
-					Expect(options.GetHeader("GR-Sample")).To(Equal("sample reply middleware"))
-					Expect(string(payload.Body)).To(Equal("content"))
-				})
-
-				replyOptions := network.NewOptions()
-				replyOptions.SetHeader("Custom-Sample-Reply", "sample reply")
-				replyOptions.SetHeader("GR-Sample-Reply", "sample reply")
-				replyOptions.SetHeader("HP-Sample-Reply", "sample reply")
-				replyOptions.SetHeader("MQ-Sample-Reply", "sample reply")
-
-				channel.Send(network.BuildPayload([]byte("content-reply"), replyOptions.Marshal()))
-			}
-
-			var middleware = func(handler network.Handler, channel *network.Channel) {
-
-				callHandler = true
-
-				payload := channel.Receive()
-				options := network.NewOptions().Unmarshal(payload.Options)
-
-				It("Should receive valid params", func() {
-					Expect(options.GetHeader("Custom-Sample")).To(Equal("sample"))
-					Expect(options.GetHeader("GR-Sample")).To(Equal("sample"))
-					Expect(options.GetHeader("HP-Sample")).To(BeEmpty())
-					Expect(options.GetHeader("MQ-Sample")).To(BeEmpty())
-					Expect(string(payload.Body)).To(Equal("content"))
-				})
-
-				replyOptions := network.NewOptions()
-				replyOptions.SetHeader("Custom-Sample", "sample reply middleware")
-				replyOptions.SetHeader("GR-Sample", "sample reply middleware")
-
-				channel.Send(network.BuildPayload([]byte("content"), replyOptions.Marshal()))
-				handler(channel)
-			}
-
-			router := netgrpc.NewRouter()
-
-			server := &netgrpc.Server{Router: router}
-			server.Listen(netgrpc.SetConf("the/path"), handler, middleware)
-
-			It("Should add a new route", func() {
-				Expect(router.PathsWrapper["the/path"]).ToNot(BeNil())
-			})
-
-			handlerReply, err := server.HandlerSync(nil, handlerRequest)
-
-			It("Should call the handler function", func() {
-				Expect(callHandler).To(BeTrue())
-			})
-
-			It("Should return nil error object", func() {
-				Expect(err).To(BeNil())
-			})
-
-			It("Should return the right values", func() {
-
-				options := network.NewOptions().Unmarshal(handlerReply.Options)
-
-				Expect(options.GetHeader("Custom-Sample-Reply")).To(Equal("sample reply"))
-				Expect(options.GetHeader("GR-Sample-Reply")).To(Equal("sample reply"))
-				Expect(options.GetHeader("HP-Sample-Reply")).To(BeEmpty())
-				Expect(options.GetHeader("MQ-Sample-Reply")).To(BeEmpty())
-				Expect(string(handlerReply.Content)).To(Equal("content-reply"))
-			})
-
-		})
-
-		Context("Handler function", func() {
-
-			It("Should return an error", func() {
-				server := &netgrpc.Server{}
-				err := server.Handler(nil)
-				Expect(err).ToNot(BeNil())
-			})
-
-		})
-
-		Context("Serve function", func() {
-
-			It("Should not panic", func() {
-
-				netgrpc.Listen = func(network, address string) (net.Listener, error) {
-					return nil, nil
-				}
-
-				netgrpc.NewGRPCServer = func(opt ...grpc.ServerOption) *grpc.Server {
-					return nil
-				}
-
-				netgrpc.RegisterServeServer = func(s *grpc.Server, srv pb.ServeServer) {
-				}
-
-				netgrpc.ReflectionRegister = func(s *grpc.Server) {
-
-				}
-
-				server := netgrpc.NewServer(nil)
-				Expect(func() { server.Serve("address") }).ToNot(Panic())
-			})
-
-			It("Should panic on Listen function failure", func(done Done) {
-
-				netgrpc.Listen = func(network, address string) (net.Listener, error) {
-					return nil, errors.New("error")
-				}
-
-				netgrpc.NewGRPCServer = func(opt ...grpc.ServerOption) *grpc.Server {
-					return nil
-				}
-
-				netgrpc.RegisterServeServer = func(s *grpc.Server, srv pb.ServeServer) {
-				}
-
-				netgrpc.ReflectionRegister = func(s *grpc.Server) {
-				}
-
-				server := netgrpc.NewServer(nil)
-				server.Serve("address")
-				errorTracking := <-network.ErrorTrack
-				Expect(errorTracking).ToNot(BeNil())
-				fmt.Print(errorTracking)
-				close(done)
-			})
-
-			It("Should panic on Serve function failure", func(done Done) {
-
-				netgrpc.Listen = func(network, address string) (net.Listener, error) {
-					return nil, nil
-				}
-
-				netgrpc.NewGRPCServer = func(opt ...grpc.ServerOption) *grpc.Server {
-					return nil
-				}
-
-				netgrpc.RegisterServeServer = func(s *grpc.Server, srv pb.ServeServer) {
-				}
-
-				netgrpc.ReflectionRegister = func(s *grpc.Server) {
-				}
-
-				server := netgrpc.NewServer(nil)
-				server.Serve("address")
-				errorTracking := <-network.ErrorTrack
-				Expect(errorTracking).ToNot(BeNil())
-				close(done)
-			})
-
-		})
-
-	})
-
-})
+}

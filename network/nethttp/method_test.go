@@ -3,31 +3,20 @@ package nethttp_test
 import (
 	"github.com/cpapidas/pegasus/network/nethttp"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"net/http"
+	"testing"
+	"github.com/stretchr/testify/assert"
 )
 
-var _ = Describe("Method", func() {
-
-	Describe("Method type", func() {
-
-		Context("Const variables", func() {
-
-			It("Should the right const variables", func() {
-				Expect(nethttp.Get.String()).To(Equal(http.MethodGet))
-				Expect(nethttp.Head.String()).To(Equal(http.MethodHead))
-				Expect(nethttp.Post.String()).To(Equal(http.MethodPost))
-				Expect(nethttp.Put.String()).To(Equal(http.MethodPut))
-				Expect(nethttp.Patch.String()).To(Equal(http.MethodPatch))
-				Expect(nethttp.Delete.String()).To(Equal(http.MethodDelete))
-				Expect(nethttp.Connect.String()).To(Equal(http.MethodConnect))
-				Expect(nethttp.Options.String()).To(Equal(http.MethodOptions))
-				Expect(nethttp.Trace.String()).To(Equal(http.MethodTrace))
-			})
-
-		})
-
-	})
-
-})
+func TestMethod_String(t *testing.T) {
+	// Should the right const variables
+	assert.Equal(t, http.MethodGet, nethttp.Get.String())
+	assert.Equal(t, http.MethodHead, nethttp.Head.String(), "Should be equals to methods type")
+	assert.Equal(t, http.MethodPost, nethttp.Post.String(), "Should be equals to methods type")
+	assert.Equal(t, http.MethodPut, nethttp.Put.String(), "Should be equals to methods type")
+	assert.Equal(t, http.MethodPatch, nethttp.Patch.String(), "Should be equals to methods type")
+	assert.Equal(t, http.MethodDelete, nethttp.Delete.String(), "Should be equals to methods type")
+	assert.Equal(t, http.MethodConnect, nethttp.Connect.String(), "Should be equals to methods type")
+	assert.Equal(t, http.MethodOptions, nethttp.Options.String(), "Should be equals to methods type")
+	assert.Equal(t, http.MethodTrace, nethttp.Trace.String(), "Should be equals to methods type")
+}

@@ -35,8 +35,8 @@ func Client() {
 	}
 
 	// Send the grpc call and print the result
-	_, err = netamqp.NewClient(rabbitMQAddress).
-		Send(netamqp.SetConf("/sample"), send)
+	amqpClient, err := netamqp.NewClient(rabbitMQAddress)
+	amqpClient.Send(netamqp.SetConf("/sample"), send)
 
 	if err != nil {
 		panic(err)

@@ -2,662 +2,692 @@ package netamqp_test
 
 import (
 	"github.com/cpapidas/pegasus/network/netamqp"
-
+	"github.com/stretchr/testify/assert"
 	"errors"
 	"github.com/cpapidas/pegasus/network"
 	"github.com/cpapidas/pegasus/tests/mocks/mnetamqp"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"github.com/streadway/amqp"
+	"testing"
 )
 
-var _ = Describe("Server", func() {
+var serverNewConnection = netamqp.NewConnection
+
+func setServerDefaults() {
+	netamqp.Dial = amqp.Dial
+	netamqp.NewConnection = serverNewConnection
+}
+
+func TestNewServer(t *testing.T) {
+	setServerDefaults()
+	// Should return a non empty object
+	assert.NotNil(t, netamqp.NewServer(), "Should not return a nil server object")
+}
+
+func TestServer_Serve(t *testing.T) {
+	setServerDefaults()
+	// Should panics on connection not found
+	netamqp.RetriesTimes = 0
+	server := netamqp.NewServer()
+	assert.Panics(t, func() {
+		server.Serve("whatever")
+	}, "Should panics on connection not found")
+
+	// Should call the amqp.Dial method
+	netamqp.RetriesTimes = 1
+	netamqp.Sleep = 0
+	called := false
+	netamqp.Dial = func(url string) (*amqp.Connection, error) {
+		called = true
+		return &amqp.Connection{}, nil
+	}
+	server = netamqp.NewServer()
+	server.Serve("")
+	assert.True(t, called, "Should call the dial function")
+
+	// Should panics on amqp.Dial error method
+	netamqp.RetriesTimes = 1
+	netamqp.Sleep = 0
+	netamqp.Dial = func(url string) (*amqp.Connection, error) {
+		called = true
+		return nil, errors.New("error")
+	}
+	server = netamqp.NewServer()
+
+	assert.Panics(t, func(){server.Serve("")}, "Should panic on Dial errors")
+}
+
+func TestServer_Listen(t *testing.T) {
+	setClientDefaults()
+
+	// Should call the amqp.Dial method
+	netamqp.RetriesTimes = 1
+	netamqp.Sleep = 0
+
+	// Set the call* variables in order to test if the following methods are called
+	callChannel := false
+	callQueueDeclare := false
+	callQos := false
+	callConsume := false
+	callHandler := false
+
+	// Create a channel for mocks
+	deliveries := make(chan amqp.Delivery)
+
+	// Generate a mocked connection object
+	mockConnection := &mnetamqp.MockConnection{}
+
+	// Have to configure the following functions in ChannelMock method
+	mockConnection.ChannelMock = func() (netamqp.IChannel, error) {
+
+		// Generate the mocked channel
+		mockChannel := &mnetamqp.MockChannel{}
+
+		callChannel = true
+
+		// Mock the QueueDeclare function in order to check the parameters
+		mockChannel.QueueDeclareMock = func(
+			name string,
+			durable,
+			autoDelete,
+			exclusive,
+			noWait bool,
+			args amqp.Table,
+		) (amqp.Queue, error) {
+			callQueueDeclare = true
+
+			// Should has the right params
+			assert.Equal(t, name, "/random/path")
+			assert.True(t, durable, "Should durable be true")
+			assert.False(t, autoDelete, "Should autoDelete be false")
+			assert.False(t, exclusive, "Should exclusive be false")
+			assert.False(t, noWait, "Should noWait be false")
+			assert.Nil(t, args, "Should pass nil args")
+
+			return amqp.Queue{Name: "QueueName"}, nil
+		}
+
+		// Mock the QosMock function in order to check the parameters
+		mockChannel.QosMock = func(prefetchCount, prefetchSize int, global bool) error {
+
+			callQos = true
+
+			// Should has the right params
+			assert.Equal(t, 1, prefetchCount, "Should be 1")
+			assert.Equal(t, 0, prefetchSize, "Should be 0")
+			assert.False(t, global, "Should be false")
 
-	Describe("Server constructor", func() {
+			return nil
+		}
 
-		BeforeEach(func() {
-			// Set the mocked variable back to originals
-			netamqp.Dial = amqp.Dial
-			netamqp.NewConnection = NewConnection
-		})
+		// Mock the Consume function in order to check the parameters
+		mockChannel.ConsumeMock = func(
+			queue,
+			consumer string,
+			autoAck,
+			exclusive,
+			noLocal,
+			noWait bool,
+			args amqp.Table,
+		) (<-chan amqp.Delivery, error) {
 
-		Context("Test struct constructor", func() {
+			callConsume = true
 
-			It("Should return a non empty object", func() {
-				Expect(netamqp.NewServer()).ToNot(BeNil())
-			})
-
-		})
-
-		Context("Test Serve function", func() {
-
-			It("Should throw a panic when connection not found", func() {
-				netamqp.RetriesTimes = 0
-				Expect(func() { netamqp.NewClient("whatever") }).To(Panic())
-			})
-
-			It("Should call the amqp.Dial method", func() {
-				netamqp.RetriesTimes = 1
-				netamqp.Sleep = 1
-				called := false
-				netamqp.Dial = func(url string) (*amqp.Connection, error) {
-					called = true
-					return &amqp.Connection{}, nil
-				}
-				server := netamqp.NewServer()
-				server.Serve("")
-				Expect(called).To(BeTrue())
-			})
+			// Should call the consume function with valid parameters
+			assert.Equal(t, "QueueName", queue, "Should be equals to QueueName")
+			assert.Empty(t, consumer, "Should be empty")
+			assert.False(t, autoAck, "Should be false")
+			assert.False(t, exclusive, "Should be false")
+			assert.False(t, noLocal, "Should be false")
+			assert.False(t, noWait, "Should be false")
+			assert.Nil(t, args, "Should be nil")
 
-		})
+			return (<-chan amqp.Delivery)(deliveries), nil
+		}
+
+		return mockChannel, nil
+	}
+
+	// Replace the NewConnection function in order to run the mocked object
+	netamqp.NewConnection = func(address string) (netamqp.IConnection, error) {
+		return mockConnection, nil
+	}
+
+	server := netamqp.NewServer()
+	server.Serve("whatever")
+
+	c := make(chan bool)
+
+	// The main handler
+	var handler = func(channel *network.Channel) {
+
+		callHandler = true
+
+		payload := channel.Receive()
+
+		// Should return a body equals to body content
+		assert.Equal(t, "body content", string(payload.Body),
+			"Should be equals to body content")
+
+		options := network.NewOptions().Unmarshal(payload.Options)
+
+		assert.Equal(t, "sample", options.GetHeader("Sample"), "Should be equals to Sample")
+		assert.Empty(t, options.GetHeader("HP-Sample"), "Should be empty")
+		assert.Empty(t, options.GetHeader("GR-Sample"), "Should be empty")
+		assert.Equal(t, "sample", options.GetParam("Sample"), "Should be equals to sample")
+		c <- true
+	}
+
+	server.Listen(netamqp.SetConf("/random/path"), handler, nil)
+
+	headers := make(map[string]interface{})
+	headers["Sample"] = "sample"
+	headers["HP-Sample"] = "sample"
+	headers["GR-Sample"] = "sample"
+	headers["MP-Sample"] = "sample"
+
+	deliveries <- amqp.Delivery{
+		Body:    []byte("body content"),
+		Headers: headers,
+	}
+
+	// wait unit handler was called
+	<-c
+
+	// Should call the Channel function=
+	assert.True(t, callChannel, "Should call the function channel")
+
+	// Should call the QueueDeclare function
+	assert.True(t, callQueueDeclare, "Should call the function QueueDeclare")
+
+	// Should call the Qos function"
+	assert.True(t, callQos, "Should call the function Qos")
+
+	// Should call the Consume function
+	assert.True(t, callConsume, "Should call the function Consume")
+
+	// Should call the handler
+	assert.True(t, callHandler, "Should call the request Handler")
+}
+
+func TestServer_Listen_middleware(t *testing.T) {
+	// Should call the amqp.Dial method
+	netamqp.RetriesTimes = 1
+	netamqp.Sleep = 0
+
+	// Set the call* variables in order to test if the following methods are called
+	callChannel := false
+	callQueueDeclare := false
+	callQos := false
+	callConsume := false
+	callHandler := false
+	callMiddleware := false
+
+	// Create a channel for mocks
+	deliveries := make(chan amqp.Delivery)
+
+	// Generate a mocked connection object
+	mockConnection := &mnetamqp.MockConnection{}
+
+	// Have to configure the following functions in ChannelMock method
+	mockConnection.ChannelMock = func() (netamqp.IChannel, error) {
+
+		// Generate the mocked channel
+		mockChannel := &mnetamqp.MockChannel{}
+
+		callChannel = true
+
+		// Mock the QueueDeclare function in order to check the parameters
+		mockChannel.QueueDeclareMock = func(
+			name string,
+			durable,
+			autoDelete,
+			exclusive,
+			noWait bool,
+			args amqp.Table,
+		) (amqp.Queue, error) {
+			callQueueDeclare = true
+
+			// Should has the right params
+			assert.Equal(t, name, "/random/path")
+			assert.True(t, durable, "Should durable be true")
+			assert.False(t, autoDelete, "Should autoDelete be false")
+			assert.False(t, exclusive, "Should exclusive be false")
+			assert.False(t, noWait, "Should noWait be false")
+			assert.Nil(t, args, "Should pass nil args")
+
+			return amqp.Queue{Name: "QueueName"}, nil
+		}
+
+		// Mock the QosMock function in order to check the parameters
+		mockChannel.QosMock = func(prefetchCount, prefetchSize int, global bool) error {
+
+			callQos = true
+
+			// Should has the right params
+			assert.Equal(t, 1, prefetchCount, "Should be 1")
+			assert.Equal(t, 0, prefetchSize, "Should be 0")
+			assert.False(t, global, "Should be false")
+
+			return nil
+		}
+
+		// Mock the Consume function in order to check the parameters
+		mockChannel.ConsumeMock = func(
+			queue,
+			consumer string,
+			autoAck,
+			exclusive,
+			noLocal,
+			noWait bool,
+			args amqp.Table,
+		) (<-chan amqp.Delivery, error) {
+
+			callConsume = true
+
+			// Should call the consume function with valid parameters
+			assert.Equal(t, "QueueName", queue, "Should be equals to QueueName")
+			assert.Empty(t, consumer, "Should be empty")
+			assert.False(t, autoAck, "Should be false")
+			assert.False(t, exclusive, "Should be false")
+			assert.False(t, noLocal, "Should be false")
+			assert.False(t, noWait, "Should be false")
+			assert.Nil(t, args, "Should be nil")
+
+			return (<-chan amqp.Delivery)(deliveries), nil
+		}
+
+		return mockChannel, nil
+	}
+
+	// Replace the NewConnection function in order to run the mocked object
+	netamqp.NewConnection = func(address string) (netamqp.IConnection, error) {
+		return mockConnection, nil
+	}
+
+	server := netamqp.NewServer()
+	server.Serve("whatever")
 
-		Context("Test Listen method", func() {
+	c := make(chan bool)
 
-			netamqp.RetriesTimes = 1
-			netamqp.Sleep = 0
+	// The main handler
+	var handler = func(channel *network.Channel) {
+
+		callHandler = true
+
+		payload := channel.Receive()
+
+		// Should return a body equals to body content
+		assert.Equal(t, "body content", string(payload.Body),
+			"Should be equals to body content")
+
+		options := network.NewOptions().Unmarshal(payload.Options)
+
+		assert.Equal(t, "sample", options.GetHeader("Sample"), "Should be equals to Sample")
+		assert.Empty(t, options.GetHeader("HP-Sample"), "Should be empty")
+		assert.Empty(t, options.GetHeader("GR-Sample"), "Should be empty")
+		assert.Equal(t, "middleware", options.GetHeader("middleware"),
+			"Should be equals to middleware")
+		assert.Equal(t, "sample", options.GetParam("Sample"), "Should be equals to sample")
+		assert.Equal(t, "sample", options.GetParam("Sample"), "Should be equals to sample")
+		assert.Equal(t, "middleware", options.GetParam("middleware"),
+			"Should be equals to middleware")
+		c <- true
+	}
+
+	// The middleware
+	var middleware = func(handler network.Handler, channel *network.Channel) {
+		callMiddleware = true
+		receive := channel.Receive()
 
-			callChannel := false
-			callQueueDeclare := false
-			callQos := false
-			callConsume := false
-			callHandler := false
+		options := network.NewOptions().Unmarshal(receive.Options)
+		options.SetParam("middleware", "middleware")
+		options.SetHeader("middleware", "middleware")
 
-			deliveries := make(chan amqp.Delivery)
+		payload := network.BuildPayload(receive.Body, options.Marshal())
+		channel.Send(payload)
+		handler(channel)
+	}
 
-			mockConnection := &mnetamqp.MockConnection{}
+	server.Listen(netamqp.SetConf("/random/path"), handler, middleware)
 
-			mockConnection.ChannelMock = func() (netamqp.IChannel, error) {
+	headers := make(map[string]interface{})
+	headers["Sample"] = "sample"
+	headers["HP-Sample"] = "sample"
+	headers["GR-Sample"] = "sample"
+	headers["MP-Sample"] = "sample"
 
-				mockChannel := &mnetamqp.MockChannel{}
+	deliveries <- amqp.Delivery{
+		Body:    []byte("body content"),
+		Headers: headers,
+	}
 
-				callChannel = true
+	// wait unit handler was called
+	<-c
 
-				mockChannel.QueueDeclareMock = func(
-					name string,
-					durable,
-					autoDelete,
-					exclusive,
-					noWait bool,
-					args amqp.Table,
-				) (amqp.Queue, error) {
+	// Should call the Channel function=
+	assert.True(t, callChannel, "Should call the function channel")
 
-					callQueueDeclare = true
+	// Should call the QueueDeclare function
+	assert.True(t, callQueueDeclare, "Should call the function QueueDeclare")
 
-					It("Should call connection.Channel() with valid parameters", func() {
-						Expect(name).To(Equal("/random/path"))
-						Expect(durable).To(BeTrue())
-						Expect(autoDelete).To(BeFalse())
-						Expect(exclusive).To(BeFalse())
-						Expect(noWait).To(BeFalse())
-						Expect(args).To(BeNil())
-					})
+	// Should call the Qos function"
+	assert.True(t, callQos, "Should call the function Qos")
 
-					return amqp.Queue{Name: "QueueName"}, nil
-				}
+	// Should call the Consume function
+	assert.True(t, callConsume, "Should call the function Consume")
 
-				mockChannel.QosMock = func(prefetchCount, prefetchSize int, global bool) error {
+	// Should call the middleware
+	assert.True(t, callHandler, "Should call the middleware")
 
-					callQos = true
+	// Should call the handler
+	assert.True(t, callHandler, "Should call the request Handler")
+}
 
-					It("Should call the Qos function with right parameters", func() {
-						Expect(prefetchCount).To(Equal(1))
-						Expect(prefetchSize).To(Equal(0))
-						Expect(global).To(Equal(false))
-					})
+func TestServer_Listen_channel(t *testing.T) {
+	setServerDefaults()
 
-					return nil
-				}
+	// Should call the amqp.Dial method
+	netamqp.RetriesTimes = 1
+	netamqp.Sleep = 0
 
-				mockChannel.ConsumeMock = func(
-					queue,
-					consumer string,
-					autoAck,
-					exclusive,
-					noLocal,
-					noWait bool,
-					args amqp.Table,
-				) (<-chan amqp.Delivery, error) {
+	// Set the call* variables in order to test if the following methods are called
+	callChannel := false
+	callQueueDeclare := false
 
-					callConsume = true
+	// Generate a mocked connection object
+	mockConnection := &mnetamqp.MockConnection{}
 
-					It("Should call the consume function with valid parameters", func() {
-						Expect(queue).To(Equal("QueueName"))
-						Expect(consumer).To(Equal(""))
-						Expect(autoAck).To(BeFalse())
-						Expect(exclusive).To(BeFalse())
-						Expect(exclusive).To(BeFalse())
-						Expect(noLocal).To(BeFalse())
-						Expect(noWait).To(BeFalse())
-						Expect(args).To(BeNil())
-					})
+	block := make(chan bool)
 
-					return (<-chan amqp.Delivery)(deliveries), nil
-				}
+	// Have to configure the following functions in ChannelMock method
+	mockConnection.ChannelMock = func() (netamqp.IChannel, error) {
 
-				return mockChannel, nil
-			}
+		// Generate the mocked channel
+		mockChannel := &mnetamqp.MockChannel{}
 
-			netamqp.NewConnection = func(address string) (netamqp.IConnection, error) {
-				return mockConnection, nil
-			}
-
-			server := netamqp.NewServer()
-			server.Serve("whatever")
+		callChannel = true
 
-			var handler = func(channel *network.Channel) {
+		// Mock the QueueDeclare function in order to return an error
+		mockChannel.QueueDeclareMock = func(
+			name string,
+			durable,
+			autoDelete,
+			exclusive,
+			noWait bool,
+			args amqp.Table,
+		) (amqp.Queue, error) {
 
-				callHandler = true
+			callQueueDeclare = true
 
-				payload := channel.Receive()
+			return amqp.Queue{}, errors.New("error")
+		}
+		block <- true
+		return mockChannel, errors.New("error")
+	}
 
-				It("Should return a body equals to body content", func() {
-					Expect(string(payload.Body)).To(Equal("body content"))
-				})
+	// Replace the NewConnection function in order to run the mocked object
+	netamqp.NewConnection = func(address string) (netamqp.IConnection, error) {
+		return mockConnection, nil
+	}
 
-				options := network.NewOptions().Unmarshal(payload.Options)
+	server := netamqp.NewServer()
+	server.Serve("whatever")
 
-				It("Should have the right headers", func() {
-					Expect(options.GetHeader("Sample")).To(Equal("sample"))
-					Expect(options.GetHeader("HP-Sample")).To(Equal(""))
-					Expect(options.GetHeader("GR-Sample")).To(Equal(""))
-					Expect(options.GetParam("Sample")).To(Equal("sample"))
-				})
+	server.Listen(netamqp.SetConf("/what/ever"), nil, nil)
 
-			}
-
-			server.Listen(netamqp.SetConf("/random/path"), handler, nil)
-
-			headers := make(map[string]interface{})
-			headers["Sample"] = "sample"
-			headers["HP-Sample"] = "sample"
-			headers["GR-Sample"] = "sample"
-			headers["MP-Sample"] = "sample"
-
-			deliveries <- amqp.Delivery{
-				Body:    []byte("body content"),
-				Headers: headers,
-			}
-
-			It("Should call the Channel function", func() {
-				Expect(callChannel).To(BeTrue())
-			})
-
-			It("Should call the QueueDeclare function", func() {
-				Expect(callQueueDeclare).To(BeTrue())
-			})
-
-			It("Should call the Qos function", func() {
-				Expect(callQos).To(BeTrue())
-			})
-
-			It("Should call the Consume function", func() {
-				Expect(callConsume).To(BeTrue())
-			})
-
-			It("Should call the handler", func() {
-				Expect(callHandler).To(BeTrue())
-			})
-		})
+	<-block
 
-		Context("Test Middleware method", func() {
+	// Should call the Channel function
+	assert.True(t, callChannel, "Should call the channel function")
 
-			netamqp.RetriesTimes = 1
-			netamqp.Sleep = 0
+	// Should not call the QueueDeclare function
+	assert.False(t, callQueueDeclare, "Should NOT call the QueueDeclare function")
+}
 
-			callChannel := false
-			callQueueDeclare := false
-			callQos := false
-			callConsume := false
-			callHandler := false
-			callMiddleware := false
+func TestServer_Listen_queueDeclare(t *testing.T) {
 
-			deliveries := make(chan amqp.Delivery)
+	setServerDefaults()
 
-			mockConnection := &mnetamqp.MockConnection{}
+	// Should call the amqp.Dial method
+	netamqp.RetriesTimes = 1
+	netamqp.Sleep = 0
 
-			mockConnection.ChannelMock = func() (netamqp.IChannel, error) {
-
-				mockChannel := &mnetamqp.MockChannel{}
+	// Set the call* variables in order to test if the following methods are called
+	callChannel := false
+	callQueueDeclare := false
+	callQos := false
 
-				callChannel = true
+	// Generate a mocked connection object
+	mockConnection := &mnetamqp.MockConnection{}
 
-				mockChannel.QueueDeclareMock = func(
-					name string,
-					durable,
-					autoDelete,
-					exclusive,
-					noWait bool,
-					args amqp.Table,
-				) (amqp.Queue, error) {
+	block := make(chan bool)
 
-					callQueueDeclare = true
+	// Have to configure the following functions in ChannelMock method
+	mockConnection.ChannelMock = func() (netamqp.IChannel, error) {
 
-					It("Should call connection.Channel() with valid parameters", func() {
-						Expect(name).To(Equal("/random/path"))
-						Expect(durable).To(BeTrue())
-						Expect(autoDelete).To(BeFalse())
-						Expect(exclusive).To(BeFalse())
-						Expect(noWait).To(BeFalse())
-						Expect(args).To(BeNil())
-					})
+		// Generate the mocked channel
+		mockChannel := &mnetamqp.MockChannel{}
 
-					return amqp.Queue{Name: "QueueName"}, nil
-				}
+		callChannel = true
 
-				mockChannel.QosMock = func(prefetchCount, prefetchSize int, global bool) error {
+		// Mock the QueueDeclare function in order to return an error
+		mockChannel.QueueDeclareMock = func(
+			name string,
+			durable,
+			autoDelete,
+			exclusive,
+			noWait bool,
+			args amqp.Table,
+		) (amqp.Queue, error) {
 
-					callQos = true
+			callQueueDeclare = true
+			block <- true
+			return amqp.Queue{}, errors.New("error")
+		}
 
-					It("Should call the Qos function with right parameters", func() {
-						Expect(prefetchCount).To(Equal(1))
-						Expect(prefetchSize).To(Equal(0))
-						Expect(global).To(Equal(false))
-					})
+		mockChannel.QosMock = func(prefetchCount, prefetchSize int, global bool) error {
+			callQos = true
+			return nil
+		}
 
-					return nil
-				}
-
-				mockChannel.ConsumeMock = func(
-					queue,
-					consumer string,
-					autoAck,
-					exclusive,
-					noLocal,
-					noWait bool,
-					args amqp.Table,
-				) (<-chan amqp.Delivery, error) {
+		return mockChannel, nil
+	}
 
-					callConsume = true
-
-					It("Should call the consume function with valid parameters", func() {
-						Expect(queue).To(Equal("QueueName"))
-						Expect(consumer).To(Equal(""))
-						Expect(autoAck).To(BeFalse())
-						Expect(exclusive).To(BeFalse())
-						Expect(exclusive).To(BeFalse())
-						Expect(noLocal).To(BeFalse())
-						Expect(noWait).To(BeFalse())
-						Expect(args).To(BeNil())
-					})
+	// Replace the NewConnection function in order to run the mocked object
+	netamqp.NewConnection = func(address string) (netamqp.IConnection, error) {
+		return mockConnection, nil
+	}
 
-					return (<-chan amqp.Delivery)(deliveries), nil
-				}
+	server := netamqp.NewServer()
+	server.Serve("whatever")
 
-				return mockChannel, nil
-			}
+	server.Listen(netamqp.SetConf("/what/ever"), nil, nil)
 
-			netamqp.NewConnection = func(address string) (netamqp.IConnection, error) {
-				return mockConnection, nil
-			}
+	<-block
 
-			server := netamqp.NewServer()
-			server.Serve("whatever")
+	// Should call the Channel function
+	assert.True(t, callChannel, "Should call the channel function")
 
-			var handler = func(channel *network.Channel) {
+	// Should call the QueueDeclare function
+	assert.True(t, callQueueDeclare, "Should call the QueueDeclare function")
 
-				callHandler = true
+	// Should not call the Qos function
+	assert.False(t, callQos, "Should NOT call the Qos function")
+}
 
-				payload := channel.Receive()
 
-				It("Should return a body equals to body content", func() {
-					Expect(string(payload.Body)).To(Equal("body content"))
-				})
+func TestServer_Listen_qos(t *testing.T) {
 
-				options := network.NewOptions().Unmarshal(payload.Options)
+	setServerDefaults()
 
-				It("Should have the right headers", func() {
-					Expect(options.GetHeader("Sample")).To(Equal("sample"))
-					Expect(options.GetHeader("HP-Sample")).To(Equal(""))
-					Expect(options.GetHeader("GR-Sample")).To(Equal(""))
-					Expect(options.GetParam("Sample")).To(Equal("sample"))
-				})
+	// Should call the amqp.Dial method
+	netamqp.RetriesTimes = 1
+	netamqp.Sleep = 0
 
-				It("Should have the middleware param and header", func() {
-					Expect(options.GetHeader("middleware")).To(Equal("middleware"))
-					Expect(options.GetParam("middleware")).To(Equal("middleware"))
-				})
+	// Set the call* variables in order to test if the following methods are called
+	callChannel := false
+	callQueueDeclare := false
+	callQos := false
+	callConsume := false
 
-			}
+	// Generate a mocked connection object
+	mockConnection := &mnetamqp.MockConnection{}
 
-			var middleware = func(handler network.Handler, channel *network.Channel) {
-				callMiddleware = true
-				receive := channel.Receive()
+	block := make(chan bool)
 
-				options := network.NewOptions().Unmarshal(receive.Options)
-				options.SetParam("middleware", "middleware")
-				options.SetHeader("middleware", "middleware")
+	// Have to configure the following functions in ChannelMock method
+	mockConnection.ChannelMock = func() (netamqp.IChannel, error) {
 
-				payload := network.BuildPayload(receive.Body, options.Marshal())
-				channel.Send(payload)
-				handler(channel)
-			}
+		// Generate the mocked channel
+		mockChannel := &mnetamqp.MockChannel{}
 
-			server.Listen(netamqp.SetConf("/random/path"), handler, middleware)
+		callChannel = true
 
-			headers := make(map[string]interface{})
-			headers["Sample"] = "sample"
-			headers["HP-Sample"] = "sample"
-			headers["GR-Sample"] = "sample"
-			headers["MP-Sample"] = "sample"
+		// Mock the QueueDeclare function in order to return an error
+		mockChannel.QueueDeclareMock = func(
+			name string,
+			durable,
+			autoDelete,
+			exclusive,
+			noWait bool,
+			args amqp.Table,
+		) (amqp.Queue, error) {
 
-			deliveries <- amqp.Delivery{
-				Body:    []byte("body content"),
-				Headers: headers,
-			}
+			callQueueDeclare = true
+			return amqp.Queue{}, nil
+		}
 
-			It("Should call the Channel function", func() {
-				Expect(callChannel).To(BeTrue())
-			})
+		mockChannel.QosMock = func(prefetchCount, prefetchSize int, global bool) error {
+			callQos = true
+			block <- true
+			return errors.New("error")
+		}
 
-			It("Should call the QueueDeclare function", func() {
-				Expect(callQueueDeclare).To(BeTrue())
-			})
+		mockChannel.ConsumeMock = func(
+			queue,
+			consumer string,
+			autoAck,
+			exclusive,
+			noLocal,
+			noWait bool,
+			args amqp.Table,
+		) (<-chan amqp.Delivery, error) {
+			callConsume = true
+			return nil, errors.New("error")
+		}
 
-			It("Should call the Qos function", func() {
-				Expect(callQos).To(BeTrue())
-			})
+		return mockChannel, nil
+	}
 
-			It("Should call the Consume function", func() {
-				Expect(callConsume).To(BeTrue())
-			})
+	// Replace the NewConnection function in order to run the mocked object
+	netamqp.NewConnection = func(address string) (netamqp.IConnection, error) {
+		return mockConnection, nil
+	}
 
-			It("Should call the handler", func() {
-				Expect(callHandler).To(BeTrue())
-			})
+	server := netamqp.NewServer()
+	server.Serve("whatever")
 
-			It("Should call the handler", func() {
-				Expect(callMiddleware).To(BeTrue())
-			})
-		})
+	server.Listen(netamqp.SetConf("/what/ever"), nil, nil)
 
-		Context("Test Channel throw an error", func() {
+	<-block
 
-			netamqp.RetriesTimes = 1
-			netamqp.Sleep = 0
+	// Should call the Channel function
+	assert.True(t, callChannel, "Should call the channel function")
 
-			callChannel := false
-			callQueueDeclare := false
+	// Should call the QueueDeclare function
+	assert.True(t, callQueueDeclare, "Should call the QueueDeclare function")
 
-			mockConnection := &mnetamqp.MockConnection{}
+	// Should call the Qos function
+	assert.True(t, callQos, "Should call the Qos function")
 
-			mockConnection.ChannelMock = func() (netamqp.IChannel, error) {
+	// Should NOT call the Consume function
+	assert.False(t, callConsume, "Should NOT call the Consume function")
+}
 
-				mockChannel := &mnetamqp.MockChannel{}
+func TestServer_Listen_consume(t *testing.T) {
 
-				callChannel = true
+	setServerDefaults()
 
-				mockChannel.QueueDeclareMock = func(
-					name string,
-					durable,
-					autoDelete,
-					exclusive,
-					noWait bool,
-					args amqp.Table,
-				) (amqp.Queue, error) {
+	// Should call the amqp.Dial method
+	netamqp.RetriesTimes = 1
+	netamqp.Sleep = 0
 
-					callQueueDeclare = true
+	// Set the call* variables in order to test if the following methods are called
+	callChannel := false
+	callQueueDeclare := false
+	callQos := false
+	callConsume := false
 
-					return amqp.Queue{}, errors.New("error")
-				}
+	// Generate a mocked connection object
+	mockConnection := &mnetamqp.MockConnection{}
 
-				return mockChannel, errors.New("error")
-			}
+	block := make(chan bool)
 
-			netamqp.NewConnection = func(address string) (netamqp.IConnection, error) {
-				return mockConnection, nil
-			}
+	// Have to configure the following functions in ChannelMock method
+	mockConnection.ChannelMock = func() (netamqp.IChannel, error) {
 
-			server := netamqp.NewServer()
-			server.Serve("whatever")
+		// Generate the mocked channel
+		mockChannel := &mnetamqp.MockChannel{}
 
-			server.Listen(netamqp.SetConf("/what/ever"), nil, nil)
+		callChannel = true
 
-			It("Should call the Channel function", func() {
-				Expect(callChannel).To(BeTrue())
-			})
+		// Mock the QueueDeclare function in order to return an error
+		mockChannel.QueueDeclareMock = func(
+			name string,
+			durable,
+			autoDelete,
+			exclusive,
+			noWait bool,
+			args amqp.Table,
+		) (amqp.Queue, error) {
 
-			It("Should not call the QueueDeclare function", func() {
-				Expect(callQueueDeclare).To(BeFalse())
-			})
+			callQueueDeclare = true
+			return amqp.Queue{}, nil
+		}
 
-		})
+		mockChannel.QosMock = func(prefetchCount, prefetchSize int, global bool) error {
+			callQos = true
+			return nil
+		}
 
-		Context("Test Listen method error on QueueDeclare", func() {
+		mockChannel.ConsumeMock = func(
+			queue,
+			consumer string,
+			autoAck,
+			exclusive,
+			noLocal,
+			noWait bool,
+			args amqp.Table,
+		) (<-chan amqp.Delivery, error) {
+			callConsume = true
+			block <- true
+			return nil, errors.New("error")
+		}
 
-			netamqp.RetriesTimes = 1
-			netamqp.Sleep = 0
+		return mockChannel, nil
+	}
 
-			callChannel := false
-			callQueueDeclare := false
-			callQos := false
+	// Replace the NewConnection function in order to run the mocked object
+	netamqp.NewConnection = func(address string) (netamqp.IConnection, error) {
+		return mockConnection, nil
+	}
 
-			mockConnection := &mnetamqp.MockConnection{}
+	server := netamqp.NewServer()
+	server.Serve("whatever")
 
-			mockConnection.ChannelMock = func() (netamqp.IChannel, error) {
+	server.Listen(netamqp.SetConf("/what/ever"), nil, nil)
 
-				mockChannel := &mnetamqp.MockChannel{}
+	<-block
 
-				callChannel = true
+	// Should call the Channel function
+	assert.True(t, callChannel, "Should call the channel function")
 
-				mockChannel.QueueDeclareMock = func(
-					name string,
-					durable,
-					autoDelete,
-					exclusive,
-					noWait bool,
-					args amqp.Table,
-				) (amqp.Queue, error) {
+	// Should call the QueueDeclare function
+	assert.True(t, callQueueDeclare, "Should call the QueueDeclare function")
 
-					callQueueDeclare = true
+	// Should call the Qos function
+	assert.True(t, callQos, "Should call the Qos function")
 
-					return amqp.Queue{}, errors.New("error")
-				}
-
-				mockChannel.QosMock = func(prefetchCount, prefetchSize int, global bool) error {
-					callQos = true
-					return nil
-				}
-
-				return mockChannel, nil
-			}
-
-			netamqp.NewConnection = func(address string) (netamqp.IConnection, error) {
-				return mockConnection, nil
-			}
-
-			server := netamqp.NewServer()
-			server.Serve("whatever")
-
-			server.Listen(netamqp.SetConf("/what/ever"), nil, nil)
-
-			It("Should call the Channel function", func() {
-				Expect(callChannel).To(BeTrue())
-			})
-
-			It("Should call the QueueDeclare function", func() {
-				Expect(callQueueDeclare).To(BeTrue())
-			})
-
-			It("Should not clal the function Qos", func() {
-				Expect(callQos).To(BeFalse())
-			})
-
-		})
-
-		Context("Test Listen method error on Consume", func() {
-
-			netamqp.RetriesTimes = 1
-			netamqp.Sleep = 0
-
-			callChannel := false
-			callQueueDeclare := false
-			callQos := false
-			callConsume := false
-
-			mockConnection := &mnetamqp.MockConnection{}
-
-			mockConnection.ChannelMock = func() (netamqp.IChannel, error) {
-
-				mockChannel := &mnetamqp.MockChannel{}
-
-				callChannel = true
-
-				mockChannel.QueueDeclareMock = func(
-					name string,
-					durable,
-					autoDelete,
-					exclusive,
-					noWait bool,
-					args amqp.Table,
-				) (amqp.Queue, error) {
-
-					callQueueDeclare = true
-
-					return amqp.Queue{}, nil
-				}
-
-				mockChannel.QosMock = func(prefetchCount, prefetchSize int, global bool) error {
-					callQos = true
-					return nil
-				}
-
-				mockChannel.ConsumeMock = func(
-					queue,
-					consumer string,
-					autoAck,
-					exclusive,
-					noLocal,
-					noWait bool,
-					args amqp.Table,
-				) (<-chan amqp.Delivery, error) {
-					callConsume = true
-					return nil, errors.New("error")
-				}
-
-				return mockChannel, nil
-			}
-
-			netamqp.NewConnection = func(address string) (netamqp.IConnection, error) {
-				return mockConnection, nil
-			}
-
-			server := netamqp.NewServer()
-			server.Serve("whatever")
-
-			server.Listen(netamqp.SetConf("/what/ever"), nil, nil)
-
-			It("Should call the Channel function", func() {
-				Expect(callChannel).To(BeTrue())
-			})
-
-			It("Should call the QueueDeclare function", func() {
-				Expect(callQueueDeclare).To(BeTrue())
-			})
-
-			It("Should call the function Qos", func() {
-				Expect(callQos).To(BeTrue())
-			})
-
-			It("Should call the function Consume", func() {
-				Expect(callConsume).To(BeTrue())
-			})
-
-		})
-
-		Context("Test Listen method error on Qos", func() {
-
-			netamqp.RetriesTimes = 1
-			netamqp.Sleep = 0
-
-			callChannel := false
-			callQueueDeclare := false
-			callQos := false
-			callConsume := false
-
-			mockConnection := &mnetamqp.MockConnection{}
-
-			mockConnection.ChannelMock = func() (netamqp.IChannel, error) {
-
-				mockChannel := &mnetamqp.MockChannel{}
-
-				callChannel = true
-
-				mockChannel.QueueDeclareMock = func(
-					name string,
-					durable,
-					autoDelete,
-					exclusive,
-					noWait bool,
-					args amqp.Table,
-				) (amqp.Queue, error) {
-
-					callQueueDeclare = true
-
-					return amqp.Queue{}, nil
-				}
-
-				mockChannel.QosMock = func(prefetchCount, prefetchSize int, global bool) error {
-					callQos = true
-					return errors.New("error")
-				}
-
-				mockChannel.ConsumeMock = func(
-					queue,
-					consumer string,
-					autoAck,
-					exclusive,
-					noLocal,
-					noWait bool,
-					args amqp.Table,
-				) (<-chan amqp.Delivery, error) {
-					callConsume = true
-					return nil, nil
-				}
-
-				return mockChannel, nil
-			}
-
-			netamqp.NewConnection = func(address string) (netamqp.IConnection, error) {
-				return mockConnection, nil
-			}
-
-			server := netamqp.NewServer()
-			server.Serve("whatever")
-
-			server.Listen(netamqp.SetConf("/what/ever"), nil, nil)
-
-			It("Should call the Channel function", func() {
-				Expect(callChannel).To(BeTrue())
-			})
-
-			It("Should call the QueueDeclare function", func() {
-				Expect(callQueueDeclare).To(BeTrue())
-			})
-
-			It("Should call the function Qos", func() {
-				Expect(callQos).To(BeTrue())
-			})
-
-			It("Should call the function Consume", func() {
-				Expect(callConsume).To(BeFalse())
-			})
-
-		})
-
-		Context("On connection nil", func() {
-			netamqp.NewConnection = func(address string) (netamqp.IConnection, error) {
-				return nil, nil
-			}
-			server := netamqp.NewServer()
-			It("Should throw a panic on nil connection", func() {
-				Expect(func() {
-					server.Serve("whatever")
-					server.Listen(netamqp.SetConf("/what/ever"), nil, nil)
-				}).To(Panic())
-			})
-
-		})
-
-	})
-
-})
+	// Should call the Consume function
+	assert.True(t, callConsume, "Should call the Consume function")
+}

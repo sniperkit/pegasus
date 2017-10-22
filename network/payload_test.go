@@ -2,35 +2,20 @@ package network_test
 
 import (
 	"github.com/cpapidas/pegasus/network"
-
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
-var _ = Describe("Payload", func() {
+func TestNewPayload(t *testing.T) {
+	// Should returns a payload
+	payload := network.NewPayload([]byte("body"), []byte("options"))
+	assert.Equal(t, []byte("body"), payload.Body, "Should returns the body")
+	assert.Equal(t, []byte("options"), payload.Options, "Should returns the options")
+}
 
-	Describe("Payload struct", func() {
-
-		Context("Payload Constructor", func() {
-
-			It("Should returns a payload", func() {
-				payload := network.NewPayload([]byte("body"), []byte("options"))
-				Expect(payload.Body).To(Equal([]byte("body")))
-				Expect(payload.Options).To(Equal([]byte("options")))
-			})
-
-		})
-
-		Context("Build a payload struct", func() {
-
-			It("Should returns a payload", func() {
-				payload := network.BuildPayload([]byte("body"), []byte("options"))
-				Expect(payload.Body).To(Equal([]byte("body")))
-				Expect(payload.Options).To(Equal([]byte("options")))
-			})
-
-		})
-
-	})
-
-})
+func TestBuildPayload(t *testing.T) {
+	// Should returns a payload
+	payload := network.BuildPayload([]byte("body"), []byte("options"))
+	assert.Equal(t, []byte("body"), payload.Body, "Should returns the body")
+	assert.Equal(t, []byte("options"), payload.Options, "Should returns the options")
+}

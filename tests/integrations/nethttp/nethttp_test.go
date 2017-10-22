@@ -3,11 +3,11 @@ package nethttp_test
 import (
 	"github.com/cpapidas/pegasus/network"
 	"github.com/cpapidas/pegasus/network/nethttp"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"testing"
+	"github.com/stretchr/testify/assert"
 )
 
-var _ = Describe("Nethttp", func() {
+func TestNethttp_integration(t *testing.T) {
 
 	var handlerGet = func(channel *network.Channel) {
 		// Receive the payload
@@ -124,168 +124,151 @@ var _ = Describe("Nethttp", func() {
 
 	server.Serve("localhost:7000")
 
-	Describe("HTTP Server", func() {
+	// HTTP Server
 
-		Context("Exchange message via HTTP", func() {
+	// Exchange message via HTTP
 
-			It("Should not be nil", func() {
-				Expect(server).ToNot(BeNil())
-			})
+	// Should not be nil
+	assert.NotNil(t, server, "Should not be nil")
 
-		})
+	// Send a GET request
+	// Create a payload
+	options := network.NewOptions()
 
-		Context("Send a GET request", func() {
-			// Create a payload
-			options := network.NewOptions()
+	options.SetHeader("Custom", "header-value")
+	options.SetHeader("MQ-Custom", "mq-value")
+	options.SetHeader("GR-Custom", "gr-value")
 
-			options.SetHeader("Custom", "header-value")
-			options.SetHeader("MQ-Custom", "mq-value")
-			options.SetHeader("GR-Custom", "gr-value")
+	payload := network.BuildPayload(nil, options.Marshal())
 
-			payload := network.BuildPayload(nil, options.Marshal())
+	// Send the payload
+	response, err := nethttp.NewClient(nil).
+		Send(nethttp.SetConf("http://localhost:7000/http?foo=bar", nethttp.Get), payload)
 
-			// Send the payload
-			response, err := nethttp.NewClient(nil).
-				Send(nethttp.SetConf("http://localhost:7000/http?foo=bar", nethttp.Get), payload)
+	replyOptions := network.NewOptions().Unmarshal(response.Options)
 
-			replyOptions := network.NewOptions().Unmarshal(response.Options)
+	// Should not throw an error
+	assert.Nil(t, err, "Should not be nil")
 
-			It("Should not throw an error", func() {
-				Expect(err).To(BeNil())
-			})
+	// Should return a application/json as default Content-Type
+	assert.Equal(t, "application/json", replyOptions.GetHeader("Content-Type"),
+		"Should be equals to application/json")
 
-			It("Should return a application/json as default Content-Type", func() {
-				Expect(replyOptions.GetHeader("Content-Type")).To(Equal("application/json"))
-			})
+	// Should return nil headers for GR-* and MQ-*
+	assert.Empty(t, replyOptions.GetHeader("MQ-Custom"), "Should be empty")
+	assert.Empty(t, replyOptions.GetHeader("GR-Custom"), "Should be empty")
 
-			It("Should return nil headers for GR-* and MQ-*", func() {
-				Expect(replyOptions.GetHeader("MQ-Custom")).To(BeEmpty())
-				Expect(replyOptions.GetHeader("GR-Custom")).To(BeEmpty())
-			})
+	// She response should have the following values
+	assert.Equal(t, []byte("bar response"), response.Body,
+		"Should be equals to bar response")
+	assert.Equal(t, "header-value response", replyOptions.GetHeader("Custom"),
+		"Should be equals to header-value response")
 
-			It("The response should have the following values", func() {
-				Expect(response.Body).To(Equal([]byte("bar response")))
-				Expect(replyOptions.GetHeader("Custom")).To(Equal("header-value response"))
-			})
-		})
+	// Send a POST request", func()
+	// Create a payload
+	options = network.NewOptions()
 
-		Context("Send a POST request", func() {
-			// Create a payload
-			options := network.NewOptions()
+	options.SetHeader("Custom", "header-value")
 
-			options.SetHeader("Custom", "header-value")
+	payload = network.BuildPayload([]byte("foo"), options.Marshal())
 
-			payload := network.BuildPayload([]byte("foo"), options.Marshal())
+	// Send the payload
+	response, err = nethttp.NewClient(nil).
+		Send(nethttp.SetConf("http://localhost:7000/http?name=christos", nethttp.Post), payload)
 
-			// Send the payload
-			response, err := nethttp.NewClient(nil).
-				Send(nethttp.SetConf("http://localhost:7000/http?name=christos", nethttp.Post), payload)
+	replyOptions = network.NewOptions().Unmarshal(response.Options)
 
-			replyOptions := network.NewOptions().Unmarshal(response.Options)
+	// Should not throw an error
+	if err != nil {
+		panic(err)
+	}
+	assert.Nil(t, err, "Should not be nil")
 
-			It("Should not throw an error", func() {
-				if err != nil {
-					panic(err)
-				}
-				Expect(err).To(BeNil())
-			})
+	// The response should have the following values
+	assert.Equal(t, []byte("foo response"), response.Body)
+	assert.Equal(t, "header-value response", replyOptions.GetHeader("Custom"),
+		"Should be equals to header-value response")
 
-			It("The response should have the following values", func() {
-				Expect(response.Body).To(Equal([]byte("foo response")))
-				Expect(replyOptions.GetHeader("Custom")).To(Equal("header-value response"))
-			})
+	// Should returns the param name
+	assert.Equal(t, "christos response", replyOptions.GetHeader("Name"),
+		"Should be equals to christos response")
 
-			It("Should returns the param name", func() {
-				Expect(replyOptions.GetHeader("Name")).To(Equal("christos response"))
-			})
-		})
+	// Send a PUT request
+	// Create a payload
+	options = network.NewOptions()
 
-		Context("Send a PUT request", func() {
-			// Create a payload
-			options := network.NewOptions()
+	options.SetHeader("Custom", "header-value")
 
-			options.SetHeader("Custom", "header-value")
+	payload = network.BuildPayload([]byte("foo"), options.Marshal())
 
-			payload := network.BuildPayload([]byte("foo"), options.Marshal())
+	// Send the payload
+	response, err = nethttp.NewClient(nil).
+		Send(nethttp.SetConf("http://localhost:7000/http?name=christos", nethttp.Put), payload)
 
-			// Send the payload
-			response, err := nethttp.NewClient(nil).
-				Send(nethttp.SetConf("http://localhost:7000/http?name=christos", nethttp.Put), payload)
+	replyOptions = network.NewOptions().Unmarshal(response.Options)
 
-			replyOptions := network.NewOptions().Unmarshal(response.Options)
+	// Should not throw an error
+	if err != nil {
+		panic(err)
+	}
+	assert.Nil(t, err, "Should be nil")
 
-			It("Should not throw an error", func() {
-				if err != nil {
-					panic(err)
-				}
-				Expect(err).To(BeNil())
-			})
+	// The response should have the following values
+	assert.Equal(t, []byte("foo response"), response.Body, "Should be equals to foo repsonse")
+	assert.Equal(t, "header-value response", replyOptions.GetHeader("Custom"),
+		"Should be equals to header-value response")
 
-			It("The response should have the following values", func() {
-				Expect(response.Body).To(Equal([]byte("foo response")))
-				Expect(replyOptions.GetHeader("Custom")).To(Equal("header-value response"))
-			})
+	// Should returns the param name
+	assert.Equal(t, "christos response", replyOptions.GetHeader("Name"),
+		"Should be equals to christos response")
 
-			It("Should returns the param name", func() {
-				Expect(replyOptions.GetHeader("Name")).To(Equal("christos response"))
-			})
-		})
+	// Send a DELETE request
+	// Create a payload
+	options = network.NewOptions()
 
-		Context("Send a DELETE request", func() {
-			// Create a payload
-			options := network.NewOptions()
+	options.SetHeader("Custom", "header-value")
 
-			options.SetHeader("Custom", "header-value")
+	payload = network.BuildPayload([]byte("foo"), options.Marshal())
 
-			payload := network.BuildPayload([]byte("foo"), options.Marshal())
+	// Send the payload
+	response, err = nethttp.NewClient(nil).
+		Send(nethttp.SetConf("http://localhost:7000/http?name=christos", nethttp.Delete), payload)
 
-			// Send the payload
-			response, err := nethttp.NewClient(nil).
-				Send(nethttp.SetConf("http://localhost:7000/http?name=christos", nethttp.Delete), payload)
+	replyOptions = network.NewOptions().Unmarshal(response.Options)
 
-			replyOptions := network.NewOptions().Unmarshal(response.Options)
+	// Should not throw an error
+	if err != nil {
+		panic(err)
+	}
+	assert.Nil(t, err, "Should be nil")
 
-			It("Should not throw an error", func() {
-				if err != nil {
-					panic(err)
-				}
-				Expect(err).To(BeNil())
-			})
+	// The response should have the following values
+	assert.Equal(t, []byte("foo response"), response.Body, "Should be equals to foo response")
+	assert.Equal(t, "header-value response", replyOptions.GetHeader("Custom"),
+		"Should be equals to header-value response")
 
-			It("The response should have the following values", func() {
-				Expect(response.Body).To(Equal([]byte("foo response")))
-				Expect(replyOptions.GetHeader("Custom")).To(Equal("header-value response"))
-			})
+	// Should returns the param name
+	assert.Equal(t, "christos response", replyOptions.GetHeader("Name"),
+		"Should be equal to christos response")
 
-			It("Should returns the param name", func() {
-				Expect(replyOptions.GetHeader("Name")).To(Equal("christos response"))
-			})
+	// Send a GET middleware request
+	// Create a payload
+	options = network.NewOptions()
 
-		})
+	options.SetHeader("Custom", "header-value")
 
-		Context("Send a GET middleware request", func() {
-			// Create a payload
-			options := network.NewOptions()
+	payload = network.BuildPayload(nil, options.Marshal())
 
-			options.SetHeader("Custom", "header-value")
+	// Send the payload
+	response, err = nethttp.NewClient(nil).
+		Send(nethttp.SetConf("http://localhost:7000/http/middleware?foo=bar", nethttp.Get), payload)
 
-			payload := network.BuildPayload(nil, options.Marshal())
+	// Should not throw an error", func() {
+	assert.Nil(t, err, "Should be nil")
 
-			// Send the payload
-			response, err := nethttp.NewClient(nil).
-				Send(nethttp.SetConf("http://localhost:7000/http/middleware?foo=bar", nethttp.Get), payload)
-
-			It("Should not throw an error", func() {
-				Expect(err).To(BeNil())
-			})
-
-			It("The response should have the following values", func() {
-				Expect(response.Body).To(Equal([]byte("bar response")))
-				options := network.NewOptions().Unmarshal(response.Options)
-				Expect(options.GetHeader("Custom")).To(Equal("header-value middleware response"))
-			})
-		})
-
-	})
-
-})
+	// The response should have the following values", func() {
+	assert.Equal(t, []byte("bar response"), response.Body, "Should be bar response")
+	options = network.NewOptions().Unmarshal(response.Options)
+	assert.Equal(t, "header-value middleware response", options.GetHeader("Custom"),
+		"Should be equals to header-value middleware response")
+}

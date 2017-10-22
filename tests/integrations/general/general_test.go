@@ -5,151 +5,134 @@ import (
 	"github.com/cpapidas/pegasus/network/netamqp"
 	"github.com/cpapidas/pegasus/network/netgrpc"
 	"github.com/cpapidas/pegasus/network/nethttp"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"testing"
+	"github.com/stretchr/testify/assert"
 )
 
-var _ = Describe("General", func() {
+func TestGeneral_allProtocols(t *testing.T) {
 
 	var skipAMQP = false
 
-	Describe("Check rabbitMQ server", func() {
-		defer func() {
-			if r := recover(); r != nil {
-				skipAMQP = true
-			}
-		}()
+	defer func() {
+		if r := recover(); r != nil {
+			skipAMQP = true
+		}
+	}()
 
-		netamqp.RetriesTimes = 1
-		netamqp.Sleep = 0
-		serverAMQP := netamqp.NewServer()
-		serverAMQP.Serve("amqp://guest:guest@localhost:5672/")
-	})
+	netamqp.RetriesTimes = 1
+	netamqp.Sleep = 0
+	serverAMQP := netamqp.NewServer()
+	serverAMQP.Serve("amqp://guest:guest@localhost:5672/")
 
-	Describe("Test all net* packages together", func() {
+	if skipAMQP {
+		t.Skip("You need a RabbitMQ server to continue")
+		return
+	}
 
-		if skipAMQP {
-			PIt("RabbitMQ server is not listing")
-			return
+	var handler = func(channel *network.Channel) {
+		// Receive the payload
+		receive := channel.Receive()
+
+		// Unmarshal options, change them and send them back
+		options := network.NewOptions().Unmarshal(receive.Options)
+
+		replyOptions := network.NewOptions()
+
+		// RabbitMQ does not send back any response so we have to do the assertions inside handler
+		if options.GetHeader("Custom") == "" || receive.Body == nil {
+			panic("Header Custom and Body have to be set")
 		}
 
-		var handler = func(channel *network.Channel) {
-			// Receive the payload
-			receive := channel.Receive()
+		replyOptions.SetHeader("Custom", options.GetHeader("Custom")+" response")
+		replyOptions.SetHeader("name", options.GetParam("name")+" response")
+		replyOptions.SetHeader("id", options.GetParam("id")+" response")
 
-			// Unmarshal options, change them and send them back
-			options := network.NewOptions().Unmarshal(receive.Options)
+		responseBody := string(receive.Body) + " response"
 
-			replyOptions := network.NewOptions()
+		// Create the new payload
+		payload := network.BuildPayload([]byte(responseBody), replyOptions.Marshal())
 
-			// RabbitMQ does not send back any response so we have to do the assertions inside handler
-			if options.GetHeader("Custom") == "" || receive.Body == nil {
-				panic("Header Custom and Body have to be set")
-			}
+		// Send it back
+		channel.Send(payload)
 
-			replyOptions.SetHeader("Custom", options.GetHeader("Custom")+" response")
-			replyOptions.SetHeader("name", options.GetParam("name")+" response")
-			replyOptions.SetHeader("id", options.GetParam("id")+" response")
+	}
 
-			responseBody := string(receive.Body) + " response"
+	netamqp.RetriesTimes = 1
+	netamqp.Sleep = 0
 
-			// Create the new payload
-			payload := network.BuildPayload([]byte(responseBody), replyOptions.Marshal())
+	serverHTTP := nethttp.NewServer(nil)
+	serverGRPC := netgrpc.NewServer(nil)
+	serverAMQP = netamqp.NewServer()
 
-			// Send it back
-			channel.Send(payload)
+	serverAMQP.Serve("amqp://guest:guest@localhost:5672/")
 
-		}
+	serverHTTP.Listen(nethttp.SetConf("/hello", nethttp.Put), handler, nil)
+	serverGRPC.Listen(netgrpc.SetConf("/hello"), handler, nil)
+	serverAMQP.Listen(netamqp.SetConf("/hello"), handler, nil)
 
-		netamqp.RetriesTimes = 1
-		netamqp.Sleep = 0
+	serverHTTP.Serve("localhost:7001")
+	serverGRPC.Serve("localhost:50051")
 
-		serverHTTP := nethttp.NewServer(nil)
-		serverGRPC := netgrpc.NewServer(nil)
-		serverAMQP := netamqp.NewServer()
+	// Create a payload
+	options := network.NewOptions()
 
-		serverAMQP.Serve("amqp://guest:guest@localhost:5672/")
+	options.SetHeader("Custom", "header-value")
 
-		serverHTTP.Listen(nethttp.SetConf("/hello", nethttp.Put), handler, nil)
-		serverGRPC.Listen(netgrpc.SetConf("/hello"), handler, nil)
-		serverAMQP.Listen(netamqp.SetConf("/hello"), handler, nil)
+	payload := network.BuildPayload([]byte("foo"), options.Marshal())
 
-		serverHTTP.Serve("localhost:7001")
-		serverGRPC.Serve("localhost:50051")
+	// Send the payload
+	response, err := nethttp.NewClient(nil).
+		Send(nethttp.SetConf("http://localhost:7001/hello?name=christos", nethttp.Put), payload)
 
-		Context("Send a PUT request", func() {
-			// Create a payload
-			options := network.NewOptions()
+	replyOptions := network.NewOptions().Unmarshal(response.Options)
 
-			options.SetHeader("Custom", "header-value")
+	// Should not throw an error
+	if err != nil {
+		panic(err)
+	}
+	assert.Nil(t, err, "Should be nil")
 
-			payload := network.BuildPayload([]byte("foo"), options.Marshal())
+	// The response should have the following values
+	assert.Equal(t, "foo response", string(response.Body),
+		"Should be equals to foo response")
+	assert.Equal(t, "header-value response", replyOptions.GetHeader("Custom"),
+		"Should be equals to header-value response")
 
-			// Send the payload
-			response, err := nethttp.NewClient(nil).
-				Send(nethttp.SetConf("http://localhost:7001/hello?name=christos", nethttp.Put), payload)
+	// Should returns the param name
+	assert.Equal(t, "christos response", replyOptions.GetHeader("Name"),
+		"Should be equals to christos response")
 
-			replyOptions := network.NewOptions().Unmarshal(response.Options)
+	client, _ := netamqp.NewClient("amqp://guest:guest@localhost:5672/")
 
-			It("Should not throw an error", func() {
-				if err != nil {
-					panic(err)
-				}
-				Expect(err).To(BeNil())
-			})
+	// Should not throw panic
+	options = network.NewOptions()
+	options.SetHeader("Custom", "bar")
+	payload = network.BuildPayload([]byte("foo"), options.Marshal())
 
-			It("The response should have the following values", func() {
-				Expect(string(response.Body)).To(Equal("foo response"))
-				Expect(replyOptions.GetHeader("Custom")).To(Equal("header-value response"))
-			})
+	assert.NotPanics(t, func() { client.Send(netamqp.SetConf("/hello"), payload) },
+		"Should not panics")
 
-			It("Should returns the param name", func() {
-				Expect(replyOptions.GetHeader("Name")).To(Equal("christos response"))
-			})
+	// Create a payload
+	options = network.NewOptions()
 
-		})
+	options.SetHeader("Custom", "header-value")
 
-		Context("Send AMQP request", func() {
+	payload = network.BuildPayload([]byte("foo"), options.Marshal())
 
-			clientHTTP := netamqp.NewClient("amqp://guest:guest@localhost:5672/")
+	// Send the payload
+	response, err = netgrpc.NewClient("localhost:50051").
+		Send(netgrpc.SetConf("/hello"), payload)
 
-			It("Should not throw panic ", func() {
-				options := network.NewOptions()
-				options.SetHeader("Custom", "bar")
-				payload := network.BuildPayload([]byte("foo"), options.Marshal())
+	replyOptions = network.NewOptions().Unmarshal(response.Options)
 
-				Expect(func() { clientHTTP.Send(netamqp.SetConf("/hello"), payload) }).ToNot(Panic())
-			})
-		})
+	// Should not throw an error
+	if err != nil {
+		panic(err)
+	}
+	assert.Nil(t, err, "Should be nil")
 
-		Context("Send GRPC request", func() {
-
-			// Create a payload
-			options := network.NewOptions()
-
-			options.SetHeader("Custom", "header-value")
-
-			payload := network.BuildPayload([]byte("foo"), options.Marshal())
-
-			// Send the payload
-			response, err := netgrpc.NewClient("localhost:50051").
-				Send(netgrpc.SetConf("/hello"), payload)
-
-			replyOptions := network.NewOptions().Unmarshal(response.Options)
-
-			It("Should not throw an error", func() {
-				if err != nil {
-					panic(err)
-				}
-				Expect(err).To(BeNil())
-			})
-
-			It("The response should have the following values", func() {
-				Expect(response.Body).To(Equal([]byte("foo response")))
-				Expect(replyOptions.GetHeader("Custom")).To(Equal("header-value response"))
-			})
-		})
-
-	})
-
-})
+	// The response should have the following values
+	assert.Equal(t, []byte("foo response"), response.Body, "Should be equals to foo response")
+	assert.Equal(t, "header-value response", replyOptions.GetHeader("Custom"),
+		"Should be equals to header-value response")
+}

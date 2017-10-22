@@ -3,186 +3,173 @@ package netgrpc_test
 import (
 	"github.com/cpapidas/pegasus/network"
 	"github.com/cpapidas/pegasus/network/netgrpc"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"testing"
+	"github.com/stretchr/testify/assert"
 )
 
-var _ = Describe("Netgrpc", func() {
+func TestNetgrpc_integration(t *testing.T) {
 
-	Describe("GRPC Server", func() {
+	var handler = func(channel *network.Channel) {
+		// Receive the payload
+		receive := channel.Receive()
 
-		// Create a new server
-		server := netgrpc.NewServer(nil)
+		// Unmarshal options, change them and send them back
+		options := network.NewOptions().Unmarshal(receive.Options)
 
-		// Set the listeners
+		options.SetField("options", "value", options.GetField("options", "value")+" response")
+		options.SetHeader("GR-Whatever", options.GetHeader("GR-Whatever"))
 
-		server.Listen(netgrpc.SetConf("/grpc/end-to-end"), handler, nil)
+		// Create the new payload
+		payload := network.BuildPayload([]byte(string(receive.Body)+" response"), options.Marshal())
 
-		server.Listen(netgrpc.SetConf("/grpc/end-to-end/middleware"), handler, middleware)
+		// Send it back
+		channel.Send(payload)
+	}
 
-		// Start the server
-		server.Serve("localhost:50052")
+	var middleware = func(handler network.Handler, channel *network.Channel) {
 
-		Context("Exchange GRPC messages via Listen-Send hit at same time", func() {
+		// Receive the payload
+		receive := channel.Receive()
 
-			request := func(id string) {
+		// Unmarshal options, change them and send them back
+		options := network.NewOptions().Unmarshal(receive.Options)
+		options.SetField("options", "value", options.GetField("options", "value")+" middleware")
 
-				// Create a payload
-				options := network.NewOptions()
-				options.SetField("options", "value", id+"option")
-				payload := network.BuildPayload([]byte(id+"hello message"), options.Marshal())
+		// Create the new payload
+		payload := network.BuildPayload([]byte(string(receive.Body)+" middleware"), options.Marshal())
 
-				// Send the payload
-				netgrpc.NewClient("localhost:50052").Send([]string{"/grpc/end-to-end"}, payload)
-				response, err := netgrpc.NewClient("localhost:50052").Send([]string{"/grpc/end-to-end"}, payload)
+		// Send it back
+		channel.Send(payload)
 
-				It("Should not throw an error", func() {
-					Expect(err).To(BeNil())
-				})
+		handler(channel)
+	}
 
-				It("The response should have the following values", func() {
-					Expect(response.Body).To(Equal([]byte(id + "hello message response")))
-					options := network.NewOptions().Unmarshal(response.Options)
-					Expect(options.Fields["options"]["value"]).To(Equal(id + "option response"))
-				})
+	// Create a new server
+	server := netgrpc.NewServer(nil)
 
-			}
+	// Set the listeners
 
-			go request("1")
-			go request("2")
+	server.Listen(netgrpc.SetConf("/grpc/end-to-end"), handler, nil)
 
-		})
+	server.Listen(netgrpc.SetConf("/grpc/end-to-end/middleware"), handler, middleware)
 
-		Context("Exchange GRPC payload via Listen-Send", func() {
+	// Start the server
+	server.Serve("localhost:50052")
 
-			// Create a payload
-			options := network.NewOptions()
-			options.SetField("options", "value", "option")
-			options.SetHeader("HP-Whatever", "MQ-value")
-			options.SetHeader("MQ-Whatever", "HP-value")
-			options.SetHeader("GR-Whatever", "GR-value")
-			payload := network.BuildPayload([]byte("hello message"), options.Marshal())
+	// Exchange GRPC messages via Listen-Send hit at same time
 
-			// Send the payload
-			response, err := netgrpc.NewClient("localhost:50052").Send([]string{"/grpc/end-to-end"}, payload)
+	request := func(id string) {
 
-			replyOptions := network.NewOptions().Unmarshal(response.Options)
+		// Create a payload
+		options := network.NewOptions()
+		options.SetField("options", "value", id+"option")
+		payload := network.BuildPayload([]byte(id+"hello message"), options.Marshal())
 
-			It("Should not throw an error", func() {
-				Expect(err).To(BeNil())
-			})
+		// Send the payload
+		netgrpc.NewClient("localhost:50052").Send([]string{"/grpc/end-to-end"}, payload)
+		response, err := netgrpc.NewClient("localhost:50052").Send([]string{"/grpc/end-to-end"}, payload)
 
-			It("Should return nil headers for HP-* and MQ-*", func() {
-				Expect(replyOptions.GetHeader("MQ-Custom")).To(BeEmpty())
-				Expect(replyOptions.GetHeader("HP-Custom")).To(BeEmpty())
-			})
+		// Should not throw an error
+		assert.Nil(t, err, "Should be nil")
 
-			It("Should return GR-* Header", func() {
-				Expect(replyOptions.GetHeader("GR-Whatever")).To(Equal("GR-value"))
-			})
+		// The response should have the following values
+		assert.Equal(t, []byte(id+"hello message response"), response.Body,
+			"Should be equals to id + hello message response")
+		options = network.NewOptions().Unmarshal(response.Options)
+		assert.Equal(t, id+"option response", options.Fields["options"]["value"],
+			"Should be equals to id + option response")
+	}
 
-			It("The response should have the following values", func() {
-				Expect(response.Body).To(Equal([]byte("hello message response")))
+	go request("1")
+	go request("2")
 
-				Expect(replyOptions.Fields["options"]["value"]).To(Equal("option response"))
-			})
-		})
+	// Exchange GRPC payload via Listen-Send
 
-		Context("Exchange GRPC payload via Listen-Send with middleware", func() {
-			// Create a payload
-			options := network.NewOptions()
-			options.SetField("options", "value", "option")
-			payload := network.BuildPayload([]byte("hello message"), options.Marshal())
+	// Create a payload
+	options := network.NewOptions()
+	options.SetField("options", "value", "option")
+	options.SetHeader("HP-Whatever", "MQ-value")
+	options.SetHeader("MQ-Whatever", "HP-value")
+	options.SetHeader("GR-Whatever", "GR-value")
+	payload := network.BuildPayload([]byte("hello message"), options.Marshal())
 
-			// Send the payload
-			response, err := netgrpc.NewClient("localhost:50052").
-				Send([]string{"/grpc/end-to-end/middleware"}, payload)
+	// Send the payload
+	response, err := netgrpc.NewClient("localhost:50052").Send([]string{"/grpc/end-to-end"}, payload)
 
-			It("Should not throw an error", func() {
-				Expect(err).To(BeNil())
-			})
+	replyOptions := network.NewOptions().Unmarshal(response.Options)
 
-			It("The response should have the following values", func() {
-				Expect(response.Body).To(Equal([]byte("hello message middleware response")))
-				options := network.NewOptions().Unmarshal(response.Options)
-				Expect(options.Fields["options"]["value"]).To(Equal("option middleware response"))
-			})
-		})
+	// Should not throw an error
+	assert.Nil(t, err, "Should be nil")
 
-		Context("Exchange GRPC payload via Listen-Send-Send hit the service twice", func() {
+	// Should return nil headers for HP-* and MQ-*
+	assert.Empty(t, replyOptions.GetHeader("MQ-Custom"), "Should be empty")
+	assert.Empty(t, replyOptions.GetHeader("HP-Custom"), "Should be empty")
 
-			// Create a payload
-			options := network.NewOptions()
-			options.SetField("options", "value", "option")
-			payload := network.BuildPayload([]byte("hello message"), options.Marshal())
+	// Should return GR-* Header
+	assert.Equal(t, "GR-value", replyOptions.GetHeader("GR-Whatever"),
+		"Should be equals to GR-value")
 
-			// Send the payload
-			netgrpc.NewClient("localhost:50052").Send([]string{"/grpc/end-to-end"}, payload)
-			response, err := netgrpc.NewClient("localhost:50052").Send([]string{"/grpc/end-to-end"}, payload)
+	// The response should have the following values
+	assert.Equal(t, []byte("hello message response"), response.Body,
+		"Should be equals to hello message response")
 
-			It("Should not throw an error", func() {
-				Expect(err).To(BeNil())
-			})
+	assert.Equal(t, "option response", replyOptions.Fields["options"]["value"],
+		"Should be equals to option response")
 
-			It("The response should have the following values", func() {
-				Expect(response.Body).To(Equal([]byte("hello message response")))
-				options := network.NewOptions().Unmarshal(response.Options)
-				Expect(options.Fields["options"]["value"]).To(Equal("option response"))
-			})
-		})
+	// Exchange GRPC payload via Listen-Send with middleware
 
-		Context("Exchange GRPC payload via Listen-Send with nil options in payload", func() {
+	// Create a payload
+	options = network.NewOptions()
+	options.SetField("options", "value", "option")
+	payload = network.BuildPayload([]byte("hello message"), options.Marshal())
 
-			// Create a payload
-			payload := network.BuildPayload([]byte("hello message"), nil)
+	// Send the payload
+	response, err = netgrpc.NewClient("localhost:50052").
+		Send([]string{"/grpc/end-to-end/middleware"}, payload)
 
-			// Send the payload
-			response, err := netgrpc.NewClient("localhost:50052").Send([]string{"/grpc/end-to-end"}, payload)
+	// Should not throw an error
+	assert.Nil(t, err, "Should be nil")
 
-			It("Should not throw an error", func() {
-				Expect(err).To(BeNil())
-			})
+	// The response should have the following values
+	assert.Equal(t, []byte("hello message middleware response"), response.Body,
+		"Should be equals to hello message middleware response")
+	options = network.NewOptions().Unmarshal(response.Options)
+	assert.Equal(t, "option middleware response", options.Fields["options"]["value"],
+		"Should be equals to option middleware response")
 
-			It("The response should have the following values", func() {
-				Expect(response.Body).To(Equal([]byte("hello message response")))
-			})
-		})
+	// Exchange GRPC payload via Listen-Send-Send hit the service twice
 
-	})
+	// Create a payload
+	options = network.NewOptions()
+	options.SetField("options", "value", "option")
+	payload = network.BuildPayload([]byte("hello message"), options.Marshal())
 
-})
+	// Send the payload
+	netgrpc.NewClient("localhost:50052").Send([]string{"/grpc/end-to-end"}, payload)
+	response, err = netgrpc.NewClient("localhost:50052").Send([]string{"/grpc/end-to-end"}, payload)
 
-func handler(channel *network.Channel) {
-	// Receive the payload
-	receive := channel.Receive()
+	// Should not throw an error
+	assert.Nil(t, err, "Should be nil")
 
-	// Unmarshal options, change them and send them back
-	options := network.NewOptions().Unmarshal(receive.Options)
+	// The response should have the following values
+	assert.Equal(t, []byte("hello message response"), response.Body,
+		"Should be hello message response")
+	options = network.NewOptions().Unmarshal(response.Options)
+	assert.Equal(t, "option response", options.Fields["options"]["value"],
+		"Should be equals to option response")
 
-	options.SetField("options", "value", options.GetField("options", "value")+" response")
-	options.SetHeader("GR-Whatever", options.GetHeader("GR-Whatever"))
+	// Exchange GRPC payload via Listen-Send with nil options in payload
 
-	// Create the new payload
-	payload := network.BuildPayload([]byte(string(receive.Body)+" response"), options.Marshal())
+	// Create a payload
+	payload = network.BuildPayload([]byte("hello message"), nil)
 
-	// Send it back
-	channel.Send(payload)
-}
+	// Send the payload
+	response, err = netgrpc.NewClient("localhost:50052").Send([]string{"/grpc/end-to-end"}, payload)
 
-func middleware(handler network.Handler, channel *network.Channel) {
+	// Should not throw an error
+	assert.Nil(t, err, "Should be nil")
 
-	// Receive the payload
-	receive := channel.Receive()
-
-	// Unmarshal options, change them and send them back
-	options := network.NewOptions().Unmarshal(receive.Options)
-	options.SetField("options", "value", options.GetField("options", "value")+" middleware")
-
-	// Create the new payload
-	payload := network.BuildPayload([]byte(string(receive.Body)+" middleware"), options.Marshal())
-
-	// Send it back
-	channel.Send(payload)
-
-	handler(channel)
+	// The response should have the following values
+	assert.Equal(t, []byte("hello message response"), response.Body,
+		"Should be equals to hello message response")
 }

@@ -2,42 +2,30 @@ package netgrpc_test
 
 import (
 	"github.com/cpapidas/pegasus/network/netgrpc"
-
 	"github.com/cpapidas/pegasus/network"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"reflect"
+	"testing"
+	"github.com/stretchr/testify/assert"
 )
 
-var _ = Describe("PathWrapper", func() {
+func TestPathWrapper(t *testing.T) {
 
-	Describe("PathWrapper struct", func() {
+	pathWrapper := netgrpc.PathWrapper{}
+	pathWrapper.Handler = func(chanel *network.Channel) {}
+	pathWrapper.Middleware = func(handler network.Handler, chanel *network.Channel) {}
 
-		Context("Struct fields", func() {
+	// Should not be nil
+	assert.NotNil(t, pathWrapper, "Should not be nil")
 
-			pathWrapper := netgrpc.PathWrapper{}
-			pathWrapper.Handler = func(chanel *network.Channel) {}
-			pathWrapper.Middleware = func(handler network.Handler, chanel *network.Channel) {}
+	// Should be type of netgrpc.PathWrapper
+	assert.Equal(t, "<netgrpc.PathWrapper Value>", reflect.ValueOf(pathWrapper).String(),
+		"Should be equals to <netgrpc.PathWrapper Value>")
 
-			It("Should not be nil", func() {
-				Expect(pathWrapper).ToNot(BeNil())
-			})
+	// Should be type of network.Handler
+	assert.Equal(t, "<network.Handler Value>", reflect.ValueOf(pathWrapper.Handler).String(),
+		"Should be equals to <network.Handler Value>")
 
-			It("Should be type of netgrpc.PathWrapper", func() {
-				Expect(reflect.ValueOf(pathWrapper).String()).To(Equal("<netgrpc.PathWrapper Value>"))
-			})
-
-			It("Should be type of network.Handler", func() {
-				Expect(reflect.ValueOf(pathWrapper.Handler).String()).To(Equal("<network.Handler Value>"))
-			})
-
-			It("Should be type of network.Middleware", func() {
-				Expect(reflect.ValueOf(pathWrapper.Middleware).String()).
-					To(Equal("<network.Middleware Value>"))
-			})
-
-		})
-
-	})
-
-})
+	// Should be type of network.Middleware
+	assert.Equal(t, "<network.Middleware Value>", reflect.ValueOf(pathWrapper.Middleware).String(),
+		"Should be equals to <network.Middleware Value>")
+}

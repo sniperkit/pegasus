@@ -2,37 +2,21 @@ package network_test
 
 import (
 	"github.com/cpapidas/pegasus/network"
-
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"github.com/stretchr/testify/assert"
 	"reflect"
+	"testing"
 )
 
-var _ = Describe("Channel", func() {
+func TestNewChannel(t *testing.T) {
+	channel := network.NewChannel(2000)
 
-	Describe("Channel struct", func() {
+	// Should create a new channel and be type of *network.Channel
+	valueOf := reflect.ValueOf(channel).String()
+	assert.Equal(t, "<*network.Channel Value>", valueOf, "Should be type of *network.Channel")
 
-		Context("Channel Create new Chanel function test", func() {
-
-			It("should create a new channel", func() {
-				channel := network.NewChannel(2000)
-				Expect(reflect.ValueOf(channel).String()).To(Equal("<*network.Channel Value>"))
-			})
-
-		})
-
-		Context("Channel Send & Receive function test", func() {
-
-			It("Should send the data to the channel", func() {
-				channel := network.NewChannel(2000)
-				channel.Send(network.BuildPayload([]byte("data"), []byte("options")))
-				data := channel.Receive()
-				Expect(data.Body).To(Equal([]byte("data")))
-				Expect(data.Options).To(Equal([]byte("options")))
-			})
-
-		})
-
-	})
-
-})
+	// Should send and receive though channel
+	channel.Send(network.BuildPayload([]byte("data"), []byte("options")))
+	data := channel.Receive()
+	assert.Equal(t, []byte("data"), data.Body, "Should get the Body field and be equal to data")
+	assert.Equal(t, []byte("options"), data.Options, "Should get the Options and be equal to options")
+}

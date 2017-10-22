@@ -2,37 +2,25 @@ package helpers_test
 
 import (
 	"github.com/cpapidas/pegasus/helpers"
-
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
-var _ = Describe("Commands", func() {
+func TestGetContainerID(t *testing.T) {
+	var id string
 
-	Describe("Call GetContainerID", func() {
+	// Should return commandSuccess
+	helpers.GetContainerIDScriptPath = "../tests/fixtures/commands/get_container_id.sh"
+	id = helpers.GetContainerID()
+	assert.Equal(t, "commandSuccess", id)
 
-		Context("on success", func() {
+	// Should return the default error message
+	helpers.GetContainerIDScriptPath = "invalid command"
+	id = helpers.GetContainerID()
+	assert.Equal(t, "Container ID not found", id)
 
-			It("should return the container id for valid file path", func() {
-				helpers.GetContainerIDScriptPath = "../tests/fixtures/commands/get_container_id.sh"
-				containerID := helpers.GetContainerID()
-				Expect(containerID).To(BeEquivalentTo("commandSuccess"))
-			})
-
-			It("should return the default error message for invalid command", func() {
-				helpers.GetContainerIDScriptPath = "invalid command"
-				containerID := helpers.GetContainerID()
-				Expect(containerID).To(BeEquivalentTo("Container ID not found"))
-			})
-
-			It("should return the default error message for undefined container id", func() {
-				helpers.GetContainerIDScriptPath = `echo ""`
-				containerID := helpers.GetContainerID()
-				Expect(containerID).To(BeEquivalentTo("Container ID not found"))
-			})
-
-		})
-
-	})
-
-})
+	// Should return the default error message for undefined container id
+	helpers.GetContainerIDScriptPath = `echo ""`
+	id = helpers.GetContainerID()
+	assert.Equal(t, "Container ID not found", id)
+}

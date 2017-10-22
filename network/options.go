@@ -48,7 +48,7 @@ func (c Options) GetParams() map[string]string {
 }
 
 // SetParam sets a parameter.
-func (c Options) SetParam(key string, value string) {
+func (c *Options) SetParam(key string, value string) {
 	c.SetField("PARAMS", key, value)
 }
 
@@ -71,7 +71,7 @@ func (c Options) GetHeaders() map[string]string {
 }
 
 // SetHeader sets a header parameter.
-func (c Options) SetHeader(key string, value string) {
+func (c *Options) SetHeader(key string, value string) {
 	c.SetField("HEADERS", key, value)
 }
 

@@ -3,17 +3,16 @@ package netamqp_test
 import (
 	"github.com/cpapidas/pegasus/network"
 	"github.com/cpapidas/pegasus/network/netamqp"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"testing"
+	"github.com/stretchr/testify/assert"
 )
 
 var failure = make(chan bool, 2)
 
-var _ = Describe("Netamqp", func() {
-
+func TestNetamqp_integration(t *testing.T) {
 	defer func() {
 		if r := recover(); r != nil {
-			PIt("RabbitMQ server is not listing")
+			t.Skip(r)
 		}
 	}()
 
@@ -68,22 +67,17 @@ var _ = Describe("Netamqp", func() {
 
 	server.Listen(netamqp.SetConf("/simple/handler"), simpleHandler, middleware)
 
-	client := netamqp.NewClient("amqp://guest:guest@localhost:5672/")
+	client, _ := netamqp.NewClient("amqp://guest:guest@localhost:5672/")
 
-	Describe("RabbitMQ Integration Tests", func() {
+	// Should not throw panic
+	options := network.NewOptions()
+	options.SetHeader("Custom", "bar")
+	options.SetHeader("HP-Custom", "bar")
+	options.SetHeader("GR-Custom", "bar")
+	payload := network.BuildPayload([]byte("foo"), options.Marshal())
 
-		It("Should not throw panic ", func() {
-			options := network.NewOptions()
-			options.SetHeader("Custom", "bar")
-			options.SetHeader("HP-Custom", "bar")
-			options.SetHeader("GR-Custom", "bar")
-			payload := network.BuildPayload([]byte("foo"), options.Marshal())
+	assert.NotPanics(t, func() { client.Send(netamqp.SetConf("/simple/handler"), payload) },
+	"Should not panics")
 
-			Expect(func() { client.Send(netamqp.SetConf("/simple/handler"), payload) }).ToNot(Panic())
-
-			Expect(<-failure).To(BeFalse())
-		})
-
-	})
-
-})
+	assert.False(t, <-failure, "Should be false")
+}

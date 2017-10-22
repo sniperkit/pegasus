@@ -2,268 +2,247 @@ package nethttp_test
 
 import (
 	"github.com/cpapidas/pegasus/network/nethttp"
-
 	"bytes"
 	"errors"
 	"github.com/cpapidas/pegasus/network"
 	"github.com/cpapidas/pegasus/tests/mocks/mhttp"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"reflect"
+	"testing"
+	"github.com/stretchr/testify/assert"
 )
 
-var _ = Describe("Client", func() {
+func TestNewClient(t *testing.T) {
 
-	Describe("Client struct", func() {
+	client := nethttp.NewClient(nil)
 
-		Context("Constructor", func() {
+	// Should not be nil
+	assert.NotNil(t, client, "Should not return a nil client object")
 
-			client := nethttp.NewClient(nil)
+	// Should be type of *nethttp.Client
+	assert.Equal(t, "<*nethttp.Client Value>", reflect.ValueOf(client).String(),
+		"Should be type of <*nethttp.Client Value>")
+}
 
-			It("Should not be nil", func() {
-				Expect(client).ToNot(BeNil())
-			})
+func TestClient_Send(t *testing.T) {
 
-			It("Should be type of *nethttp.Client", func() {
-				Expect(reflect.ValueOf(client).String()).To(Equal("<*nethttp.Client Value>"))
-			})
+	called := false
 
-		})
+	// Create a mock object
+	mockHTTPClient := &mhttp.MockHTTPClient{}
 
-		Context("Send function - POST request", func() {
+	// Mock the methods
+	mockHTTPClient.DoMock = func(req *http.Request) (*http.Response, error) {
 
-			called := false
+		called = true
 
-			mockHTTPClient := &mhttp.MockHTTPClient{}
+		// Should have the right parameters
+		assert.Equal(t, []string{"sample"}, req.Header["Custom-Sample"],
+			"Should be equals to [sample]")
+		assert.Equal(t, []string{"sample"}, req.Header["Hp-Sample"],
+			"Should be equals to [sample]")
+		assert.Nil(t, req.Header["Mq-Sample"], "Should be nil")
+		assert.Nil(t, req.Header["Gr-Sample"], "Should be nil")
 
-			mockHTTPClient.DoMock = func(req *http.Request) (*http.Response, error) {
+		b, err := ioutil.ReadAll(req.Body)
 
-				called = true
+		assert.Nil(t, err, "Should not be nil")
+		assert.Equal(t, "content", string(b), "Should be equals to content")
 
-				It("Should have the right parameters", func() {
-					Expect(req.Header["Custom-Sample"]).To(Equal([]string{"sample"}))
-					Expect(req.Header["Hp-Sample"]).To(Equal([]string{"sample"}))
-					Expect(req.Header["Mq-Sample"]).To(BeNil())
-					Expect(req.Header["Gr-Sample"]).To(BeNil())
+		response := &http.Response{}
+		response.Header = make(map[string][]string)
+		response.Header["Custom-Sample-Reply"] = []string{"sample reply"}
+		response.Header["HP-Sample-Reply"] = []string{"sample reply"}
+		response.Header["MQ-Sample-Reply"] = []string{"sample reply"}
+		response.Header["GR-Sample-Reply"] = []string{"sample reply"}
 
-					b, err := ioutil.ReadAll(req.Body)
+		response.Body = ioutil.NopCloser(bytes.NewReader([]byte("content reply")))
 
-					Expect(err).To(BeNil())
-					Expect(string(b)).To(Equal("content"))
-				})
+		return response, nil
+	}
 
-				response := &http.Response{}
-				response.Header = make(map[string][]string)
-				response.Header["Custom-Sample-Reply"] = []string{"sample reply"}
-				response.Header["HP-Sample-Reply"] = []string{"sample reply"}
-				response.Header["MQ-Sample-Reply"] = []string{"sample reply"}
-				response.Header["GR-Sample-Reply"] = []string{"sample reply"}
+	requestOptions := network.NewOptions()
+	requestOptions.SetHeader("Custom-Sample", "sample")
+	requestOptions.SetHeader("HP-Sample", "sample")
+	requestOptions.SetHeader("MQ-Sample", "sample")
+	requestOptions.SetHeader("GR-Sample", "sample")
 
-				response.Body = ioutil.NopCloser(bytes.NewReader([]byte("content reply")))
+	// Pass the mock object and create a client
+	client := nethttp.NewClient(mockHTTPClient)
 
-				return response, nil
-			}
+	payload := network.BuildPayload([]byte("content"), requestOptions.Marshal())
 
-			requestOptions := network.NewOptions()
-			requestOptions.SetHeader("Custom-Sample", "sample")
-			requestOptions.SetHeader("HP-Sample", "sample")
-			requestOptions.SetHeader("MQ-Sample", "sample")
-			requestOptions.SetHeader("GR-Sample", "sample")
+	reply, err := client.Send(nethttp.SetConf("/whatever", "POST"), payload)
 
-			client := nethttp.NewClient(mockHTTPClient)
+	replyOptions := network.NewOptions().Unmarshal(reply.Options)
 
-			payload := network.BuildPayload([]byte("content"), requestOptions.Marshal())
+	// Should return a nil error
+	assert.Nil(t, err, "Should not returns error")
 
-			reply, err := client.Send(nethttp.SetConf("/whatever", "POST"), payload)
+	// Should call the Do function
+	assert.True(t, called, "Should be call the handler")
 
-			replyOptions := network.NewOptions().Unmarshal(reply.Options)
+	// Should return valid parameters
+	assert.Equal(t, "sample reply", replyOptions.GetHeader("Custom-Sample-Reply"),
+		"Should be equals to sample reply")
+	assert.Equal(t, "sample reply", replyOptions.GetHeader("HP-Sample-Reply"),
+		"Should be equals to sample reply")
+	assert.Empty(t, replyOptions.GetHeader("MQ-Sample-Reply"), "Should be empty")
+	assert.Empty(t, replyOptions.GetHeader("GR-Sample-Reply"), "Should be empty")
+	assert.Equal(t, string(reply.Body), "content reply", "Should be equals to content reply")
+}
 
-			It("Should return a nil error", func() {
-				Expect(err).To(BeNil())
-			})
+func TestClient_Send_getRequest(t *testing.T) {
 
-			It("Should call the Do function", func() {
-				Expect(called).To(BeTrue())
-			})
+	called := false
 
-			It("Should return valid parameters", func() {
-				Expect(replyOptions.GetHeader("Custom-Sample-Reply")).To(Equal("sample reply"))
-				Expect(replyOptions.GetHeader("HP-Sample-Reply")).To(Equal("sample reply"))
-				Expect(replyOptions.GetHeader("MQ-Sample-Reply")).To(BeEmpty())
-				Expect(replyOptions.GetHeader("GR-Sample-Reply")).To(BeEmpty())
-				Expect(string(reply.Body)).To(Equal("content reply"))
-			})
+	mockHTTPClient := &mhttp.MockHTTPClient{}
 
-		})
+	mockHTTPClient.DoMock = func(req *http.Request) (*http.Response, error) {
 
-		Context("Send function - GET request", func() {
+		called = true
 
-			called := false
+		// Should have the right parameters
+		assert.Equal(t, []string{"sample"}, req.Header["Custom-Sample"],
+			"Should be equals to [sample]")
+		assert.Equal(t, []string{"sample"}, req.Header["Hp-Sample"],
+			"Should be equals to [sample]")
+		assert.Nil(t, req.Header["Mq-Sample"], "Should be nil")
+		assert.Nil(t, req.Header["Gr-Sample"], "Should be nil")
 
-			mockHTTPClient := &mhttp.MockHTTPClient{}
+		b, err := ioutil.ReadAll(req.Body)
 
-			mockHTTPClient.DoMock = func(req *http.Request) (*http.Response, error) {
+		assert.Nil(t, err, "Should not be nil")
+		assert.Empty(t, string(b), "Should be empty")
 
-				called = true
+		assert.Equal(t, "bar", req.URL.Query().Get("foo"),
+			"Should be equals to bar")
 
-				It("Should have the right parameters", func() {
-					Expect(req.Header["Custom-Sample"]).To(Equal([]string{"sample"}))
-					Expect(req.Header["Hp-Sample"]).To(Equal([]string{"sample"}))
-					Expect(req.Header["Mq-Sample"]).To(BeNil())
-					Expect(req.Header["Gr-Sample"]).To(BeNil())
+		response := &http.Response{}
+		response.Header = make(map[string][]string)
+		response.Header["Custom-Sample-Reply"] = []string{"sample reply"}
+		response.Header["HP-Sample-Reply"] = []string{"sample reply"}
+		response.Header["MQ-Sample-Reply"] = []string{"sample reply"}
+		response.Header["GR-Sample-Reply"] = []string{"sample reply"}
 
-					b, err := ioutil.ReadAll(req.Body)
+		response.Body = ioutil.NopCloser(bytes.NewReader([]byte("content reply")))
 
-					Expect(err).To(BeNil())
-					Expect(string(b)).To(BeEmpty())
+		return response, nil
+	}
 
-					Expect(req.URL.Query().Get("foo")).To(Equal("bar"))
-				})
+	requestOptions := network.NewOptions()
+	requestOptions.SetHeader("Custom-Sample", "sample")
+	requestOptions.SetHeader("HP-Sample", "sample")
+	requestOptions.SetHeader("MQ-Sample", "sample")
+	requestOptions.SetHeader("GR-Sample", "sample")
 
-				response := &http.Response{}
-				response.Header = make(map[string][]string)
-				response.Header["Custom-Sample-Reply"] = []string{"sample reply"}
-				response.Header["HP-Sample-Reply"] = []string{"sample reply"}
-				response.Header["MQ-Sample-Reply"] = []string{"sample reply"}
-				response.Header["GR-Sample-Reply"] = []string{"sample reply"}
+	requestOptions.SetParam("foo", "bar")
 
+	client := nethttp.NewClient(mockHTTPClient)
 
-				response.Body = ioutil.NopCloser(bytes.NewReader([]byte("content reply")))
+	payload := network.BuildPayload([]byte("content"), requestOptions.Marshal())
 
-				return response, nil
-			}
+	reply, err := client.Send(nethttp.SetConf("/whatever", nethttp.Get), payload)
 
-			requestOptions := network.NewOptions()
-			requestOptions.SetHeader("Custom-Sample", "sample")
-			requestOptions.SetHeader("HP-Sample", "sample")
-			requestOptions.SetHeader("MQ-Sample", "sample")
-			requestOptions.SetHeader("GR-Sample", "sample")
+	replyOptions := network.NewOptions().Unmarshal(reply.Options)
 
-			requestOptions.SetParam("foo", "bar")
+	// Should return a nil error
+	assert.Nil(t, err, "Should not returns error")
 
-			client := nethttp.NewClient(mockHTTPClient)
+	// Should call the Do function
+	assert.True(t, called, "Should be call the handler")
 
-			payload := network.BuildPayload([]byte("content"), requestOptions.Marshal())
+	// Should return valid parameters
+	assert.Equal(t, "sample reply", replyOptions.GetHeader("Custom-Sample-Reply"),
+		"Should be equals to sample reply")
+	assert.Equal(t, "sample reply", replyOptions.GetHeader("HP-Sample-Reply"),
+		"Should be equals to sample reply")
+	assert.Empty(t, replyOptions.GetHeader("MQ-Sample-Reply"), "Should be empty")
+	assert.Empty(t, replyOptions.GetHeader("GR-Sample-Reply"), "Should be empty")
+	assert.Equal(t, string(reply.Body), "content reply", "Should be equals to content reply")
+}
 
-			reply, err := client.Send(nethttp.SetConf("/whatever", nethttp.Get), payload)
+func TestClient_Send_requestFailure(t *testing.T) {
 
-			replyOptions := network.NewOptions().Unmarshal(reply.Options)
+	nethttp.NewRequest = func(method, url string, body io.Reader) (*http.Request, error) {
+		return nil, errors.New("error")
+	}
 
-			It("Should return a nil error", func() {
-				Expect(err).To(BeNil())
-			})
+	client := nethttp.NewClient(nil)
 
-			It("Should call the Do function", func() {
-				Expect(called).To(BeTrue())
-			})
+	payload, err := client.Send(nethttp.SetConf("what", "ever"), network.Payload{})
 
-			It("Should return valid parameters", func() {
-				Expect(replyOptions.GetHeader("Custom-Sample-Reply")).To(Equal("sample reply"))
-				Expect(replyOptions.GetHeader("HP-Sample-Reply")).To(Equal("sample reply"))
-				Expect(replyOptions.GetHeader("MQ-Sample-Reply")).To(BeEmpty())
-				Expect(replyOptions.GetHeader("GR-Sample-Reply")).To(BeEmpty())
-				Expect(string(reply.Body)).To(Equal("content reply"))
-			})
+	// Should return nil payload
+	assert.Nil(t, payload, "Should be nil")
 
-		})
+	// Should return an error
+	assert.NotNil(t, err, "Should not be nil")
 
-		Context("Send function request failure", func() {
+	nethttp.NewRequest = http.NewRequest
+}
 
-			nethttp.NewRequest = func(method, url string, body io.Reader) (*http.Request, error) {
-				return nil, errors.New("error")
-			}
+func TestClient_Send_doFailure(t *testing.T) {
 
-			client := nethttp.NewClient(nil)
+	called := false
 
-			payload, err := client.Send(nethttp.SetConf("what", "ever"), network.Payload{})
+	mockHTTPClient := &mhttp.MockHTTPClient{}
 
-			It("Should return nil payload", func() {
-				Expect(payload).To(BeNil())
-			})
+	mockHTTPClient.DoMock = func(req *http.Request) (*http.Response, error) {
+		called = true
+		return nil, errors.New("error")
+	}
 
-			It("Should return an error", func() {
-				Expect(err).ToNot(BeNil())
-			})
+	client := nethttp.NewClient(mockHTTPClient)
 
-			nethttp.NewRequest = http.NewRequest
-		})
+	reply, err := client.Send(nethttp.SetConf("/whatever", "POST"), network.Payload{})
 
-	})
+	// Should call the Do function
+	assert.True(t, called, "Should call the handler")
 
-	Context("Send function Do function failure", func() {
+	// Should return a nil reply
+	assert.Nil(t, reply, "Should be nil")
 
-		called := false
+	// Should an error
+	assert.NotNil(t, err, "Should not be nil")
+}
 
-		mockHTTPClient := &mhttp.MockHTTPClient{}
+func TestClient_Send_readAllFailure(t *testing.T) {
 
-		mockHTTPClient.DoMock = func(req *http.Request) (*http.Response, error) {
-			called = true
-			return nil, errors.New("error")
-		}
+	called := false
 
-		client := nethttp.NewClient(mockHTTPClient)
+	nethttp.ReadAll = func(r io.Reader) ([]byte, error) {
+		return nil, errors.New("error")
+	}
 
-		reply, err := client.Send(nethttp.SetConf("/whatever", "POST"), network.Payload{})
+	mockHTTPClient := &mhttp.MockHTTPClient{}
 
-		It("Should call the Do function", func() {
-			Expect(called).To(BeTrue())
-		})
+	mockHTTPClient.DoMock = func(req *http.Request) (*http.Response, error) {
+		called = true
+		response := &http.Response{}
+		response.Body = ioutil.NopCloser(bytes.NewReader([]byte("content reply")))
+		return response, nil
+	}
 
-		It("Should return a nil reply", func() {
-			Expect(reply).To(BeNil())
-		})
+	client := nethttp.NewClient(mockHTTPClient)
 
-		It("Should an error", func() {
-			Expect(err).ToNot(BeNil())
-		})
+	reply, err := client.Send(nethttp.SetConf("/whatever", "POST"), network.Payload{})
 
-	})
+	// Should call the Do function
+	assert.True(t, called, "Should be true")
 
-	Context("Send function ReadAll function failure", func() {
+	// Should return a nil reply
+	assert.Nil(t, reply, "Should be nil")
 
-		called := false
+	// Should an error
+	assert.NotNil(t, err, "Should not be nil")
 
-		nethttp.ReadAll = func(r io.Reader) ([]byte, error) {
-			return nil, errors.New("error")
-		}
+	nethttp.ReadAll = ioutil.ReadAll
+}
 
-		mockHTTPClient := &mhttp.MockHTTPClient{}
-
-		mockHTTPClient.DoMock = func(req *http.Request) (*http.Response, error) {
-			called = true
-			response := &http.Response{}
-			response.Body = ioutil.NopCloser(bytes.NewReader([]byte("content reply")))
-			return response, nil
-		}
-
-		client := nethttp.NewClient(mockHTTPClient)
-
-		reply, err := client.Send(nethttp.SetConf("/whatever", "POST"), network.Payload{})
-
-		It("Should call the Do function", func() {
-			Expect(called).To(BeTrue())
-		})
-
-		It("Should return a nil reply", func() {
-			Expect(reply).To(BeNil())
-		})
-
-		It("Should an error", func() {
-			Expect(err).ToNot(BeNil())
-		})
-
-		nethttp.ReadAll = ioutil.ReadAll
-
-	})
-
-	Context("Test close function", func() {
-		client := nethttp.NewClient(nil)
-		It("Should an error, because this function is not implemented for nethttp provider", func() {
-			Expect(client.Close()).ToNot(BeNil())
-		})
-	})
-
-})
+func TestClient_Close(t *testing.T) {
+	client := nethttp.NewClient(nil)
+	// Should an error, because this function is not implemented for nethttp provider
+	assert.NotNil(t, client.Close(), "Should not be nil")
+}
