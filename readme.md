@@ -1,6 +1,6 @@
 # Pegasus
 
-[![Build Status](https://travis-ci.org/cpapidas/pegasus.svg?branch=master&maxAge=0)](https://travis-ci.org/cpapidas/pegasus)
+[![Build Status](https://travis-ci.org/cpapidas/pegasus.svg?branch=master)](https://travis-ci.org/cpapidas/pegasus)
 [![Go Report Card](https://goreportcard.com/badge/github.com/cpapidas/pegasus?new=report?maxAge=0)](https://goreportcard.com/report/github.com/cpapidas/pegasus)
 [![codebeat badge](https://codebeat.co/badges/d81fe30e-f110-49f1-a475-f24f1016c4c8?maxAge=0)](https://codebeat.co/projects/github-com-cpapidas-pegasus-master)
 [![codecov](https://codecov.io/gh/cpapidas/pegasus/branch/master/graph/badge.svg?maxAge=0)](https://codecov.io/gh/cpapidas/pegasus)
