@@ -40,7 +40,7 @@ const (
 	SYS_DUP                  = 41  // { int|sys||dup(int fd); }
 	SYS_PIPE                 = 42  // { int|sys||pipe(void); }
 	SYS_GETEGID              = 43  // { gid_t|sys||getegid(void); }
-	SYS_PROFIL               = 44  // { int|sys||profil(char *samples, size_t size, u_long offset, u_int scale); }
+	SYS_PROFIL               = 44  // { int|sys||profil(char *examples, size_t size, u_long offset, u_int scale); }
 	SYS_KTRACE               = 45  // { int|sys||ktrace(const char *fname, int ops, int facs, pid_t pid); }
 	SYS_GETGID               = 47  // { gid_t|sys||getgid_with_egid(void); }
 	SYS___GETLOGIN           = 49  // { int|sys||__getlogin(char *namebuf, size_t namelen); }

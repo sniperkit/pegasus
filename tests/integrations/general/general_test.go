@@ -1,12 +1,12 @@
 package general_test
 
 import (
-	"github.com/cpapidas/pegasus/network"
-	"github.com/cpapidas/pegasus/network/netamqp"
-	"github.com/cpapidas/pegasus/network/netgrpc"
-	"github.com/cpapidas/pegasus/network/nethttp"
-	"testing"
+	"github.com/cpapidas/pegasus/netamqp"
+	"github.com/cpapidas/pegasus/netgrpc"
+	"github.com/cpapidas/pegasus/nethttp"
+	"github.com/cpapidas/pegasus/peg"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestGeneral_allProtocols(t *testing.T) {
@@ -29,14 +29,14 @@ func TestGeneral_allProtocols(t *testing.T) {
 		return
 	}
 
-	var handler = func(channel *network.Channel) {
+	var handler = func(channel *peg.Channel) {
 		// Receive the payload
 		receive := channel.Receive()
 
 		// Unmarshal options, change them and send them back
-		options := network.NewOptions().Unmarshal(receive.Options)
+		options := peg.NewOptions().Unmarshal(receive.Options)
 
-		replyOptions := network.NewOptions()
+		replyOptions := peg.NewOptions()
 
 		// RabbitMQ does not send back any response so we have to do the assertions inside handler
 		if options.GetHeader("Custom") == "" || receive.Body == nil {
@@ -50,7 +50,7 @@ func TestGeneral_allProtocols(t *testing.T) {
 		responseBody := string(receive.Body) + " response"
 
 		// Create the new payload
-		payload := network.BuildPayload([]byte(responseBody), replyOptions.Marshal())
+		payload := peg.BuildPayload([]byte(responseBody), replyOptions.Marshal())
 
 		// Send it back
 		channel.Send(payload)
@@ -74,17 +74,17 @@ func TestGeneral_allProtocols(t *testing.T) {
 	serverGRPC.Serve("localhost:50051")
 
 	// Create a payload
-	options := network.NewOptions()
+	options := peg.NewOptions()
 
 	options.SetHeader("Custom", "header-value")
 
-	payload := network.BuildPayload([]byte("foo"), options.Marshal())
+	payload := peg.BuildPayload([]byte("foo"), options.Marshal())
 
 	// Send the payload
 	response, err := nethttp.NewClient(nil).
 		Send(nethttp.SetConf("http://localhost:7001/hello?name=christos", nethttp.Put), payload)
 
-	replyOptions := network.NewOptions().Unmarshal(response.Options)
+	replyOptions := peg.NewOptions().Unmarshal(response.Options)
 
 	// Should not throw an error
 	if err != nil {
@@ -105,25 +105,25 @@ func TestGeneral_allProtocols(t *testing.T) {
 	client, _ := netamqp.NewClient("amqp://guest:guest@localhost:5672/")
 
 	// Should not throw panic
-	options = network.NewOptions()
+	options = peg.NewOptions()
 	options.SetHeader("Custom", "bar")
-	payload = network.BuildPayload([]byte("foo"), options.Marshal())
+	payload = peg.BuildPayload([]byte("foo"), options.Marshal())
 
 	assert.NotPanics(t, func() { client.Send(netamqp.SetConf("/hello"), payload) },
 		"Should not panics")
 
 	// Create a payload
-	options = network.NewOptions()
+	options = peg.NewOptions()
 
 	options.SetHeader("Custom", "header-value")
 
-	payload = network.BuildPayload([]byte("foo"), options.Marshal())
+	payload = peg.BuildPayload([]byte("foo"), options.Marshal())
 
 	// Send the payload
 	response, err = netgrpc.NewClient("localhost:50051").
 		Send(netgrpc.SetConf("/hello"), payload)
 
-	replyOptions = network.NewOptions().Unmarshal(response.Options)
+	replyOptions = peg.NewOptions().Unmarshal(response.Options)
 
 	// Should not throw an error
 	if err != nil {

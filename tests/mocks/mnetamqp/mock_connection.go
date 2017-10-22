@@ -1,7 +1,7 @@
 package mnetamqp
 
 import (
-	"github.com/cpapidas/pegasus/network/netamqp"
+	"github.com/cpapidas/pegasus/netamqp"
 	"github.com/streadway/amqp"
 )
 

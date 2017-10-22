@@ -2,4 +2,4 @@
 .vagrant
 .idea
 .docker
-
+examples/examples

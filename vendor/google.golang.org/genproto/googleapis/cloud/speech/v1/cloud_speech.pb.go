@@ -67,16 +67,16 @@ type RecognitionConfig_AudioEncoding int32
 const (
 	// Not specified. Will return result [google.rpc.Code.INVALID_ARGUMENT][google.rpc.Code.INVALID_ARGUMENT].
 	RecognitionConfig_ENCODING_UNSPECIFIED RecognitionConfig_AudioEncoding = 0
-	// Uncompressed 16-bit signed little-endian samples (Linear PCM).
+	// Uncompressed 16-bit signed little-endian examples (Linear PCM).
 	RecognitionConfig_LINEAR16 RecognitionConfig_AudioEncoding = 1
 	// [`FLAC`](https://xiph.org/flac/documentation.html) (Free Lossless Audio
 	// Codec) is the recommended encoding because it is
 	// lossless--therefore recognition is not compromised--and
 	// requires only about half the bandwidth of `LINEAR16`. `FLAC` stream
-	// encoding supports 16-bit and 24-bit samples, however, not all fields in
+	// encoding supports 16-bit and 24-bit examples, however, not all fields in
 	// `STREAMINFO` are supported.
 	RecognitionConfig_FLAC RecognitionConfig_AudioEncoding = 2
-	// 8-bit samples that compand 14-bit audio samples using G.711 PCMU/mu-law.
+	// 8-bit examples that compand 14-bit audio examples using G.711 PCMU/mu-law.
 	RecognitionConfig_MULAW RecognitionConfig_AudioEncoding = 3
 	// Adaptive Multi-Rate Narrowband codec. `sample_rate_hertz` must be 8000.
 	RecognitionConfig_AMR RecognitionConfig_AudioEncoding = 4

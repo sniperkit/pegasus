@@ -1,44 +1,44 @@
 package nethttp_test
 
 import (
-	"github.com/cpapidas/pegasus/network"
-	"github.com/cpapidas/pegasus/network/nethttp"
-	"testing"
+	"github.com/cpapidas/pegasus/nethttp"
+	"github.com/cpapidas/pegasus/peg"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestNethttp_integration(t *testing.T) {
 
-	var handlerGet = func(channel *network.Channel) {
+	var handlerGet = func(channel *peg.Channel) {
 		// Receive the payload
 		receive := channel.Receive()
 
 		// Unmarshal options, change them and send them back
-		options := network.NewOptions().Unmarshal(receive.Options)
+		options := peg.NewOptions().Unmarshal(receive.Options)
 
 		if options.GetHeader("Content-Type") != "application/json" {
 			panic("The header Content-Type should have default value application/json")
 		}
 
-		replyOptions := network.NewOptions()
+		replyOptions := peg.NewOptions()
 
 		replyOptions.SetHeader("Custom", options.GetHeader("Custom")+" response")
 
 		// Create the new payload
-		payload := network.BuildPayload([]byte(options.GetParam("foo")+" response"), replyOptions.Marshal())
+		payload := peg.BuildPayload([]byte(options.GetParam("foo")+" response"), replyOptions.Marshal())
 
 		// Send it back
 		channel.Send(payload)
 	}
 
-	var handlerPost = func(channel *network.Channel) {
+	var handlerPost = func(channel *peg.Channel) {
 		// Receive the payload
 		receive := channel.Receive()
 
 		// Unmarshal options, change them and send them back
-		options := network.NewOptions().Unmarshal(receive.Options)
+		options := peg.NewOptions().Unmarshal(receive.Options)
 
-		replyOptions := network.NewOptions()
+		replyOptions := peg.NewOptions()
 
 		replyOptions.SetHeader("Custom", options.GetHeader("Custom")+" response")
 		replyOptions.SetHeader("name", options.GetParam("name")+" response")
@@ -46,20 +46,20 @@ func TestNethttp_integration(t *testing.T) {
 		responseBody := string(receive.Body) + " response"
 
 		// Create the new payload
-		payload := network.BuildPayload([]byte(responseBody), replyOptions.Marshal())
+		payload := peg.BuildPayload([]byte(responseBody), replyOptions.Marshal())
 
 		// Send it back
 		channel.Send(payload)
 	}
 
-	var handlerPut = func(channel *network.Channel) {
+	var handlerPut = func(channel *peg.Channel) {
 		// Receive the payload
 		receive := channel.Receive()
 
 		// Unmarshal options, change them and send them back
-		options := network.NewOptions().Unmarshal(receive.Options)
+		options := peg.NewOptions().Unmarshal(receive.Options)
 
-		replyOptions := network.NewOptions()
+		replyOptions := peg.NewOptions()
 
 		replyOptions.SetHeader("Custom", options.GetHeader("Custom")+" response")
 		replyOptions.SetHeader("name", options.GetParam("name")+" response")
@@ -68,44 +68,44 @@ func TestNethttp_integration(t *testing.T) {
 		responseBody := string(receive.Body) + " response"
 
 		// Create the new payload
-		payload := network.BuildPayload([]byte(responseBody), replyOptions.Marshal())
+		payload := peg.BuildPayload([]byte(responseBody), replyOptions.Marshal())
 
 		// Send it back
 		channel.Send(payload)
 	}
 
-	var handlerDelete = func(channel *network.Channel) {
+	var handlerDelete = func(channel *peg.Channel) {
 		// Receive the payload
 		receive := channel.Receive()
 
 		// Unmarshal options, change them and send them back
-		options := network.NewOptions().Unmarshal(receive.Options)
+		options := peg.NewOptions().Unmarshal(receive.Options)
 
-		replyOptions := network.NewOptions()
+		replyOptions := peg.NewOptions()
 
 		replyOptions.SetHeader("Custom", options.GetHeader("Custom")+" response")
 		replyOptions.SetHeader("name", options.GetParam("name")+" response")
 		replyOptions.SetHeader("id", options.GetParam("id")+" response")
 
 		// Create the new payload
-		payload := network.BuildPayload([]byte(string(receive.Body)+" response"), replyOptions.Marshal())
+		payload := peg.BuildPayload([]byte(string(receive.Body)+" response"), replyOptions.Marshal())
 
 		// Send it back
 		channel.Send(payload)
 	}
 
-	var middleware = func(handler network.Handler, channel *network.Channel) {
+	var middleware = func(handler peg.Handler, channel *peg.Channel) {
 
 		// Receive the payload
 		receive := channel.Receive()
 
 		// Unmarshal options, change them and send them back
-		options := network.NewOptions().Unmarshal(receive.Options)
+		options := peg.NewOptions().Unmarshal(receive.Options)
 
 		options.SetHeader("Custom", options.GetHeader("Custom")+" middleware")
 
 		// Create the new payload
-		payload := network.BuildPayload(nil, options.Marshal())
+		payload := peg.BuildPayload(nil, options.Marshal())
 
 		// Send it back
 		channel.Send(payload)
@@ -133,19 +133,19 @@ func TestNethttp_integration(t *testing.T) {
 
 	// Send a GET request
 	// Create a payload
-	options := network.NewOptions()
+	options := peg.NewOptions()
 
 	options.SetHeader("Custom", "header-value")
 	options.SetHeader("MQ-Custom", "mq-value")
 	options.SetHeader("GR-Custom", "gr-value")
 
-	payload := network.BuildPayload(nil, options.Marshal())
+	payload := peg.BuildPayload(nil, options.Marshal())
 
 	// Send the payload
 	response, err := nethttp.NewClient(nil).
 		Send(nethttp.SetConf("http://localhost:7000/http?foo=bar", nethttp.Get), payload)
 
-	replyOptions := network.NewOptions().Unmarshal(response.Options)
+	replyOptions := peg.NewOptions().Unmarshal(response.Options)
 
 	// Should not throw an error
 	assert.Nil(t, err, "Should not be nil")
@@ -166,17 +166,17 @@ func TestNethttp_integration(t *testing.T) {
 
 	// Send a POST request", func()
 	// Create a payload
-	options = network.NewOptions()
+	options = peg.NewOptions()
 
 	options.SetHeader("Custom", "header-value")
 
-	payload = network.BuildPayload([]byte("foo"), options.Marshal())
+	payload = peg.BuildPayload([]byte("foo"), options.Marshal())
 
 	// Send the payload
 	response, err = nethttp.NewClient(nil).
 		Send(nethttp.SetConf("http://localhost:7000/http?name=christos", nethttp.Post), payload)
 
-	replyOptions = network.NewOptions().Unmarshal(response.Options)
+	replyOptions = peg.NewOptions().Unmarshal(response.Options)
 
 	// Should not throw an error
 	if err != nil {
@@ -195,17 +195,17 @@ func TestNethttp_integration(t *testing.T) {
 
 	// Send a PUT request
 	// Create a payload
-	options = network.NewOptions()
+	options = peg.NewOptions()
 
 	options.SetHeader("Custom", "header-value")
 
-	payload = network.BuildPayload([]byte("foo"), options.Marshal())
+	payload = peg.BuildPayload([]byte("foo"), options.Marshal())
 
 	// Send the payload
 	response, err = nethttp.NewClient(nil).
 		Send(nethttp.SetConf("http://localhost:7000/http?name=christos", nethttp.Put), payload)
 
-	replyOptions = network.NewOptions().Unmarshal(response.Options)
+	replyOptions = peg.NewOptions().Unmarshal(response.Options)
 
 	// Should not throw an error
 	if err != nil {
@@ -224,17 +224,17 @@ func TestNethttp_integration(t *testing.T) {
 
 	// Send a DELETE request
 	// Create a payload
-	options = network.NewOptions()
+	options = peg.NewOptions()
 
 	options.SetHeader("Custom", "header-value")
 
-	payload = network.BuildPayload([]byte("foo"), options.Marshal())
+	payload = peg.BuildPayload([]byte("foo"), options.Marshal())
 
 	// Send the payload
 	response, err = nethttp.NewClient(nil).
 		Send(nethttp.SetConf("http://localhost:7000/http?name=christos", nethttp.Delete), payload)
 
-	replyOptions = network.NewOptions().Unmarshal(response.Options)
+	replyOptions = peg.NewOptions().Unmarshal(response.Options)
 
 	// Should not throw an error
 	if err != nil {
@@ -253,11 +253,11 @@ func TestNethttp_integration(t *testing.T) {
 
 	// Send a GET middleware request
 	// Create a payload
-	options = network.NewOptions()
+	options = peg.NewOptions()
 
 	options.SetHeader("Custom", "header-value")
 
-	payload = network.BuildPayload(nil, options.Marshal())
+	payload = peg.BuildPayload(nil, options.Marshal())
 
 	// Send the payload
 	response, err = nethttp.NewClient(nil).
@@ -268,7 +268,7 @@ func TestNethttp_integration(t *testing.T) {
 
 	// The response should have the following values", func() {
 	assert.Equal(t, []byte("bar response"), response.Body, "Should be bar response")
-	options = network.NewOptions().Unmarshal(response.Options)
+	options = peg.NewOptions().Unmarshal(response.Options)
 	assert.Equal(t, "header-value middleware response", options.GetHeader("Custom"),
 		"Should be equals to header-value middleware response")
 }

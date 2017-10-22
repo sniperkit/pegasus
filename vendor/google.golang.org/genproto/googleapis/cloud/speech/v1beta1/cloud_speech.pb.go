@@ -64,7 +64,7 @@ type RecognitionConfig_AudioEncoding int32
 const (
 	// Not specified. Will return result [google.rpc.Code.INVALID_ARGUMENT][google.rpc.Code.INVALID_ARGUMENT].
 	RecognitionConfig_ENCODING_UNSPECIFIED RecognitionConfig_AudioEncoding = 0
-	// Uncompressed 16-bit signed little-endian samples (Linear PCM).
+	// Uncompressed 16-bit signed little-endian examples (Linear PCM).
 	// This is the only encoding that may be used by `AsyncRecognize`.
 	RecognitionConfig_LINEAR16 RecognitionConfig_AudioEncoding = 1
 	// This is the recommended encoding for `SyncRecognize` and
@@ -73,10 +73,10 @@ const (
 	//
 	// The stream FLAC (Free Lossless Audio Codec) encoding is specified at:
 	// http://flac.sourceforge.net/documentation.html.
-	// 16-bit and 24-bit samples are supported.
+	// 16-bit and 24-bit examples are supported.
 	// Not all fields in STREAMINFO are supported.
 	RecognitionConfig_FLAC RecognitionConfig_AudioEncoding = 2
-	// 8-bit samples that compand 14-bit audio samples using G.711 PCMU/mu-law.
+	// 8-bit examples that compand 14-bit audio examples using G.711 PCMU/mu-law.
 	RecognitionConfig_MULAW RecognitionConfig_AudioEncoding = 3
 	// Adaptive Multi-Rate Narrowband codec. `sample_rate` must be 8000 Hz.
 	RecognitionConfig_AMR RecognitionConfig_AudioEncoding = 4

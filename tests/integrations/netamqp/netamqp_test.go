@@ -1,10 +1,10 @@
 package netamqp_test
 
 import (
-	"github.com/cpapidas/pegasus/network"
-	"github.com/cpapidas/pegasus/network/netamqp"
-	"testing"
+	"github.com/cpapidas/pegasus/netamqp"
+	"github.com/cpapidas/pegasus/peg"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 var failure = make(chan bool, 2)
@@ -16,11 +16,11 @@ func TestNetamqp_integration(t *testing.T) {
 		}
 	}()
 
-	var simpleHandler = func(channel *network.Channel) {
+	var simpleHandler = func(channel *peg.Channel) {
 
 		receive := channel.Receive()
 
-		options := network.BuildOptions(receive.Options)
+		options := peg.BuildOptions(receive.Options)
 
 		if options.GetHeader("HP-Custom") != "" || options.GetHeader("GR-Custom") != "" {
 			panic("Header should contains key with prefix HP-* or GR-*")
@@ -39,10 +39,10 @@ func TestNetamqp_integration(t *testing.T) {
 		failure <- false
 	}
 
-	var middleware = func(handler network.Handler, channel *network.Channel) {
+	var middleware = func(handler peg.Handler, channel *peg.Channel) {
 		receive := channel.Receive()
 
-		options := network.BuildOptions(receive.Options)
+		options := peg.BuildOptions(receive.Options)
 
 		customHeaderValue := options.GetHeader("Custom") + " middleware"
 
@@ -50,7 +50,7 @@ func TestNetamqp_integration(t *testing.T) {
 
 		body := string(receive.Body) + " middleware"
 
-		payload := network.BuildPayload([]byte(body), options.Marshal())
+		payload := peg.BuildPayload([]byte(body), options.Marshal())
 
 		channel.Send(payload)
 
@@ -70,14 +70,14 @@ func TestNetamqp_integration(t *testing.T) {
 	client, _ := netamqp.NewClient("amqp://guest:guest@localhost:5672/")
 
 	// Should not throw panic
-	options := network.NewOptions()
+	options := peg.NewOptions()
 	options.SetHeader("Custom", "bar")
 	options.SetHeader("HP-Custom", "bar")
 	options.SetHeader("GR-Custom", "bar")
-	payload := network.BuildPayload([]byte("foo"), options.Marshal())
+	payload := peg.BuildPayload([]byte("foo"), options.Marshal())
 
 	assert.NotPanics(t, func() { client.Send(netamqp.SetConf("/simple/handler"), payload) },
-	"Should not panics")
+		"Should not panics")
 
 	assert.False(t, <-failure, "Should be false")
 }

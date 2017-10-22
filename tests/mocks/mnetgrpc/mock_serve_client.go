@@ -2,7 +2,7 @@ package mnetgrpc
 
 import (
 	"context"
-	pb "github.com/cpapidas/pegasus/network/netgrpc/proto"
+	pb "github.com/cpapidas/pegasus/netgrpc/proto"
 	"google.golang.org/grpc"
 )
 

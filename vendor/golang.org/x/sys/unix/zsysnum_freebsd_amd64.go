@@ -44,7 +44,7 @@ const (
 	SYS_DUP                    = 41  // { int dup(u_int fd); }
 	SYS_PIPE                   = 42  // { int pipe(void); }
 	SYS_GETEGID                = 43  // { gid_t getegid(void); }
-	SYS_PROFIL                 = 44  // { int profil(caddr_t samples, size_t size, \
+	SYS_PROFIL                 = 44  // { int profil(caddr_t examples, size_t size, \
 	SYS_KTRACE                 = 45  // { int ktrace(const char *fname, int ops, \
 	SYS_GETGID                 = 47  // { gid_t getgid(void); }
 	SYS_GETLOGIN               = 49  // { int getlogin(char *namebuf, u_int \
