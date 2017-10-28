@@ -68,7 +68,7 @@ func runServers(rabbitMQ bool) {
 	serverAMQP := netamqp.NewServer()
 	serverAMQP.Serve("amqp://guest:guest@localhost:5672/")
 
-	serverHTTP := nethttp.NewServer(nil)
+	serverHTTP := nethttp.NewServer()
 	serverGRPC := netgrpc.NewServer(nil)
 
 	if rabbitMQ {

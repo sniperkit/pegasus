@@ -3,38 +3,27 @@ package nethttp
 import (
 	"github.com/cpapidas/pegasus/peg"
 
-	"github.com/gorilla/mux"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 )
 
-// Router interface for mux.Router
-type Router interface {
-	HandleFunc(path string, f func(http.ResponseWriter, *http.Request)) *mux.Route
-}
-
 // ListenAndServe start the server
 var ListenAndServe = http.ListenAndServe
+
+// HandleFunction handle the http request
+var HandleFunction = http.HandleFunc
 
 // Server implements the peg.Server
 // Server struct is responsible for http server. It manages connections and configuration might be needed in order to
 // ensure that the http server works properly
 type Server struct {
-	// Router is responsible for handler and middleware
-	Router Router
 }
 
-// NewServer is a constructor of Server struct. It initializes and returns a Server object. It gets a *mux.Router as
-// parameter, if the router parameter is nil it will generate a new router and assign it to the object.
-var NewServer = func(router Router) peg.Server {
-
-	if router == nil {
-		router = mux.NewRouter()
-	}
-
-	return &Server{Router: router}
+// NewServer is a constructor of Server struct. It initializes and returns a Server object.
+var NewServer = func() peg.Server {
+	return &Server{}
 }
 
 // SetConf gets a path as parameter and returns an array. It is used for Server.Listen.
@@ -44,13 +33,13 @@ func SetConf(path string, method Method) []string {
 
 // Serve function starts the server for a specific part and port.
 func (s Server) Serve(path string) {
-	go func() { ListenAndServe(path, s.Router.(*mux.Router)) }()
+	go func() { ListenAndServe(path, nil) }()
 }
 
 // Listen function creates a handler for a specific endpoint. It gets the path string unique key, the handler
 // which is a function and the middleware which also is a function.
-func (s Server) Listen(paths []string, handler peg.Handler, middleware peg.Middleware) {
-	s.Router.HandleFunc(paths[0], func(w http.ResponseWriter, r *http.Request) {
+func (s Server) Listen(conf []string, handler peg.Handler, middleware peg.Middleware) {
+	HandleFunction(conf[0], func(w http.ResponseWriter, r *http.Request) {
 		options := s.setRequestOptions(r)
 
 		body, err := ReadAll(r.Body)
@@ -65,8 +54,7 @@ func (s Server) Listen(paths []string, handler peg.Handler, middleware peg.Middl
 		s.callHandler(handler, middleware, channel)
 
 		s.response(channel, w)
-
-	}).Methods(paths[1])
+	})
 }
 
 // setRequestOptions sets and return a peg.Option object.

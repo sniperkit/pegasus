@@ -36,11 +36,11 @@ func Server() {
 
 	// Create the servers objects.
 	grpcServer := netgrpc.NewServer(nil)
-	httpServer := nethttp.NewServer(nil)
+	httpServer := nethttp.NewServer()
 
 	// Create the listeners
-	grpcServer.Listen(netgrpc.SetConf("/sample"), handler, nil)
-	httpServer.Listen(nethttp.SetConf("/sample", nethttp.Put), handler, nil)
+	grpcServer.Listen(netgrpc.SetConf("/sample/put"), handler, nil)
+	httpServer.Listen(nethttp.SetConf("/sample/put", nethttp.Put), handler, nil)
 
 	// We have to keep the main goroutine up so we have to create something like while(true) but more elegant
 	stop := make(chan bool)

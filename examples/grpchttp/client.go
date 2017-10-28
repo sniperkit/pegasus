@@ -18,15 +18,15 @@ func Client() {
 	send := peg.BuildPayload([]byte("hello "), options.Marshal())
 
 	// Send the http call and print the result
-	httpResponse, err := nethttp.NewClient("http://localhost:9092/").
-		Send(nethttp.SetConf("sample", nethttp.Put), send)
+	httpResponse, err := nethttp.NewClient("http://localhost:9092").
+		Send(nethttp.SetConf("/sample/put", nethttp.Put), send)
 	if err != nil {
 		panic(err)
 	}
 
 	// Send the grpc call and print the result
 	grpcResponse, err := netgrpc.NewClient("localhost:9091").
-		Send(netgrpc.SetConf("/sample"), send)
+		Send(netgrpc.SetConf("/sample/put"), send)
 
 	if err != nil {
 		panic(err)

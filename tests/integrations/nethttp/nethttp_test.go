@@ -113,12 +113,12 @@ func TestNethttp_integration(t *testing.T) {
 		handler(channel)
 	}
 
-	server := nethttp.NewServer(nil)
+	server := nethttp.NewServer()
 
-	server.Listen(nethttp.SetConf("/http", nethttp.Get), handlerGet, nil)
-	server.Listen(nethttp.SetConf("/http", nethttp.Post), handlerPost, nil)
-	server.Listen(nethttp.SetConf("/http", nethttp.Put), handlerPut, nil)
-	server.Listen(nethttp.SetConf("/http", nethttp.Delete), handlerDelete, nil)
+	server.Listen(nethttp.SetConf("/http/get", nethttp.Get), handlerGet, nil)
+	server.Listen(nethttp.SetConf("/http/post", nethttp.Post), handlerPost, nil)
+	server.Listen(nethttp.SetConf("/http/put", nethttp.Put), handlerPut, nil)
+	server.Listen(nethttp.SetConf("/http/delete", nethttp.Delete), handlerDelete, nil)
 
 	server.Listen(nethttp.SetConf("/http/middleware", nethttp.Get), handlerGet, middleware)
 
@@ -143,7 +143,7 @@ func TestNethttp_integration(t *testing.T) {
 
 	// Send the payload
 	response, err := nethttp.NewClient("http://localhost:7000/").
-		Send(nethttp.SetConf("http?foo=bar", nethttp.Get), payload)
+		Send(nethttp.SetConf("http/get?foo=bar", nethttp.Get), payload)
 
 	replyOptions := peg.NewOptions().Unmarshal(response.Options)
 
@@ -174,7 +174,7 @@ func TestNethttp_integration(t *testing.T) {
 
 	// Send the payload
 	response, err = nethttp.NewClient("http://localhost:7000/").
-		Send(nethttp.SetConf("http?name=christos", nethttp.Post), payload)
+		Send(nethttp.SetConf("http/post?name=christos", nethttp.Post), payload)
 
 	replyOptions = peg.NewOptions().Unmarshal(response.Options)
 
@@ -203,7 +203,7 @@ func TestNethttp_integration(t *testing.T) {
 
 	// Send the payload
 	response, err = nethttp.NewClient("http://localhost:7000/").
-		Send(nethttp.SetConf("http?name=christos", nethttp.Put), payload)
+		Send(nethttp.SetConf("http/put?name=christos", nethttp.Put), payload)
 
 	replyOptions = peg.NewOptions().Unmarshal(response.Options)
 
@@ -232,7 +232,7 @@ func TestNethttp_integration(t *testing.T) {
 
 	// Send the payload
 	response, err = nethttp.NewClient("http://localhost:7000/").
-		Send(nethttp.SetConf("http?name=christos", nethttp.Delete), payload)
+		Send(nethttp.SetConf("http/delete?name=christos", nethttp.Delete), payload)
 
 	replyOptions = peg.NewOptions().Unmarshal(response.Options)
 

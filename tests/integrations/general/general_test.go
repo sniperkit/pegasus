@@ -60,7 +60,7 @@ func TestGeneral_allProtocols(t *testing.T) {
 	netamqp.RetriesTimes = 1
 	netamqp.Sleep = 0
 
-	serverHTTP := nethttp.NewServer(nil)
+	serverHTTP := nethttp.NewServer()
 	serverGRPC := netgrpc.NewServer(nil)
 	serverAMQP = netamqp.NewServer()
 

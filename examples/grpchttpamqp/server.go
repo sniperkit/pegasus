@@ -46,16 +46,16 @@ func Server() {
 
 	// Create the servers objects.
 	grpcServer := netgrpc.NewServer(nil)
-	httpServer := nethttp.NewServer(nil)
+	httpServer := nethttp.NewServer()
 	amqpServer := netamqp.NewServer()
 
 	// We have to start the amqp server before listeners in order to get the connection object
 	amqpServer.Serve(rabbitMQAddress)
 
 	// Create the listeners
-	grpcServer.Listen(netgrpc.SetConf("/sample"), handler, nil)
-	httpServer.Listen(nethttp.SetConf("/sample", nethttp.Put), handler, nil)
-	amqpServer.Listen(netamqp.SetConf("/sample"), handler, nil)
+	grpcServer.Listen(netgrpc.SetConf("/sample/put"), handler, nil)
+	httpServer.Listen(nethttp.SetConf("/sample/put", nethttp.Put), handler, nil)
+	amqpServer.Listen(netamqp.SetConf("/sample/put"), handler, nil)
 
 	// We have to keep the main goroutine up so we have to create something like while(true) but more elegant
 	stop := make(chan bool)

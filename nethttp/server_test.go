@@ -7,7 +7,6 @@ import (
 	"errors"
 	"github.com/cpapidas/pegasus/peg"
 	"github.com/cpapidas/pegasus/tests/mocks/mhttp"
-	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
 	"io"
 	"io/ioutil"
@@ -17,40 +16,45 @@ import (
 	"testing"
 )
 
+func SetDefaults() {
+	nethttp.HandleFunction = http.HandleFunc
+}
+
 func TestNewServer(t *testing.T) {
+	SetDefaults()
 	// Should not be nil
-	server := nethttp.NewServer(nil)
+	server := nethttp.NewServer()
 	assert.NotNil(t, server, "Should not be nil")
 
 	// Should be type of *Server
-	server = nethttp.NewServer(nil)
+	server = nethttp.NewServer()
 	assert.Equal(t, "<*nethttp.Server Value>", reflect.ValueOf(server).String(),
 		"Should be type of <*nethttp.Server Value>")
 }
 
 func TestSetConf(t *testing.T) {
+	SetDefaults()
 	// Should return an array of given strings
 	assert.Equal(t, []string{"foo", "bar"}, nethttp.SetConf("foo", "bar"),
 		`Should be equals to []string{"foo", "bar"}`)
 }
 
 func TestServer_Serve(t *testing.T) {
+	SetDefaults()
 	var server peg.Server
 	nethttp.ListenAndServe = func(addr string, handler http.Handler) error {
 		return nil
 	}
-	server = nethttp.NewServer(nil)
+	server = nethttp.NewServer()
 	assert.NotPanics(t, func() { server.Serve("Foo") }, "Should not panics")
 }
 
 func TestServer_Listen(t *testing.T) {
+	SetDefaults()
 	callHandler := false
 
-	// Create a mock router
-	router := &mhttp.MockRouter{}
-
 	// Initialize the handler function
-	router.HandleFuncMock = func(path string, f func(http.ResponseWriter, *http.Request)) *mux.Route {
+	nethttp.HandleFunction = func(path string, f func(http.ResponseWriter, *http.Request)) {
 
 		w := &mhttp.MockResponseWriter{
 			Headers: make(map[string][]string),
@@ -79,11 +83,9 @@ func TestServer_Listen(t *testing.T) {
 			"Should be empty")
 		assert.Equal(t, "content reply", string(w.Body),
 			"Should be content reply")
-
-		return &mux.Route{}
 	}
 
-	server := nethttp.NewServer(router)
+	server := nethttp.NewServer()
 
 	// Initialize the request handler
 	var handler = func(channel *peg.Channel) {
@@ -120,13 +122,12 @@ func TestServer_Listen(t *testing.T) {
 }
 
 func TestServer_Listen_middleware(t *testing.T) {
+	SetDefaults()
 	callHandler := false
 	callMiddleware := false
 
-	router := &mhttp.MockRouter{}
-
 	// Initialize the handler function
-	router.HandleFuncMock = func(path string, f func(http.ResponseWriter, *http.Request)) *mux.Route {
+	nethttp.HandleFunction = func(path string, f func(http.ResponseWriter, *http.Request)) {
 
 		w := &mhttp.MockResponseWriter{
 			Headers: make(map[string][]string),
@@ -160,12 +161,10 @@ func TestServer_Listen_middleware(t *testing.T) {
 		assert.Equal(t, "content reply", string(w.Body),
 			"Should be content reply")
 		assert.Equal(t, 201, w.Status, "Should be equals to 201")
-
-		return &mux.Route{}
 	}
 
 	// Create a server object with mocked date
-	server := nethttp.NewServer(router)
+	server := nethttp.NewServer()
 
 	// Initialize the handler
 	var handler = func(channel *peg.Channel) {
@@ -235,18 +234,17 @@ func TestServer_Listen_middleware(t *testing.T) {
 }
 
 func TestServer_Listen_readAllFailure(t *testing.T) {
+	SetDefaults()
 	var server peg.Server
-	router := &mhttp.MockRouter{}
-	router.HandleFuncMock = func(path string, f func(http.ResponseWriter, *http.Request)) *mux.Route {
+	nethttp.HandleFunction = func(path string, f func(http.ResponseWriter, *http.Request)) {
 		w := &mhttp.MockResponseWriter{
 			Headers: make(map[string][]string),
 		}
 		r, _ := http.NewRequest("POST", "anything", bytes.NewReader([]byte("content")))
 		f(w, r)
 
-		return &mux.Route{}
 	}
-	server = nethttp.NewServer(router)
+	server = nethttp.NewServer()
 	nethttp.ReadAll = func(r io.Reader) ([]byte, error) {
 		return nil, errors.New("error")
 	}
