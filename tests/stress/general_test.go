@@ -29,12 +29,12 @@ func TestMain(m *testing.M) {
 }
 
 func BenchmarkHTTP(b *testing.B) {
-	client := nethttp.NewClient(nil)
+	client := nethttp.NewClient("localhost::7001/")
 	for n := 0; n < b.N; n++ {
 		options := peg.NewOptions()
 		options.SetHeader("Custom", "header-value")
 		payload := peg.BuildPayload([]byte("foo"), options.Marshal())
-		client.Send(nethttp.SetConf(":7001/hello?name=christos", nethttp.Put), payload)
+		client.Send(nethttp.SetConf("hello?name=christos", nethttp.Put), payload)
 	}
 }
 

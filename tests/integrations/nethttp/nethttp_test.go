@@ -142,8 +142,8 @@ func TestNethttp_integration(t *testing.T) {
 	payload := peg.BuildPayload(nil, options.Marshal())
 
 	// Send the payload
-	response, err := nethttp.NewClient(nil).
-		Send(nethttp.SetConf("http://localhost:7000/http?foo=bar", nethttp.Get), payload)
+	response, err := nethttp.NewClient("http://localhost:7000/").
+		Send(nethttp.SetConf("http?foo=bar", nethttp.Get), payload)
 
 	replyOptions := peg.NewOptions().Unmarshal(response.Options)
 
@@ -173,8 +173,8 @@ func TestNethttp_integration(t *testing.T) {
 	payload = peg.BuildPayload([]byte("foo"), options.Marshal())
 
 	// Send the payload
-	response, err = nethttp.NewClient(nil).
-		Send(nethttp.SetConf("http://localhost:7000/http?name=christos", nethttp.Post), payload)
+	response, err = nethttp.NewClient("http://localhost:7000/").
+		Send(nethttp.SetConf("http?name=christos", nethttp.Post), payload)
 
 	replyOptions = peg.NewOptions().Unmarshal(response.Options)
 
@@ -202,8 +202,8 @@ func TestNethttp_integration(t *testing.T) {
 	payload = peg.BuildPayload([]byte("foo"), options.Marshal())
 
 	// Send the payload
-	response, err = nethttp.NewClient(nil).
-		Send(nethttp.SetConf("http://localhost:7000/http?name=christos", nethttp.Put), payload)
+	response, err = nethttp.NewClient("http://localhost:7000/").
+		Send(nethttp.SetConf("http?name=christos", nethttp.Put), payload)
 
 	replyOptions = peg.NewOptions().Unmarshal(response.Options)
 
@@ -231,8 +231,8 @@ func TestNethttp_integration(t *testing.T) {
 	payload = peg.BuildPayload([]byte("foo"), options.Marshal())
 
 	// Send the payload
-	response, err = nethttp.NewClient(nil).
-		Send(nethttp.SetConf("http://localhost:7000/http?name=christos", nethttp.Delete), payload)
+	response, err = nethttp.NewClient("http://localhost:7000/").
+		Send(nethttp.SetConf("http?name=christos", nethttp.Delete), payload)
 
 	replyOptions = peg.NewOptions().Unmarshal(response.Options)
 
@@ -260,8 +260,8 @@ func TestNethttp_integration(t *testing.T) {
 	payload = peg.BuildPayload(nil, options.Marshal())
 
 	// Send the payload
-	response, err = nethttp.NewClient(nil).
-		Send(nethttp.SetConf("http://localhost:7000/http/middleware?foo=bar", nethttp.Get), payload)
+	response, err = nethttp.NewClient("http://localhost:7000/").
+		Send(nethttp.SetConf("http/middleware?foo=bar", nethttp.Get), payload)
 
 	// Should not throw an error", func() {
 	assert.Nil(t, err, "Should be nil")

@@ -81,8 +81,8 @@ func TestGeneral_allProtocols(t *testing.T) {
 	payload := peg.BuildPayload([]byte("foo"), options.Marshal())
 
 	// Send the payload
-	response, err := nethttp.NewClient(nil).
-		Send(nethttp.SetConf("http://localhost:7001/hello?name=christos", nethttp.Put), payload)
+	response, err := nethttp.NewClient("http://localhost:7001/").
+		Send(nethttp.SetConf("hello?name=christos", nethttp.Put), payload)
 
 	replyOptions := peg.NewOptions().Unmarshal(response.Options)
 

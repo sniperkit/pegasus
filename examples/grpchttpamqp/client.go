@@ -21,8 +21,8 @@ func Client() {
 	send := peg.BuildPayload([]byte("hello "), options.Marshal())
 
 	// Send the http call and print the result
-	httpResponse, err := nethttp.NewClient(nil).
-		Send(nethttp.SetConf("http://localhost:9092/sample", nethttp.Put), send)
+	httpResponse, err := nethttp.NewClient("http://localhost:9092/").
+		Send(nethttp.SetConf("sample", nethttp.Put), send)
 	if err != nil {
 		panic(err)
 	}

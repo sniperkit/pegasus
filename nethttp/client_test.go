@@ -16,7 +16,7 @@ import (
 
 func TestNewClient(t *testing.T) {
 
-	client := nethttp.NewClient(nil)
+	client := nethttp.NewClient("http://localhost")
 
 	// Should not be nil
 	assert.NotNil(t, client, "Should not return a nil client object")
@@ -70,7 +70,7 @@ func TestClient_Send(t *testing.T) {
 	requestOptions.SetHeader("GR-Sample", "sample")
 
 	// Pass the mock object and create a client
-	client := nethttp.NewClient(mockHTTPClient)
+	client := nethttp.NewClient("", mockHTTPClient)
 
 	payload := peg.BuildPayload([]byte("content"), requestOptions.Marshal())
 
@@ -140,7 +140,7 @@ func TestClient_Send_getRequest(t *testing.T) {
 
 	requestOptions.SetParam("foo", "bar")
 
-	client := nethttp.NewClient(mockHTTPClient)
+	client := nethttp.NewClient("", mockHTTPClient)
 
 	payload := peg.BuildPayload([]byte("content"), requestOptions.Marshal())
 
@@ -170,7 +170,7 @@ func TestClient_Send_requestFailure(t *testing.T) {
 		return nil, errors.New("error")
 	}
 
-	client := nethttp.NewClient(nil)
+	client := nethttp.NewClient("http://localhost")
 
 	payload, err := client.Send(nethttp.SetConf("what", "ever"), peg.Payload{})
 
@@ -194,7 +194,7 @@ func TestClient_Send_doFailure(t *testing.T) {
 		return nil, errors.New("error")
 	}
 
-	client := nethttp.NewClient(mockHTTPClient)
+	client := nethttp.NewClient("", mockHTTPClient)
 
 	reply, err := client.Send(nethttp.SetConf("/whatever", "POST"), peg.Payload{})
 
@@ -225,7 +225,7 @@ func TestClient_Send_readAllFailure(t *testing.T) {
 		return response, nil
 	}
 
-	client := nethttp.NewClient(mockHTTPClient)
+	client := nethttp.NewClient("", mockHTTPClient)
 
 	reply, err := client.Send(nethttp.SetConf("/whatever", "POST"), peg.Payload{})
 
@@ -242,7 +242,7 @@ func TestClient_Send_readAllFailure(t *testing.T) {
 }
 
 func TestClient_Close(t *testing.T) {
-	client := nethttp.NewClient(nil)
+	client := nethttp.NewClient("http://localhost")
 	// Should an error, because this function is not implemented for nethttp provider
 	assert.NotNil(t, client.Close(), "Should not be nil")
 }

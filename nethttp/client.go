@@ -14,6 +14,7 @@ import (
 // to other servers.
 type Client struct {
 	httpClient IHTTPClient
+	address    string
 }
 
 // IHTTPClient interface describe the http.Client struct
@@ -22,13 +23,20 @@ type IHTTPClient interface {
 }
 
 // NewClient generates and returns a Client object.
-var NewClient = func(httpClient IHTTPClient) peg.Client {
+var NewClient = func(address string, httpClient ...IHTTPClient, ) peg.Client {
 
-	if httpClient == nil {
-		httpClient = &http.Client{}
+	var c IHTTPClient
+
+	if len(httpClient) != 0 {
+		c = httpClient[0]
+	} else {
+		c = &http.Client{}
 	}
 
-	return &Client{httpClient: httpClient}
+	return &Client{
+		httpClient: c,
+		address:    address,
+	}
 }
 
 // Send function sends a payload to other servers. It gets the string path which is the unique id and the payload
@@ -38,7 +46,7 @@ func (c Client) Send(conf []string, payload peg.Payload) (*peg.Payload, error) {
 	httpOptions := peg.BuildOptions(payload.Options)
 
 	// Create a request
-	request, err := c.createRequest(conf[0], conf[1], payload.Body)
+	request, err := c.createRequest(c.address+conf[0], conf[1], payload.Body)
 	if err != nil {
 		return nil, err
 	}
