@@ -33,7 +33,7 @@ var (
 		`use comparison instead of sort keys when sorting.  Must be "test", "gold" or "both"`)
 	cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
 	exclude    = flag.String("exclude", "", "exclude errors that contain any of the characters")
-	limit      = flag.Int("limit", 5000000, "maximum number of examples to generate for one run")
+	limit      = flag.Int("limit", 5000000, "maximum number of samples to generate for one run")
 )
 
 func failOnError(err error) {

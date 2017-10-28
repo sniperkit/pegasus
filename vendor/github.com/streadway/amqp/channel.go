@@ -1008,7 +1008,7 @@ the library to generate a unique identity.  The consumer identity will be
 included in every Delivery in the ConsumerTag field
 
 When autoAck (also known as noAck) is true, the server will acknowledge
-deliveries to this consumer prior to writing the delivery to the peg.  When
+deliveries to this consumer prior to writing the delivery to the network.  When
 autoAck is true, the consumer should not call Delivery.Ack. Automatically
 acknowledging deliveries means that some deliveries may get lost if the
 consumer is unable to process them after the server delivers them.

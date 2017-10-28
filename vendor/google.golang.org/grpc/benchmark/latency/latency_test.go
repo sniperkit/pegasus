@@ -131,7 +131,7 @@ func TestSync(t *testing.T) {
 	sleep = func(d time.Duration) { tn = tn.Add(d) }
 
 	// Simulate a 20ms latency network, then run sync across that and expect to
-	// measure 20ms latency, or 10ms additional delay for a 30ms peg.
+	// measure 20ms latency, or 10ms additional delay for a 30ms network.
 	slowConn, err := (&Network{Kbps: 0, Latency: 20 * time.Millisecond, MTU: 5}).Conn(bufConn{&bytes.Buffer{}})
 	if err != nil {
 		t.Fatalf("Unexpected error creating connection: %v", err)

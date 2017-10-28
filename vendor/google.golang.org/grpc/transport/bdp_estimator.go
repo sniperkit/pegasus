@@ -63,7 +63,7 @@ type bdpEstimator struct {
 	isSent bool
 	// Callback to update the window sizes.
 	updateFlowControl func(n uint32)
-	// sampleCount is the number of examples taken so far.
+	// sampleCount is the number of samples taken so far.
 	sampleCount uint64
 	// round trip time (seconds)
 	rtt float64
@@ -112,7 +112,7 @@ func (b *bdpEstimator) calculate(d [8]byte) {
 	b.mu.Lock()
 	rttSample := time.Since(b.sentAt).Seconds()
 	if b.sampleCount < 10 {
-		// Bootstrap rtt with an average of first 10 rtt examples.
+		// Bootstrap rtt with an average of first 10 rtt samples.
 		b.rtt += (rttSample - b.rtt) / float64(b.sampleCount)
 	} else {
 		// Heed to the recent past more.

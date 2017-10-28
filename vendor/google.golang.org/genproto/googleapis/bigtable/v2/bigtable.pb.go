@@ -384,7 +384,7 @@ type SampleRowKeysResponse struct {
 	RowKey []byte `protobuf:"bytes,1,opt,name=row_key,json=rowKey,proto3" json:"row_key,omitempty"`
 	// Approximate total storage space used by all rows in the table which precede
 	// `row_key`. Buffering the contents of all rows between two subsequent
-	// examples would require space roughly equal to the difference in their
+	// samples would require space roughly equal to the difference in their
 	// `offset_bytes` fields.
 	OffsetBytes int64 `protobuf:"varint,2,opt,name=offset_bytes,json=offsetBytes" json:"offset_bytes,omitempty"`
 }

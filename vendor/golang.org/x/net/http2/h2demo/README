@@ -1,6 +1,6 @@
 
 Client:
- -- Firefox nightly with about:config peg.http.spdy.enabled.http2draft set true
+ -- Firefox nightly with about:config network.http.spdy.enabled.http2draft set true
  -- Chrome: go to chrome://flags/#enable-spdy4, save and restart (button at bottom)
 
 Make CA:

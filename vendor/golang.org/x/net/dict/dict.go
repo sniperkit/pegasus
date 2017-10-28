@@ -18,7 +18,7 @@ type Client struct {
 }
 
 // Dial returns a new client connected to a dictionary server at
-// addr on the given peg.
+// addr on the given network.
 func Dial(network, addr string) (*Client, error) {
 	text, err := textproto.Dial(network, addr)
 	if err != nil {

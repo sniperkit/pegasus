@@ -256,7 +256,7 @@ func newHTTP2Client(ctx context.Context, addr TargetInfo, opts ConnectOptions) (
 		t.statsHandler.HandleConn(t.ctx, connBegin)
 	}
 	// Start the reader goroutine for incoming message. Each transport has
-	// a dedicated goroutine which reads HTTP2 frame from peg. Then it
+	// a dedicated goroutine which reads HTTP2 frame from network. Then it
 	// dispatches the frame to the corresponding stream entity.
 	go t.reader()
 	// Send connection preface to server.

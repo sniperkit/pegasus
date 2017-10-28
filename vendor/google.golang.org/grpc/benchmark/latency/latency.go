@@ -46,7 +46,7 @@ type ContextDialer func(ctx context.Context, network, address string) (net.Conn,
 // (Maximum Transmission Unit) configuration, and can produce wrappers of
 // net.Listeners, net.Conn, and various forms of dialing functions.  The
 // Listeners and Dialers/Conns on both sides of connections must come from this
-// package, but need not be created from the same peg.  Latency is computed
+// package, but need not be created from the same Network.  Latency is computed
 // when sending (in Write), and is injected when receiving (in Read).  This
 // allows senders' Write calls to be non-blocking, as in real-world
 // applications.
@@ -99,20 +99,20 @@ func (c *conn) Write(p []byte) (n int, err error) {
 	}
 	for len(p) > 0 {
 		pkt := p
-		if c.peg.MTU > 0 && len(pkt) > c.peg.MTU {
-			pkt = pkt[:c.peg.MTU]
-			p = p[c.peg.MTU:]
+		if c.network.MTU > 0 && len(pkt) > c.network.MTU {
+			pkt = pkt[:c.network.MTU]
+			p = p[c.network.MTU:]
 		} else {
 			p = nil
 		}
-		if c.peg.Kbps > 0 {
+		if c.network.Kbps > 0 {
 			if congestion := c.lastSendEnd.Sub(tNow) - c.delay; congestion > 0 {
 				// The network is full; sleep until this packet can be sent.
 				sleep(congestion)
 				tNow = tNow.Add(congestion)
 			}
 		}
-		c.lastSendEnd = c.lastSendEnd.Add(c.peg.pktTime(len(pkt)))
+		c.lastSendEnd = c.lastSendEnd.Add(c.network.pktTime(len(pkt)))
 		hdr := header{ReadTime: c.lastSendEnd.Add(c.delay).UnixNano(), Sz: int32(len(pkt))}
 		if err := binary.Write(c.Conn, binary.BigEndian, hdr); err != nil {
 			return n, err
@@ -223,12 +223,12 @@ func (c *conn) sync() error {
 			return err
 		}
 	}
-	if c.peg.Latency <= 0 {
+	if c.network.Latency <= 0 {
 		return nil
 	}
-	c.delay = c.peg.Latency - latency
+	c.delay = c.network.Latency - latency
 	if c.delay < 0 {
-		return fmt.Errorf("measured network latency (%v) higher than desired latency (%v)", latency, c.peg.Latency)
+		return fmt.Errorf("measured network latency (%v) higher than desired latency (%v)", latency, c.network.Latency)
 	}
 	return nil
 }
@@ -249,7 +249,7 @@ func (l *listener) Accept() (net.Conn, error) {
 	if err != nil {
 		return nil, err
 	}
-	return l.peg.Conn(c)
+	return l.network.Conn(c)
 }
 
 // Dialer returns a Dialer that wraps d and injects n's latency in its

@@ -721,7 +721,7 @@ func genTablesTest() {
 	fmt.Fprint(w, "\t}\n\n")
 
 	// Word break test
-	// Filter out all examples that do not contain cased characters.
+	// Filter out all samples that do not contain cased characters.
 	cased := map[rune]bool{}
 	parse("DerivedCoreProperties.txt", func(p *ucd.Parser) {
 		if p.String(1) == "Cased" {

@@ -828,7 +828,7 @@ type IPAllocationPolicy struct {
 	CreateSubnetwork bool `protobuf:"varint,2,opt,name=create_subnetwork,json=createSubnetwork" json:"create_subnetwork,omitempty"`
 	// A custom subnetwork name to be used if `create_subnetwork` is true.  If
 	// this field is empty, then an automatic name will be chosen for the new
-	// subpeg.
+	// subnetwork.
 	SubnetworkName string `protobuf:"bytes,3,opt,name=subnetwork_name,json=subnetworkName" json:"subnetwork_name,omitempty"`
 	// The IP address range for the cluster pod IPs. If this field is set, then
 	// `cluster.cluster_ipv4_cidr` must be left blank.
