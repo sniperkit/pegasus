@@ -7,6 +7,7 @@ import (
 	"errors"
 	"net/http"
 	"strings"
+	"strconv"
 )
 
 // Client interface describes the protocols client model. Client keeps the connections open for each protocol.
@@ -115,4 +116,5 @@ func (Client) setResponseHeaders(response *http.Response, options *peg.Options) 
 			options.SetHeader(key, strings.Join(value, ","))
 		}
 	}
+	options.SetHeader("Status", strconv.Itoa(response.StatusCode))
 }

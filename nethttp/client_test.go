@@ -59,6 +59,7 @@ func TestClient_Send(t *testing.T) {
 		response.Header["GR-Sample-Reply"] = []string{"sample reply"}
 
 		response.Body = ioutil.NopCloser(bytes.NewReader([]byte("content reply")))
+		response.StatusCode = 200
 
 		return response, nil
 	}
@@ -91,6 +92,7 @@ func TestClient_Send(t *testing.T) {
 		"Should be equals to sample reply")
 	assert.Empty(t, replyOptions.GetHeader("MQ-Sample-Reply"), "Should be empty")
 	assert.Empty(t, replyOptions.GetHeader("GR-Sample-Reply"), "Should be empty")
+	assert.Equal(t, "200", replyOptions.GetHeader("Status"))
 	assert.Equal(t, string(reply.Body), "content reply", "Should be equals to content reply")
 }
 
